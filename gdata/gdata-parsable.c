@@ -36,6 +36,7 @@
 #include <glib/gi18n-lib.h>
 #include <string.h>
 #include <libxml/parser.h>
+#include <json-glib/json-glib.h>
 
 #include "gdata-parsable.h"
 #include "gdata-private.h"
@@ -51,6 +52,7 @@ static void gdata_parsable_get_property (GObject *object, guint property_id, GVa
 static void gdata_parsable_set_property (GObject *object, guint property_id, const GValue *value, GParamSpec *pspec);
 static void gdata_parsable_finalize (GObject *object);
 static gboolean real_parse_xml (GDataParsable *parsable, xmlDoc *doc, xmlNode *node, gpointer user_data, GError **error);
+static gboolean real_parse_json (GDataParsable *parsable, JsonReader *reader, gpointer user_data, GError **error);
 
 struct _GDataParsablePrivate {
 	GString *extra_xml;
@@ -75,6 +77,7 @@ gdata_parsable_class_init (GDataParsableClass *klass)
 	gobject_class->set_property = gdata_parsable_set_property;
 	gobject_class->finalize = gdata_parsable_finalize;
 	klass->parse_xml = real_parse_xml;
+	klass->parse_json = real_parse_json;
 
 	/**
 	 * GDataParsable:constructed-from-xml:
@@ -175,6 +178,21 @@ real_parse_xml (GDataParsable *parsable, xmlDoc *doc, xmlNode *node, gpointer us
 	}
 	xmlFree (namespaces);
 
+	return TRUE;
+}
+
+static gboolean
+real_parse_json (GDataParsable *parsable, JsonReader *reader, gpointer user_data, GError **error)
+{
+	const gchar *name;
+	
+	/* Unhandled JSON */
+	/* FIXME Have to find a way how to extract any value in string format, now we get just name */
+	name = json_reader_get_member_name (reader);
+	
+	g_string_append (parsable->priv->extra_xml, name);
+	g_debug("Unhandled JSON in %s: %s", G_OBJECT_TYPE_NAME (parsable), name);
+	
 	return TRUE;
 }
 
@@ -313,6 +331,81 @@ _gdata_parsable_new_from_xml_node (GType parsable_type, xmlDoc *doc, xmlNode *no
 	/* Call the post-parse function */
 	if (klass->post_parse_xml != NULL &&
 	    klass->post_parse_xml (parsable, user_data, error) == FALSE) {
+		g_object_unref (parsable);
+		return NULL;
+	}
+
+	return parsable;
+}
+
+GDataParsable *
+_gdata_parsable_new_from_json (GType parsable_type, const gchar *json, gint length, gpointer user_data, GError **error)
+{
+	JsonParser *parser;
+	JsonReader *reader;
+	GDataParsable *parsable;
+
+	g_return_val_if_fail (g_type_is_a (parsable_type, GDATA_TYPE_PARSABLE), NULL);
+	g_return_val_if_fail (json != NULL && *json != '\0', NULL);
+	g_return_val_if_fail (length >= -1, NULL);
+	g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+
+	if (length == -1)
+		length = strlen (json);
+
+	parser = json_parser_new ();
+	if (!json_parser_load_from_data (parser, json, length, error))
+		return NULL;
+	/* FIXME do we need explictly check if json has returned error correctly? */
+	
+	reader = json_reader_new (json_parser_get_root (parser));
+	parsable = _gdata_parsable_new_from_json_node (parsable_type, reader, user_data, error);
+	
+	g_object_unref (reader);
+	g_object_unref (parser);
+	
+	return parsable;
+}
+
+GDataParsable *
+_gdata_parsable_new_from_json_node (GType parsable_type, JsonReader *reader, gpointer user_data, GError **error)
+{
+	GDataParsable *parsable;
+	GDataParsableClass *klass;
+	guint i;
+	
+	g_return_val_if_fail (g_type_is_a (parsable_type, GDATA_TYPE_PARSABLE), NULL);
+	g_return_val_if_fail (reader != NULL, NULL);
+	g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+
+	/* indicator property which allows distinguish between locally created and server based objects */
+	/* as it is used for non-xml tasks, and adding another one for json would be dublication */
+	parsable = g_object_new (parsable_type, "constructed-from-xml", TRUE, NULL);
+
+	klass = GDATA_PARSABLE_GET_CLASS (parsable);
+	if (klass->parse_json == NULL) {
+		g_object_unref (parsable);
+		return NULL;
+	}
+
+	g_assert (klass->element_name != NULL);
+
+	/* Parse each child element */
+	for (i = 0; i < json_reader_count_members (reader); i++) {
+		g_return_val_if_fail (json_reader_read_element (reader, i), NULL);
+		if (klass->parse_json (parsable, reader, user_data, error) == FALSE) {
+			g_object_unref (parsable);
+			return NULL;
+		}
+		/* get out of root object */
+		/* FIXME this is much slower than proper read_member usage */
+		/* can be replaced by count_members/list_members */
+		json_reader_end_element (reader);
+	}
+
+	/* Call the post-parse function */
+	if (klass->post_parse_json != NULL &&
+	    klass->post_parse_json (parsable, user_data, error) == FALSE) {
 		g_object_unref (parsable);
 		return NULL;
 	}
