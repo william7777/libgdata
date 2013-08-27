@@ -57,7 +57,6 @@ static void get_xml (GDataParsable *parsable, GString *xml_string);
 static void get_namespaces (GDataParsable *parsable, GHashTable *namespaces);
 static gchar *get_entry_uri (const gchar *id) G_GNUC_WARN_UNUSED_RESULT;
 static gboolean parse_json (GDataParsable *parsable, JsonReader *reader, gpointer user_data, GError **error);
-static gboolean post_parse_json (GDataParsable *parsable, gpointer user_data, GError **error);
 static void get_json (GDataParsable *parsable, GString *json_string);
 
 struct _GDataEntryPrivate {
@@ -117,9 +116,8 @@ gdata_entry_class_init (GDataEntryClass *klass)
 	parsable_class->element_name = "entry";
 
 	parsable_class->parse_json = parse_json;
-	parsable_class->post_parse_json = post_parse_json;
 	parsable_class->get_json = get_json;
-	
+
 	klass->get_entry_uri = get_entry_uri;
 
 	/**
@@ -597,32 +595,19 @@ parse_json (GDataParsable *parsable, JsonReader *reader, gpointer user_data, GEr
 {
 	gboolean success;
 	GDataEntryPrivate *priv = GDATA_ENTRY (parsable)->priv;
-	
+
 	/* selfLink in JSON is the same as 'content' entry in XML */
 	if (gdata_parser_string_from_json_member (reader, "title", P_DEFAULT, &(priv->title), &success, error) == TRUE ||
 	    gdata_parser_string_from_json_member (reader, "id", P_DEFAULT, &(priv->id), &success, error) == TRUE ||
 	    gdata_parser_int64_time_from_json_member (reader, "updated", P_REQUIRED | P_NO_DUPES, &(priv->updated), &success, error) == TRUE) {
-			return success;
-		} else if (strcmp (json_reader_get_member_name (reader), "selfLink") == 0) {
-			priv->content = (gchar*) json_reader_get_string_value (reader);
-			priv->content_is_uri = TRUE;
-			return TRUE;
-		}
+		return success;
+	} else if (strcmp (json_reader_get_member_name (reader), "selfLink") == 0) {
+		priv->content = g_strdup (json_reader_get_string_value (reader));
+		priv->content_is_uri = TRUE;
+		return TRUE;
+	}
 
 	return GDATA_PARSABLE_CLASS (gdata_entry_parent_class)->parse_json (parsable, reader, user_data, error);
-}
-
-static gboolean
-post_parse_json (GDataParsable *parsable, gpointer user_data, GError **error)
-{
-	GDataEntryPrivate *priv = GDATA_ENTRY (parsable)->priv;
-
-	/* Reverse our lists of stuff */
-	priv->categories = g_list_reverse (priv->categories);
-	priv->links = g_list_reverse (priv->links);
-	priv->authors = g_list_reverse (priv->authors);
-
-	return TRUE;
 }
 
 static void
@@ -630,14 +615,16 @@ get_json (GDataParsable *parsable, GString *json_string)
 {
 	GDataEntryPrivate *priv = GDATA_ENTRY (parsable)->priv;
 
-	gdata_parser_string_append_escaped (json_string, "\"title\": \"", priv->title, "\",");
+	/* TODO: This is the wrong kind of escaping. */
+	gdata_parser_string_append_escaped (json_string, "\"title\": \"", priv->title, "\"");
 
-	if (priv->id != NULL)
-		gdata_parser_string_append_escaped (json_string, "\"id\": \"", priv->id, "\",");
+	if (priv->id != NULL) {
+		gdata_parser_string_append_escaped (json_string, ",\"id\": \"", priv->id, "\"");
+	}
 
 	if (priv->updated != -1) {
 		gchar *updated = gdata_parser_int64_to_iso8601 (priv->updated);
-		g_string_append_printf (json_string, "\"updated\": \"%s\",", updated);
+		g_string_append_printf (json_string, ",\"updated\": \"%s\"", updated);
 		g_free (updated);
 	}
 }

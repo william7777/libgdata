@@ -456,6 +456,58 @@ test_entry_get_xml (void)
 }
 
 static void
+test_entry_get_json (void)
+{
+	gint64 updated, published, updated2, published2, updated3, published3;
+	GDataEntry *entry, *entry2;
+	GDataCategory *category;
+	GDataLink *_link; /* stupid unistd.h */
+	GDataAuthor *author;
+	gchar *json, *title, *summary, *id, *etag, *content, *content_uri, *rights;
+	gboolean is_inserted;
+	GList *list;
+	GError *error = NULL;
+
+	entry = gdata_entry_new (NULL);
+
+	/* Set the properties more conventionally */
+	gdata_entry_set_title (entry, "Testing title & 'escaping'");
+	gdata_entry_set_summary (entry, NULL);
+	gdata_entry_set_content (entry, "This is some sample content testing, amongst other things, <markup> & odd characters‽");
+	gdata_entry_set_rights (entry, NULL);
+
+	/* Check the generated JSON's OK */
+	gdata_test_assert_json (entry,
+		"{"
+			"\"title\": \"Testing title & &apos;escaping&apos;\""
+		"}");
+
+	/* Check again by re-parsing the JSON to a GDataEntry. */
+	json = gdata_parsable_get_json (GDATA_PARSABLE (entry));
+	entry2 = GDATA_ENTRY (gdata_parsable_new_from_json (GDATA_TYPE_ENTRY, json, -1, &error));
+	g_assert_no_error (error);
+	g_assert (GDATA_IS_ENTRY (entry2));
+	g_clear_error (&error);
+	g_free (json);
+
+	g_assert_cmpstr (gdata_entry_get_title (entry), ==, gdata_entry_get_title (entry2));
+	g_assert_cmpstr (gdata_entry_get_id (entry), ==, gdata_entry_get_id (entry2)); /* should both be NULL */
+	g_assert_cmpstr (gdata_entry_get_content (entry), ==, gdata_entry_get_content (entry2));
+	g_assert_cmpstr (gdata_entry_get_content_uri (entry), ==, gdata_entry_get_content_uri (entry2)); /* should both be NULL */
+
+	updated = gdata_entry_get_updated (entry);
+	updated2 = gdata_entry_get_updated (entry2);
+	g_assert_cmpuint (updated, ==, updated2);
+
+	published = gdata_entry_get_published (entry);
+	published2 = gdata_entry_get_published (entry2);
+	g_assert_cmpuint (published, ==, published2);
+
+	g_object_unref (entry);
+	g_object_unref (entry2);
+}
+
+static void
 test_entry_parse_xml (void)
 {
 	GDataEntry *entry;
@@ -3994,6 +4046,7 @@ main (int argc, char *argv[])
 	g_test_add_func ("/service/locale", test_service_locale);
 
 	g_test_add_func ("/entry/get_xml", test_entry_get_xml);
+	g_test_add_func ("/entry/get_json", test_entry_get_json);
 	g_test_add_func ("/entry/parse_xml", test_entry_parse_xml);
 	g_test_add_func ("/entry/error_handling", test_entry_error_handling);
 	g_test_add_func ("/entry/escaping", test_entry_escaping);

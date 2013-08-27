@@ -184,15 +184,25 @@ real_parse_xml (GDataParsable *parsable, xmlDoc *doc, xmlNode *node, gpointer us
 static gboolean
 real_parse_json (GDataParsable *parsable, JsonReader *reader, gpointer user_data, GError **error)
 {
-	const gchar *name;
-	
-	/* Unhandled JSON */
-	/* FIXME Have to find a way how to extract any value in string format, now we get just name */
-	name = json_reader_get_member_name (reader);
-	
-	g_string_append (parsable->priv->extra_xml, name);
-	g_debug("Unhandled JSON in %s: %s", G_OBJECT_TYPE_NAME (parsable), name);
-	
+	gchar *json;
+	JsonNode *root;
+	JsonGenerator *generator;
+
+	/* Unhandled JSON. Save it to ->extra_xml so that it's not lost if we
+	 * re-upload this Parsable to the server. */
+	generator = json_generator_new ();
+	g_object_get (G_OBJECT (reader), "root", &root, NULL);
+	json_generator_set_root (generator, root);
+	g_object_unref (root);
+
+	json = json_generator_to_data (generator, NULL);
+	g_string_append (parsable->priv->extra_xml, json);
+
+	g_debug ("Unhandled JSON in %s: %s", G_OBJECT_TYPE_NAME (parsable), json);
+
+	g_free (json);
+	g_object_unref (generator);
+
 	return TRUE;
 }
 
@@ -338,6 +348,39 @@ _gdata_parsable_new_from_xml_node (GType parsable_type, xmlDoc *doc, xmlNode *no
 	return parsable;
 }
 
+/**
+ * gdata_parsable_new_from_json:
+ * @parsable_type: the type of the class represented by the JSON
+ * @json: the JSON for just the parsable object
+ * @length: the length of @json, or -1
+ * @error: a #GError, or %NULL
+ *
+ * Creates a new #GDataParsable subclass (of the given @parsable_type) from the given @json.
+ *
+ * An object of the given @parsable_type is created, and its <function>pre_parse_json</function>, <function>parse_json</function> and
+ * <function>post_parse_json</function> class functions called on the JSON node obtained from @json. <function>pre_parse_json</function> and
+ * <function>post_parse_json</function> are called once each on the root node, while <function>parse_json</function> is called for
+ * each of the child nodes. TODO: Check me.
+ *
+ * If @length is -1, @json will be assumed to be null-terminated.
+ *
+ * If an error occurs during parsing, a suitable error from #GDataParserError will be returned.
+ *
+ * Return value: a new #GDataParsable, or %NULL; unref with g_object_unref()
+ *
+ * Since: UNRELEASED
+ */
+GDataParsable *
+gdata_parsable_new_from_json (GType parsable_type, const gchar *json, gint length, GError **error)
+{
+	g_return_val_if_fail (g_type_is_a (parsable_type, GDATA_TYPE_PARSABLE), NULL);
+	g_return_val_if_fail (json != NULL && *json != '\0', NULL);
+	g_return_val_if_fail (length >= -1, NULL);
+	g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+
+	return _gdata_parsable_new_from_json (parsable_type, json, length, NULL, error);
+}
+
 GDataParsable *
 _gdata_parsable_new_from_json (GType parsable_type, const gchar *json, gint length, gpointer user_data, GError **error)
 {
@@ -354,16 +397,17 @@ _gdata_parsable_new_from_json (GType parsable_type, const gchar *json, gint leng
 		length = strlen (json);
 
 	parser = json_parser_new ();
-	if (!json_parser_load_from_data (parser, json, length, error))
+	if (!json_parser_load_from_data (parser, json, length, error)) {
+		g_assert (error == NULL || *error != NULL); /* safety check */
 		return NULL;
-	/* FIXME do we need explictly check if json has returned error correctly? */
-	
+	}
+
 	reader = json_reader_new (json_parser_get_root (parser));
 	parsable = _gdata_parsable_new_from_json_node (parsable_type, reader, user_data, error);
-	
+
 	g_object_unref (reader);
 	g_object_unref (parser);
-	
+
 	return parsable;
 }
 
@@ -372,14 +416,14 @@ _gdata_parsable_new_from_json_node (GType parsable_type, JsonReader *reader, gpo
 {
 	GDataParsable *parsable;
 	GDataParsableClass *klass;
-	guint i;
-	
+	gint i;
+
 	g_return_val_if_fail (g_type_is_a (parsable_type, GDATA_TYPE_PARSABLE), NULL);
 	g_return_val_if_fail (reader != NULL, NULL);
 	g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
-	/* indicator property which allows distinguish between locally created and server based objects */
-	/* as it is used for non-xml tasks, and adding another one for json would be dublication */
+	/* Indicator property which allows distinguishing between locally created and server based objects
+	 * as it is used for non-XML tasks, and adding another one for JSON would be a bit pointless. */
 	parsable = g_object_new (parsable_type, "constructed-from-xml", TRUE, NULL);
 
 	klass = GDATA_PARSABLE_GET_CLASS (parsable);
@@ -390,16 +434,15 @@ _gdata_parsable_new_from_json_node (GType parsable_type, JsonReader *reader, gpo
 
 	g_assert (klass->element_name != NULL);
 
-	/* Parse each child element */
+	/* Parse each child member. This assumes the outermost node is an object. */
 	for (i = 0; i < json_reader_count_members (reader); i++) {
 		g_return_val_if_fail (json_reader_read_element (reader, i), NULL);
+
 		if (klass->parse_json (parsable, reader, user_data, error) == FALSE) {
 			g_object_unref (parsable);
 			return NULL;
 		}
-		/* get out of root object */
-		/* FIXME this is much slower than proper read_member usage */
-		/* can be replaced by count_members/list_members */
+
 		json_reader_end_element (reader);
 	}
 
@@ -528,6 +571,66 @@ _gdata_parsable_get_xml (GDataParsable *self, GString *xml_string, gboolean decl
 		g_string_append_printf (xml_string, "</%s:%s>", klass->element_namespace, klass->element_name);
 	else
 		g_string_append_printf (xml_string, "</%s>", klass->element_name);
+}
+
+/**
+ * gdata_parsable_get_json:
+ * @self: a #GDataParsable
+ *
+ * Builds a JSON representation of the #GDataParsable in its current state, such that it could be inserted on the server. The JSON
+ * is valid for stand-alone use.
+ *
+ * TODO: How to enforce mutual exclusion between get_json and get_xml?
+ *
+ * Return value: the object's JSON; free with g_free()
+ *
+ * Since: UNRELEASED
+ */
+gchar *
+gdata_parsable_get_json (GDataParsable *self)
+{
+	GString *json_string;
+
+	g_return_val_if_fail (GDATA_IS_PARSABLE (self), NULL);
+
+	json_string = g_string_sized_new (1000);
+	_gdata_parsable_get_json (self, json_string);
+
+	return g_string_free (json_string, FALSE);
+}
+
+/*
+ * _gdata_parsable_get_json:
+ * @self: a #GDataParsable
+ * @json_string: a #GString to build the JSON in
+ *
+ * Builds a JSON representation of the #GDataParsable in its current state, such that it could be inserted on the server.
+ *
+ * Return value: the object's JSON; free with g_free()
+ *
+ * Since: UNRELEASED
+ */
+void
+_gdata_parsable_get_json (GDataParsable *self, GString *json_string)
+{
+	GDataParsableClass *klass;
+
+	g_return_if_fail (GDATA_IS_PARSABLE (self));
+	g_return_if_fail (json_string != NULL);
+
+	klass = GDATA_PARSABLE_GET_CLASS (self);
+
+	g_string_append (json_string, "{");
+
+	/* Add the JSON. */
+	if (klass->get_json != NULL)
+		klass->get_json (self, json_string);
+
+	/* Any extra JSON? Note: The use of extra_xml is intended; the variable is re-used and hence is mis-named. */
+	if (self->priv->extra_xml != NULL && self->priv->extra_xml->str != NULL)
+		g_string_append (json_string, self->priv->extra_xml->str);
+
+	g_string_append (json_string, "}");
 }
 
 /*

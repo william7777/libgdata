@@ -917,25 +917,29 @@ __gdata_service_query (GDataService *self, GDataAuthorizationDomain *domain, con
 	GDataFeed *feed = NULL;
 	SoupMessage *message;
 	SoupMessageHeaders *headers;
-	gchar *content_type;
-	
+	const gchar *content_type;
+
 	message = _gdata_service_query (self, domain, feed_uri, query, cancellable, error);
 	if (message == NULL)
 		return NULL;
 
 	g_assert (message->response_body->data != NULL);
 	klass = GDATA_SERVICE_GET_CLASS (self);
-	
+
 	headers = message->response_headers;
-	content_type = (gchar*) soup_message_headers_get_content_type (headers, NULL);
-	if (strncmp (content_type, "application/json", 16) == 0) {
-		g_debug("JSON content type detected.\n");
+	content_type = soup_message_headers_get_content_type (headers, NULL);
+
+	if (content_type != NULL && strcmp (content_type, "application/json") == 0) {
+		/* Definitely JSON. */
+		g_debug("JSON content type detected.");
 		feed = _gdata_feed_new_from_json (klass->feed_type, message->response_body->data, message->response_body->length, entry_type,
-										progress_callback, progress_user_data, is_async, error);
-	} else if (strncmp (content_type, "application/atom+xml", 20) == 0) {
-		g_debug("XML content type detected.\n");
+		                                  progress_callback, progress_user_data, is_async, error);
+	} else {
+		/* Potentially XML. Don't bother checking the Content-Type, since the parser
+		 * will fail gracefully if the response body is not valid XML. */
+		g_debug("XML content type detected.");
 		feed = _gdata_feed_new_from_xml (klass->feed_type, message->response_body->data, message->response_body->length, entry_type,
-										progress_callback, progress_user_data, is_async, error);
+		                                 progress_callback, progress_user_data, is_async, error);
 	}
 
 	g_object_unref (message);
