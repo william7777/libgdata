@@ -57,7 +57,7 @@ static void get_xml (GDataParsable *parsable, GString *xml_string);
 static void get_namespaces (GDataParsable *parsable, GHashTable *namespaces);
 static gchar *get_entry_uri (const gchar *id) G_GNUC_WARN_UNUSED_RESULT;
 static gboolean parse_json (GDataParsable *parsable, JsonReader *reader, gpointer user_data, GError **error);
-static void get_json (GDataParsable *parsable, GString *json_string);
+static void get_json (GDataParsable *parsable, JsonBuilder *builder);
 
 struct _GDataEntryPrivate {
 	gchar *title;
@@ -596,14 +596,22 @@ parse_json (GDataParsable *parsable, JsonReader *reader, gpointer user_data, GEr
 	gboolean success;
 	GDataEntryPrivate *priv = GDATA_ENTRY (parsable)->priv;
 
-	/* selfLink in JSON is the same as 'content' entry in XML */
-	if (gdata_parser_string_from_json_member (reader, "title", P_DEFAULT, &(priv->title), &success, error) == TRUE ||
-	    gdata_parser_string_from_json_member (reader, "id", P_DEFAULT, &(priv->id), &success, error) == TRUE ||
-	    gdata_parser_int64_time_from_json_member (reader, "updated", P_REQUIRED | P_NO_DUPES, &(priv->updated), &success, error) == TRUE) {
+	if (gdata_parser_string_from_json_member (reader, "title", P_DEFAULT | P_NO_DUPES, &(priv->title), &success, error) == TRUE ||
+	    gdata_parser_string_from_json_member (reader, "id", P_NON_EMPTY | P_NO_DUPES, &(priv->id), &success, error) == TRUE ||
+	    gdata_parser_int64_time_from_json_member (reader, "updated", P_REQUIRED | P_NO_DUPES, &(priv->updated), &success, error) == TRUE ||
+	    gdata_parser_string_from_json_member (reader, "etag", P_NON_EMPTY | P_NO_DUPES, &(priv->etag), &success, error) == TRUE) {
 		return success;
-	} else if (strcmp (json_reader_get_member_name (reader), "selfLink") == 0) {
-		priv->content = g_strdup (json_reader_get_string_value (reader));
-		priv->content_is_uri = TRUE;
+	} else if (g_strcmp0 (json_reader_get_member_name (reader), "selfLink") == 0) {
+		GDataLink *_link = gdata_link_new (json_reader_get_string_value (reader), GDATA_LINK_SELF);
+		gdata_entry_add_link (GDATA_ENTRY (parsable), _link);
+		g_object_unref (_link);
+
+		return TRUE;
+	} else if (g_strcmp0 (json_reader_get_member_name (reader), "kind") == 0) {
+		GDataCategory *category = gdata_category_new (json_reader_get_string_value (reader), "http://schemas.google.com/g/2005#kind", NULL);
+		gdata_entry_add_category (GDATA_ENTRY (parsable), category);
+		g_object_unref (category);
+
 		return TRUE;
 	}
 
@@ -611,21 +619,48 @@ parse_json (GDataParsable *parsable, JsonReader *reader, gpointer user_data, GEr
 }
 
 static void
-get_json (GDataParsable *parsable, GString *json_string)
+get_json (GDataParsable *parsable, JsonBuilder *builder)
 {
 	GDataEntryPrivate *priv = GDATA_ENTRY (parsable)->priv;
+	GList *i;
+	GDataLink *_link;
 
-	/* TODO: This is the wrong kind of escaping. */
-	gdata_parser_string_append_escaped (json_string, "\"title\": \"", priv->title, "\"");
+	json_builder_set_member_name (builder, "title");
+	json_builder_add_string_value (builder, priv->title);
 
 	if (priv->id != NULL) {
-		gdata_parser_string_append_escaped (json_string, ",\"id\": \"", priv->id, "\"");
+		json_builder_set_member_name (builder, "id");
+		json_builder_add_string_value (builder, priv->id);
 	}
 
 	if (priv->updated != -1) {
 		gchar *updated = gdata_parser_int64_to_iso8601 (priv->updated);
-		g_string_append_printf (json_string, ",\"updated\": \"%s\"", updated);
+		json_builder_set_member_name (builder, "updated");
+		json_builder_add_string_value (builder, updated);
 		g_free (updated);
+	}
+
+	/* If we have a "kind" category, add that. */
+	for (i = priv->categories; i != NULL; i = i->next) {
+		GDataCategory *category = GDATA_CATEGORY (i->data);
+
+		if (g_strcmp0 (gdata_category_get_scheme (category), "http://schemas.google.com/g/2005#kind") == 0) {
+			json_builder_set_member_name (builder, "kind");
+			json_builder_add_string_value (builder, gdata_category_get_term (category));
+		}
+	}
+
+	/* Add the ETag, if available. */
+	if (gdata_entry_get_etag (GDATA_ENTRY (parsable)) != NULL) {
+		json_builder_set_member_name (builder, "etag");
+		json_builder_add_string_value (builder, priv->etag);
+	}
+
+	/* Add the self-link. */
+	_link = gdata_entry_look_up_link (GDATA_ENTRY (parsable), GDATA_LINK_SELF);
+	if (_link != NULL) {
+		json_builder_set_member_name (builder, "selfLink");
+		json_builder_add_string_value (builder, gdata_link_get_uri (_link));
 	}
 }
 

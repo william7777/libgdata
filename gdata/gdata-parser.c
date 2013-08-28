@@ -765,7 +765,7 @@ gdata_parser_string_from_json_member (JsonReader *reader, const gchar *member_na
 	const GError *child_error = NULL;
 
 	/* Check if there's such element */
-	if (strcmp (json_reader_get_member_name (reader), member_name) != 0) {
+	if (g_strcmp0 (json_reader_get_member_name (reader), member_name) != 0) {
 		return FALSE;
 	}
 
@@ -834,7 +834,7 @@ gdata_parser_int64_time_from_json_member (JsonReader *reader, const gchar *membe
 	const GError *child_error = NULL;
 
 	/* Check if there's such element */
-	if (strcmp (json_reader_get_member_name (reader), member_name) != 0) {
+	if (g_strcmp0 (json_reader_get_member_name (reader), member_name) != 0) {
 		return FALSE;
 	}
 
@@ -903,7 +903,7 @@ gdata_parser_boolean_from_json_member (JsonReader *reader, const gchar *member_n
 	const GError *child_error = NULL;
 
 	/* Check if there's such an element. */
-	if (strcmp (json_reader_get_member_name (reader), member_name) != 0) {
+	if (g_strcmp0 (json_reader_get_member_name (reader), member_name) != 0) {
 		return FALSE;
 	}
 

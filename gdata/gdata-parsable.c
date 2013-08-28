@@ -193,7 +193,7 @@ real_parse_json (GDataParsable *parsable, JsonReader *reader, gpointer user_data
 	generator = json_generator_new ();
 	g_object_get (G_OBJECT (reader), "root", &root, NULL);
 	json_generator_set_root (generator, root);
-	g_object_unref (root);
+	json_node_free (root);
 
 	json = json_generator_to_data (generator, NULL);
 	g_string_append (parsable->priv->extra_xml, json);
@@ -432,8 +432,6 @@ _gdata_parsable_new_from_json_node (GType parsable_type, JsonReader *reader, gpo
 		return NULL;
 	}
 
-	g_assert (klass->element_name != NULL);
-
 	/* Parse each child member. This assumes the outermost node is an object. */
 	for (i = 0; i < json_reader_count_members (reader); i++) {
 		g_return_val_if_fail (json_reader_read_element (reader, i), NULL);
@@ -589,48 +587,63 @@ _gdata_parsable_get_xml (GDataParsable *self, GString *xml_string, gboolean decl
 gchar *
 gdata_parsable_get_json (GDataParsable *self)
 {
-	GString *json_string;
+	JsonGenerator *generator;
+	JsonBuilder *builder;
+	JsonNode *root;
+	gchar *output;
 
 	g_return_val_if_fail (GDATA_IS_PARSABLE (self), NULL);
 
-	json_string = g_string_sized_new (1000);
-	_gdata_parsable_get_json (self, json_string);
+	/* Build the JSON tree. */
+	builder = json_builder_new ();
+	_gdata_parsable_get_json (self, builder);
+	root = json_builder_get_root (builder);
+	g_object_unref (builder);
 
-	return g_string_free (json_string, FALSE);
+	/* Serialise it to a string. */
+	generator = json_generator_new ();
+	json_generator_set_root (generator, root);
+	output = json_generator_to_data (generator, NULL);
+	g_object_unref (generator);
+
+	json_node_free (root);
+
+	return output;
 }
 
 /*
  * _gdata_parsable_get_json:
  * @self: a #GDataParsable
- * @json_string: a #GString to build the JSON in
+ * @builder: a #JsonBuilder to build the JSON in
  *
  * Builds a JSON representation of the #GDataParsable in its current state, such that it could be inserted on the server.
- *
- * Return value: the object's JSON; free with g_free()
  *
  * Since: UNRELEASED
  */
 void
-_gdata_parsable_get_json (GDataParsable *self, GString *json_string)
+_gdata_parsable_get_json (GDataParsable *self, JsonBuilder *builder)
 {
 	GDataParsableClass *klass;
 
 	g_return_if_fail (GDATA_IS_PARSABLE (self));
-	g_return_if_fail (json_string != NULL);
+	g_return_if_fail (JSON_IS_BUILDER (builder));
 
 	klass = GDATA_PARSABLE_GET_CLASS (self);
 
-	g_string_append (json_string, "{");
+	json_builder_begin_object (builder);
 
 	/* Add the JSON. */
 	if (klass->get_json != NULL)
-		klass->get_json (self, json_string);
+		klass->get_json (self, builder);
 
+#if 0
+TODO
 	/* Any extra JSON? Note: The use of extra_xml is intended; the variable is re-used and hence is mis-named. */
 	if (self->priv->extra_xml != NULL && self->priv->extra_xml->str != NULL)
 		g_string_append (json_string, self->priv->extra_xml->str);
+#endif
 
-	g_string_append (json_string, "}");
+	json_builder_end_object (builder);
 }
 
 /*

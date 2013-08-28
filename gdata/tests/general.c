@@ -458,28 +458,23 @@ test_entry_get_xml (void)
 static void
 test_entry_get_json (void)
 {
-	gint64 updated, published, updated2, published2, updated3, published3;
+	gint64 updated, published, updated2, published2;
 	GDataEntry *entry, *entry2;
-	GDataCategory *category;
-	GDataLink *_link; /* stupid unistd.h */
-	GDataAuthor *author;
-	gchar *json, *title, *summary, *id, *etag, *content, *content_uri, *rights;
-	gboolean is_inserted;
-	GList *list;
+	gchar *json;
 	GError *error = NULL;
 
 	entry = gdata_entry_new (NULL);
 
 	/* Set the properties more conventionally */
-	gdata_entry_set_title (entry, "Testing title & 'escaping'");
+	gdata_entry_set_title (entry, "Testing title & \"escaping\"");
 	gdata_entry_set_summary (entry, NULL);
-	gdata_entry_set_content (entry, "This is some sample content testing, amongst other things, <markup> & odd characters‽");
+	gdata_entry_set_content (entry, NULL);
 	gdata_entry_set_rights (entry, NULL);
 
 	/* Check the generated JSON's OK */
 	gdata_test_assert_json (entry,
 		"{"
-			"\"title\": \"Testing title & &apos;escaping&apos;\""
+			"\"title\":\"Testing title & \\\"escaping\\\"\""
 		"}");
 
 	/* Check again by re-parsing the JSON to a GDataEntry. */
@@ -540,6 +535,41 @@ test_entry_parse_xml (void)
 				"<barfoo shizzle=\"zing\"/>"
 				"<ns:barfoo shizzle=\"zing\" fo=\"shizzle\">How about some characters‽</ns:barfoo>"
 			 "</entry>");
+	g_object_unref (entry);
+}
+
+static void
+test_entry_parse_json (void)
+{
+	GDataEntry *entry;
+	GError *error = NULL;
+
+	/* Create an entry from JSON with unhandled nodes. */
+	entry = GDATA_ENTRY (gdata_parsable_new_from_json (GDATA_TYPE_ENTRY,
+		"{"
+			"\"title\":\"A title\","
+			"\"updated\":\"2009-01-25T14:07:37Z\","
+			"\"selfLink\":\"http://example.com/\","
+			"\"etag\":\"some-etag\","
+			"\"id\":\"some-id\","
+			"\"kind\":\"kind#kind\","
+			"\"unhandled-member\":false"
+		 "}", -1, &error));
+	g_assert_no_error (error);
+	g_assert (GDATA_IS_ENTRY (entry));
+	g_clear_error (&error);
+
+	/* Now check the outputted JSON from the entry still has the unhandled nodes. */
+	gdata_test_assert_json (entry,
+		"{"
+			"\"title\":\"A title\","
+			"\"id\":\"some-id\","
+			"\"updated\":\"2009-01-25T14:07:37Z\","
+			"\"etag\":\"some-etag\","
+			"\"selfLink\":\"http://example.com/\","
+			"\"kind\":\"kind#kind\","
+			"\"unhandled-member\":false"
+		 "}");
 	g_object_unref (entry);
 }
 
@@ -4048,6 +4078,7 @@ main (int argc, char *argv[])
 	g_test_add_func ("/entry/get_xml", test_entry_get_xml);
 	g_test_add_func ("/entry/get_json", test_entry_get_json);
 	g_test_add_func ("/entry/parse_xml", test_entry_parse_xml);
+	g_test_add_func ("/entry/parse_json", test_entry_parse_json);
 	g_test_add_func ("/entry/error_handling", test_entry_error_handling);
 	g_test_add_func ("/entry/escaping", test_entry_escaping);
 	g_test_add_func ("/entry/links/remove", test_entry_links_remove);

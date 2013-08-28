@@ -76,7 +76,7 @@ typedef struct {
  * @get_namespaces: a function to return a string containing the namespace declarations used by the @parsable when represented in XML form
  * @parse_json: a function to parse a JSON representation of the #GDataParsable to set the properties of the @parsable
  * @post_parse_json: a function called after parsing a JSON object, to allow the @parsable to validate the parsed properties
- * @get_json: a function to build a JSON representation of the #GDataParsable in its current state, appending it to the provided #GString
+ * @get_json: a function to build a JSON representation of the #GDataParsable in its current state, appending it to the provided #JsonBuilder
  * @element_name: the name of the XML element which represents this parsable
  * @element_namespace: the prefix of the XML namespace used for the parsable
  *
@@ -98,7 +98,7 @@ typedef struct {
 
 	gboolean (*parse_json) (GDataParsable *parsable, JsonReader *reader, gpointer user_data, GError **error);
 	gboolean (*post_parse_json) (GDataParsable *parsable, gpointer user_data, GError **error);
-	void (*get_json) (GDataParsable *parsable, GString *json_string);
+	void (*get_json) (GDataParsable *parsable, JsonBuilder *builder);
 
 	const gchar *element_name;
 	const gchar *element_namespace;
