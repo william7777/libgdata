@@ -55,8 +55,13 @@ static gboolean real_parse_xml (GDataParsable *parsable, xmlDoc *doc, xmlNode *n
 static gboolean real_parse_json (GDataParsable *parsable, JsonReader *reader, gpointer user_data, GError **error);
 
 struct _GDataParsablePrivate {
+	/* XML stuff. */
 	GString *extra_xml;
 	GHashTable *extra_namespaces;
+
+	/* JSON stuff. */
+	GHashTable/*<gchar*, owned JsonNode*>*/ *extra_json;
+
 	gboolean constructed_from_xml;
 };
 
@@ -101,6 +106,9 @@ gdata_parsable_init (GDataParsable *self)
 
 	self->priv->extra_xml = g_string_new ("");
 	self->priv->extra_namespaces = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+
+	self->priv->extra_json = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, (GDestroyNotify) json_node_free);
+
 	self->priv->constructed_from_xml = FALSE;
 }
 
@@ -145,6 +153,8 @@ gdata_parsable_finalize (GObject *object)
 	g_string_free (priv->extra_xml, TRUE);
 	g_hash_table_destroy (priv->extra_namespaces);
 
+	g_hash_table_destroy (priv->extra_json);
+
 	/* Chain up to the parent class */
 	G_OBJECT_CLASS (gdata_parsable_parent_class)->finalize (object);
 }
@@ -181,27 +191,86 @@ real_parse_xml (GDataParsable *parsable, xmlDoc *doc, xmlNode *node, gpointer us
 	return TRUE;
 }
 
+/* Extract the member node. This would be a lot easier if JsonReader had an API to return
+ * the current node (regardless of whether it's a value, object or array). FIXME: bgo#707100. */
+static JsonNode * /* transfer full */
+_json_reader_dup_current_node (JsonReader *reader)
+{
+	JsonNode *value;
+
+	if (json_reader_is_value (reader) == TRUE) {
+		/* Value nodes are easy. Well, ignoring the complication of nulls. */
+		if (json_reader_get_null_value (reader) == TRUE) {
+			value = json_node_new (JSON_NODE_NULL);
+		} else {
+			value = json_node_copy (json_reader_get_value (reader));
+		}
+	} else if (json_reader_is_object (reader) == TRUE) {
+		/* Object nodes require deep copies. */
+		gint i, members;
+		JsonObject *obj;
+
+		obj = json_object_new ();
+
+		for (i = 0, members = json_reader_count_members (reader); i < members; i++) {
+			json_reader_read_element (reader, i);
+			json_object_set_member (obj, json_reader_get_member_name (reader), _json_reader_dup_current_node (reader));
+			json_reader_end_element (reader);
+		}
+
+		value = json_node_new (JSON_NODE_OBJECT);
+		json_node_take_object (value, obj);
+	} else if (json_reader_is_array (reader) == TRUE) {
+		/* Array nodes require deep copies. */
+		gint i, elements;
+		JsonArray *arr;
+
+		arr = json_array_new ();
+
+		for (i = 0, elements = json_reader_count_elements (reader); i < elements; i++) {
+			json_reader_read_element (reader, i);
+			json_array_add_element (arr, _json_reader_dup_current_node (reader));
+			json_reader_end_element (reader);
+		}
+
+		value = json_node_new (JSON_NODE_ARRAY);
+		json_node_take_array (value, arr);
+	} else {
+		/* Uh-oh. */
+		g_assert_not_reached ();
+	}
+
+	return value;
+}
+
 static gboolean
 real_parse_json (GDataParsable *parsable, JsonReader *reader, gpointer user_data, GError **error)
 {
-	gchar *json;
-	JsonNode *root;
+	gchar *json, *member_name;
 	JsonGenerator *generator;
+	JsonNode *value;
 
-	/* Unhandled JSON. Save it to ->extra_xml so that it's not lost if we
+	/* Unhandled JSON member. Save it and its value to ->extra_xml so that it's not lost if we
 	 * re-upload this Parsable to the server. */
+	member_name = g_strdup (json_reader_get_member_name (reader));
+	g_assert (member_name != NULL);
+
+	/* Extract a copy of the current node. */
+	value = _json_reader_dup_current_node (reader);
+	g_assert (value != NULL);
+
+	/* Serialise the value for debugging. */
 	generator = json_generator_new ();
-	g_object_get (G_OBJECT (reader), "root", &root, NULL);
-	json_generator_set_root (generator, root);
-	json_node_free (root);
+	json_generator_set_root (generator, value);
 
 	json = json_generator_to_data (generator, NULL);
-	g_string_append (parsable->priv->extra_xml, json);
-
-	g_debug ("Unhandled JSON in %s: %s", G_OBJECT_TYPE_NAME (parsable), json);
-
+	g_debug ("Unhandled JSON member ‘%s’ in %s: %s", member_name, G_OBJECT_TYPE_NAME (parsable), json);
 	g_free (json);
+
 	g_object_unref (generator);
+
+	/* Save the value. Transfer ownership of the member_name and value. */
+	g_hash_table_replace (parsable->priv->extra_json, (gpointer) member_name, (gpointer) value);
 
 	return TRUE;
 }
@@ -357,12 +426,12 @@ _gdata_parsable_new_from_xml_node (GType parsable_type, xmlDoc *doc, xmlNode *no
  *
  * Creates a new #GDataParsable subclass (of the given @parsable_type) from the given @json.
  *
- * An object of the given @parsable_type is created, and its <function>pre_parse_json</function>, <function>parse_json</function> and
- * <function>post_parse_json</function> class functions called on the JSON node obtained from @json. <function>pre_parse_json</function> and
- * <function>post_parse_json</function> are called once each on the root node, while <function>parse_json</function> is called for
- * each of the child nodes. TODO: Check me.
+ * An object of the given @parsable_type is created, and its <function>parse_json</function> and
+ * <function>post_parse_json</function> class functions called on the JSON node obtained from @json.
+ * <function>post_parse_json</function> is called once on the root node, while <function>parse_json</function> is called for
+ * each of the node's members.
  *
- * If @length is -1, @json will be assumed to be null-terminated.
+ * If @length is -1, @json will be assumed to be nul-terminated.
  *
  * If an error occurs during parsing, a suitable error from #GDataParserError will be returned.
  *
@@ -387,6 +456,7 @@ _gdata_parsable_new_from_json (GType parsable_type, const gchar *json, gint leng
 	JsonParser *parser;
 	JsonReader *reader;
 	GDataParsable *parsable;
+	GError *child_error = NULL;
 
 	g_return_val_if_fail (g_type_is_a (parsable_type, GDATA_TYPE_PARSABLE), NULL);
 	g_return_val_if_fail (json != NULL && *json != '\0', NULL);
@@ -397,8 +467,13 @@ _gdata_parsable_new_from_json (GType parsable_type, const gchar *json, gint leng
 		length = strlen (json);
 
 	parser = json_parser_new ();
-	if (!json_parser_load_from_data (parser, json, length, error)) {
-		g_assert (error == NULL || *error != NULL); /* safety check */
+	if (!json_parser_load_from_data (parser, json, length, &child_error)) {
+		g_set_error (error, GDATA_PARSER_ERROR, GDATA_PARSER_ERROR_PARSING_STRING,
+		             /* Translators: the parameter is an error message */
+		             _("Error parsing JSON: %s"), child_error->message);
+		g_error_free (child_error);
+		g_object_unref (parser);
+
 		return NULL;
 	}
 
@@ -427,7 +502,14 @@ _gdata_parsable_new_from_json_node (GType parsable_type, JsonReader *reader, gpo
 	parsable = g_object_new (parsable_type, "constructed-from-xml", TRUE, NULL);
 
 	klass = GDATA_PARSABLE_GET_CLASS (parsable);
-	if (klass->parse_json == NULL) {
+	g_assert (klass->parse_json != NULL);
+
+	/* Check that the outermost node is an object. */
+	if (json_reader_is_object (reader) == FALSE) {
+		g_set_error (error, GDATA_PARSER_ERROR, GDATA_PARSER_ERROR_PARSING_STRING,
+		             /* Translators: the parameter is an error message */
+		             _("Error parsing JSON: %s"),
+		             _("Outermost JSON node is not an object."));
 		g_object_unref (parsable);
 		return NULL;
 	}
@@ -578,8 +660,6 @@ _gdata_parsable_get_xml (GDataParsable *self, GString *xml_string, gboolean decl
  * Builds a JSON representation of the #GDataParsable in its current state, such that it could be inserted on the server. The JSON
  * is valid for stand-alone use.
  *
- * TODO: How to enforce mutual exclusion between get_json and get_xml?
- *
  * Return value: the object's JSON; free with g_free()
  *
  * Since: UNRELEASED
@@ -624,6 +704,9 @@ void
 _gdata_parsable_get_json (GDataParsable *self, JsonBuilder *builder)
 {
 	GDataParsableClass *klass;
+	GHashTableIter iter;
+	gchar *member_name;
+	JsonNode *value;
 
 	g_return_if_fail (GDATA_IS_PARSABLE (self));
 	g_return_if_fail (JSON_IS_BUILDER (builder));
@@ -636,12 +719,12 @@ _gdata_parsable_get_json (GDataParsable *self, JsonBuilder *builder)
 	if (klass->get_json != NULL)
 		klass->get_json (self, builder);
 
-#if 0
-TODO
-	/* Any extra JSON? Note: The use of extra_xml is intended; the variable is re-used and hence is mis-named. */
-	if (self->priv->extra_xml != NULL && self->priv->extra_xml->str != NULL)
-		g_string_append (json_string, self->priv->extra_xml->str);
-#endif
+	/* Any extra JSON which we couldn't parse before? */
+	g_hash_table_iter_init (&iter, self->priv->extra_json);
+	while (g_hash_table_iter_next (&iter, (gpointer *) &member_name, (gpointer *) &value) == TRUE) {
+		json_builder_set_member_name (builder, member_name);
+		json_builder_add_value (builder, json_node_copy (value)); /* transfers ownership */
+	}
 
 	json_builder_end_object (builder);
 }

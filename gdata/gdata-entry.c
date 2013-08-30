@@ -602,13 +602,31 @@ parse_json (GDataParsable *parsable, JsonReader *reader, gpointer user_data, GEr
 	    gdata_parser_string_from_json_member (reader, "etag", P_NON_EMPTY | P_NO_DUPES, &(priv->etag), &success, error) == TRUE) {
 		return success;
 	} else if (g_strcmp0 (json_reader_get_member_name (reader), "selfLink") == 0) {
-		GDataLink *_link = gdata_link_new (json_reader_get_string_value (reader), GDATA_LINK_SELF);
+		GDataLink *_link;
+		const gchar *uri;
+
+		/* Empty URI? */
+		uri = json_reader_get_string_value (reader);
+		if (uri == NULL || *uri == '\0') {
+			return gdata_parser_error_required_json_content_missing (reader, error);
+		}
+
+		_link = gdata_link_new (uri, GDATA_LINK_SELF);
 		gdata_entry_add_link (GDATA_ENTRY (parsable), _link);
 		g_object_unref (_link);
 
 		return TRUE;
 	} else if (g_strcmp0 (json_reader_get_member_name (reader), "kind") == 0) {
-		GDataCategory *category = gdata_category_new (json_reader_get_string_value (reader), "http://schemas.google.com/g/2005#kind", NULL);
+		GDataCategory *category;
+		const gchar *kind;
+
+		/* Empty kind? */
+		kind = json_reader_get_string_value (reader);
+		if (kind == NULL || *kind == '\0') {
+			return gdata_parser_error_required_json_content_missing (reader, error);
+		}
+
+		category = gdata_category_new (kind, "http://schemas.google.com/g/2005#kind", NULL);
 		gdata_entry_add_category (GDATA_ENTRY (parsable), category);
 		g_object_unref (category);
 

@@ -769,11 +769,8 @@ gdata_parser_string_from_json_member (JsonReader *reader, const gchar *member_na
 		return FALSE;
 	}
 
-	/* Check if the output string has already been set */
-	if (options & P_NO_DUPES && *output != NULL) {
-		*success = gdata_parser_error_duplicate_json_element (reader, error);
-		return TRUE;
-	}
+	/* Check if the output string has already been set. The JSON parser guarantees this can't happen. */
+	g_assert (!(options & P_NO_DUPES) || *output == NULL);
 
 	/* Get the string and check it for NULLness or emptiness. Check for parser errors first. */
 	text = json_reader_get_string_value (reader);
@@ -838,11 +835,8 @@ gdata_parser_int64_time_from_json_member (JsonReader *reader, const gchar *membe
 		return FALSE;
 	}
 
-	/* Check if the output time val has already been set */
-	if (options & P_NO_DUPES && *output != -1) {
-		*success = gdata_parser_error_duplicate_json_element (reader, error);
-		return TRUE;
-	}
+	/* Check if the output time val has already been set. The JSON parser guarantees this can't happen. */
+	g_assert (!(options & P_NO_DUPES) || *output == -1);
 
 	/* Get the string and check it for NULLness. Check for errors first. */
 	text = json_reader_get_string_value (reader);
