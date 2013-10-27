@@ -629,6 +629,80 @@ test_event_xml (void)
 }
 
 static void
+test_event_json (void)
+{
+	GDataCalendarEvent *event;
+	GDataGDWhere *where;
+	GDataGDWho *who;
+	GDataGDWhen *when;
+	GTimeVal start_time, end_time;
+        gchar* json_result;
+        GDataGDReminder *reminder;
+
+	event = gdata_calendar_event_new (NULL);
+
+	gdata_entry_set_title (GDATA_ENTRY (event), "Tennis with Beth");
+	gdata_entry_set_content (GDATA_ENTRY (event), "Meet for a quick lesson.");
+	gdata_calendar_event_set_transparency (event, GDATA_CALENDAR_EVENT_TRANSPARENCY_OPAQUE);
+	gdata_calendar_event_set_status (event, GDATA_CALENDAR_EVENT_STATUS_CONFIRMED);
+	where = gdata_gd_where_new (NULL, "Rolling Lawn Courts", NULL);
+	gdata_calendar_event_add_place (event, where);
+	g_object_unref (where);
+	who = gdata_gd_who_new (GDATA_GD_WHO_EVENT_ORGANIZER, "John Smith‽", "john.smith@example.com");
+	gdata_calendar_event_add_person (event, who);
+	g_object_unref (who);
+        who = gdata_gd_who_new (GDATA_GD_WHO_EVENT_ORGANIZER, "Will Smith‽", "will.smith@example.com");
+        gdata_gd_who_set_comment(who, "handsome");
+        gdata_gd_who_set_response_status(who, GDATA_CALENDAR_EVENT_RESPONSE_STATUS_ACCEPTED);
+	gdata_calendar_event_add_person (event, who);
+	g_object_unref (who);
+	g_time_val_from_iso8601 ("2009-04-17T15:00:00.000Z", &start_time);
+	g_time_val_from_iso8601 ("2009-04-17T17:00:00.000Z", &end_time);
+	when = gdata_gd_when_new (start_time.tv_sec, end_time.tv_sec, FALSE);
+        
+        reminder = gdata_gd_reminder_new(GDATA_GD_REMINDER_ALERT, -1, 30);
+        gdata_gd_when_add_reminder(when, reminder);
+        g_object_unref(reminder);
+        reminder = gdata_gd_reminder_new(GDATA_GD_REMINDER_EMAIL, -1, 120);
+        gdata_gd_when_add_reminder(when, reminder);
+        g_object_unref(reminder);
+        
+        reminder = gdata_gd_reminder_new(GDATA_GD_REMINDER_SMS, -1, 1440);
+        gdata_gd_when_add_reminder(when, reminder);
+        g_object_unref(reminder);
+        
+	gdata_calendar_event_add_time (event, when);
+        gdata_calendar_event_set_recurrence(event, "RRULE:FREQ=WEEKLY;BYDAY=MO,WE,FR");
+	g_object_unref (when);
+
+	/* Check the XML */
+	gdata_test_assert_json(event,
+                "{\"summary\":\"Tennis with Beth\","
+                "\"kind\":\"calendar#event\","
+                "\"start\":{\"dateTime\":\"2009-04-17T15:00:00Z\"},"
+                "\"end\":{\"dateTime\":\"2009-04-17T17:00:00Z\"},"
+                "\"reminders\":"
+                        "{\"overrides\":"
+                                "[{\"method\":\"popup\",\"minutes\":30},"
+                                "{\"method\":\"email\",\"minutes\":120},"
+                                "{\"method\":\"sms\",\"minutes\":1440}]},"
+                "\"recurrence\":[\"RRULE:FREQ=WEEKLY;BYDAY=MO,WE,FR\"],"
+                "\"location\":\"Rolling Lawn Courts\","
+                "\"attendees\":[{\"email\":\"john.smith@example.com\","
+                                "\"displayName\":\"John Smith‽\"},"
+                
+                                "{\"email\":\"will.smith@example.com\","
+                                "\"displayName\":\"Will Smith‽\"}],"
+                "\"status\":\"confirmed\","
+                "\"transparency\":\"opaque\","
+                "\"guestsCanModify\":false,"
+                "\"guestsCanInviteOthers\":false,"
+                "\"guestsCanSeeGuests\":false,"
+                "\"anyoneCanAddSelf\":false}");
+        
+}
+
+static void
 test_event_xml_dates (void)
 {
 	GDataCalendarEvent *event;
@@ -1445,9 +1519,251 @@ mock_server_notify_resolver_cb (GObject *object, GParamSpec *pspec, gpointer use
 	}
 }
 
+static void
+test_event_json_dates (void){
+        GDataCalendarEvent *event;
+	GList *i;
+	GDataGDWhen *when;
+	gint64 _time;
+	GError *error = NULL;
+  
+        
+        event = GDATA_CALENDAR_EVENT(gdata_parsable_new_from_json(GDATA_TYPE_CALENDAR_EVENT, 
+                "{\"kind\": \"calendar#event\","
+                "\"etag\": \"\\\"riS6FXjHtObfGZnFmNP8yHjrZcU/MTM3ODMwNzk1NzIyNjAwMA\\\"\","
+                "\"id\": \"kcbn6pik8tco9tds1hofbbj1m8\","
+                "\"status\": \"confirmed\","
+                "\"htmlLink\": \"https://www.google.com/calendar/event?eid=a2NibjZwaWs4dGNvOXRkczFob2ZiYmoxbThfMjAxMzA5MDVUMTIzMDAwWiB3aWxsLm15dUBt\","
+                "\"summary\": \"Physical Electronics \","
+                "\"description\": \"Meet for a quick lesson.\","
+                "\"start\": {"
+                "\"date\": \"2009-04-17\","
+                "\"timeZone\": \"America/New_York\"}"
+                "}", -1, &error));
+             
+        g_assert_no_error (error);
+	g_assert (GDATA_IS_ENTRY (event));
+	g_clear_error (&error);
+
+	/* Check the times */
+	i = gdata_calendar_event_get_times (event);
+
+	/* First time */
+	when = GDATA_GD_WHEN (i->data);
+	g_assert (gdata_gd_when_is_date (when) == TRUE);
+	_time = gdata_gd_when_get_start_time (when);
+	g_assert_cmpint (_time, ==, 1239926400);
+	_time = gdata_gd_when_get_end_time (when);
+	g_assert_cmpint (_time, ==, -1);
+	g_assert (gdata_gd_when_get_value_string (when) == NULL);
+	g_assert (gdata_gd_when_get_reminders (when) == NULL);
+        gchar* tmp1 = gdata_parsable_get_json(GDATA_PARSABLE(event));
+        //printf("\n THe first shot \n %s \n", tmp1);
+        //fflush(NULL);
+        
+        gdata_test_assert_json (event,
+		"{\"summary\":\"Physical Electronics \","
+                "\"id\":\"kcbn6pik8tco9tds1hofbbj1m8\","
+                "\"kind\":\"calendar#event\","
+                "\"etag\":\"\\\"riS6FXjHtObfGZnFmNP8yHjrZcU/MTM3ODMwNzk1NzIyNjAwMA\\\"\","
+                "\"htmlLink\":\"https://www.google.com/calendar/event?eid=a2NibjZwaWs4dGNvOXRkczFob2ZiYmoxbThfMjAxMzA5MDVUMTIzMDAwWiB3aWxsLm15dUBt\","
+                "\"start\":{\"date\":\"2009-04-17\",\"timeZone\":\"America/New_York\"},"
+                "\"status\":\"confirmed\",\"guestsCanModify\":false,"
+                "\"guestsCanInviteOthers\":false,"
+                "\"guestsCanSeeGuests\":false,"
+                "\"anyoneCanAddSelf\":false,"
+                "\"description\":\"Meet for a quick lesson.\"}");
+         
+        
+        event = GDATA_CALENDAR_EVENT(gdata_parsable_new_from_json(GDATA_TYPE_CALENDAR_EVENT, 
+                "{\"kind\": \"calendar#event\","
+                "\"etag\": \"\\\"riS6FXjHtObfGZnFmNP8yHjrZcU/MTM3ODMwNzk1NzIyNjAwMA\\\"\","
+                "\"id\": \"kcbn6pik8tco9tds1hofbbj1m8\","
+                "\"status\": \"confirmed\","
+                "\"htmlLink\": \"https://www.google.com/calendar/event?eid=a2NibjZwaWs4dGNvOXRkczFob2ZiYmoxbThfMjAxMzA5MDVUMTIzMDAwWiB3aWxsLm15dUBt\","
+                "\"summary\": \"Physical Electronics \","
+                "\"description\": \"Meet for a quick lesson.\","
+                "\"start\": {"
+                "\"dateTime\": \"2009-04-17T15:00:00Z\","
+                "\"timeZone\": \"America/New_York\"}"
+                "}", -1, &error));
+        g_assert_no_error (error);
+	g_assert (GDATA_IS_ENTRY (event));
+	g_clear_error (&error);
+
+	/* Check the times */
+	i = gdata_calendar_event_get_times (event);
+
+	/* Second time */
+	when = GDATA_GD_WHEN (i->data);
+	g_assert (gdata_gd_when_is_date (when) == FALSE);
+	_time = gdata_gd_when_get_start_time (when);
+	g_assert_cmpint (_time, ==, 1239926400 + 54000);
+	_time = gdata_gd_when_get_end_time (when);
+	g_assert_cmpint (_time, ==, -1);
+	g_assert (gdata_gd_when_get_value_string (when) == NULL);
+	g_assert (gdata_gd_when_get_reminders (when) == NULL);
+        
+        gdata_test_assert_json (event,
+		"{\"summary\":\"Physical Electronics \","
+                "\"id\":\"kcbn6pik8tco9tds1hofbbj1m8\","
+                "\"kind\":\"calendar#event\","
+                "\"etag\":\"\\\"riS6FXjHtObfGZnFmNP8yHjrZcU/MTM3ODMwNzk1NzIyNjAwMA\\\"\","
+                "\"htmlLink\":\"https://www.google.com/calendar/event?eid=a2NibjZwaWs4dGNvOXRkczFob2ZiYmoxbThfMjAxMzA5MDVUMTIzMDAwWiB3aWxsLm15dUBt\","
+                "\"start\":{\"dateTime\":\"2009-04-17T15:00:00Z\", \"timeZone\":\"America/New_York\"},"
+                "\"status\":\"confirmed\","
+                "\"guestsCanModify\":false,"
+                "\"guestsCanInviteOthers\":false,"
+                "\"guestsCanSeeGuests\":false,"
+                "\"anyoneCanAddSelf\":false,"
+                "\"description\":\"Meet for a quick lesson.\"}");
+        
+        event = GDATA_CALENDAR_EVENT(gdata_parsable_new_from_json(GDATA_TYPE_CALENDAR_EVENT, 
+                "{\"kind\": \"calendar#event\","
+                "\"etag\": \"\\\"riS6FXjHtObfGZnFmNP8yHjrZcU/MTM3ODMwNzk1NzIyNjAwMA\\\"\","
+                "\"id\": \"kcbn6pik8tco9tds1hofbbj1m8\","
+                "\"status\": \"confirmed\","
+                "\"htmlLink\": \"https://www.google.com/calendar/event?eid=a2NibjZwaWs4dGNvOXRkczFob2ZiYmoxbThfMjAxMzA5MDVUMTIzMDAwWiB3aWxsLm15dUBt\","
+                "\"summary\": \"Physical Electronics \","
+                "\"description\": \"Meet for a quick lesson.\","
+                "\"start\": {"
+                "\"date\": \"2009-04-27\","
+                "\"timeZone\": \"America/New_York\"},"
+                "\"end\": {"
+                "\"date\": \"2009-05-06\","
+                "\"timeZone\": \"America/Detroit\"}"
+                "}", -1, &error));
+        g_assert_no_error (error);
+	g_assert (GDATA_IS_ENTRY (event));
+	g_clear_error (&error);
+
+	/* Check the times */
+	i = gdata_calendar_event_get_times (event);
+
+	/* Third time */
+	when = GDATA_GD_WHEN (i->data);
+	g_assert (gdata_gd_when_is_date (when) == TRUE);
+	_time = gdata_gd_when_get_start_time (when);
+	g_assert_cmpint (_time, ==, 1239926400 + 864000);
+	_time = gdata_gd_when_get_end_time (when);
+	g_assert_cmpint (_time, ==, 1241568000);
+	g_assert (gdata_gd_when_get_value_string (when) == NULL);
+	g_assert (gdata_gd_when_get_reminders (when) == NULL);
+        
+        //gchar* tmp = gdata_parsable_get_json(GDATA_PARSABLE(event));
+
+       
+	gdata_test_assert_json (event,
+		"{\"summary\":\"Physical Electronics \","
+                "\"id\":\"kcbn6pik8tco9tds1hofbbj1m8\","
+                "\"kind\":\"calendar#event\","
+                "\"etag\":\"\\\"riS6FXjHtObfGZnFmNP8yHjrZcU/MTM3ODMwNzk1NzIyNjAwMA\\\"\","
+                "\"htmlLink\":\"https://www.google.com/calendar/event?eid=a2NibjZwaWs4dGNvOXRkczFob2ZiYmoxbThfMjAxMzA5MDVUMTIzMDAwWiB3aWxsLm15dUBt\","
+                "\"start\":{\"date\":\"2009-04-27\", \"timeZone\": \"America/New_York\"},"
+                "\"end\":{\"date\":\"2009-05-06\", \"timeZone\": \"America/Detroit\"},"
+                "\"status\":\"confirmed\","
+                "\"guestsCanModify\":false,"
+                "\"guestsCanInviteOthers\":false,"
+                "\"guestsCanSeeGuests\":false,"
+                "\"anyoneCanAddSelf\":false,"
+                "\"description\":\"Meet for a quick lesson.\"}");
+        
+
+	g_object_unref (event);        
+}
+
+static void
+test_event_json_recurrence(void){
+    GDataCalendarEvent *event;
+	GError *error = NULL;
+	gchar *id, *uri;
+
+	event = GDATA_CALENDAR_EVENT (gdata_parsable_new_from_json (GDATA_TYPE_CALENDAR_EVENT,
+		"{\"kind\": \"calendar#event\","
+                "\"etag\": \"\\\"riS6FXjHtObfGZnFmNP8yHjrZcU/MTM3ODMwNzk1NzIyNjAwMA\\\"\","
+                "\"id\": \"kcbn6pik8tco9tds1hofbbj1m8\","
+                "\"status\": \"confirmed\","
+                "\"htmlLink\": \"https://www.google.com/calendar/event?eid=a2NibjZwaWs4dGNvOXRkczFob2ZiYmoxbThfMjAxMzA5MDVUMTIzMDAwWiB3aWxsLm15dUBt\","
+                "\"created\": \"2009-04-25T15:22:47.000Z\","
+                "\"updated\": \"2009-04-27T17:54:10.000Z\","
+                "\"summary\": \"Test daily instance event\","
+                "\"location\": \"1255 Anthony Hall \","
+                "\"colorId\": \"10\","
+                "\"creator\": {"
+                "\"email\": \"libgdata.test@googlemail.com\","
+                "\"displayName\": \"GData Test\","
+                "\"self\": true"
+                "},"
+                "\"recurringEventId\":\"g5928e82rrch95b25f8ud0dlsg\","
+                "\"originalStartTime\":\"2009-04-29T16:30:00.000+01:00\","
+                "\"guestsCanModify\":false,"
+                "\"guestsCanInviteOthers\":false,"
+                "\"guestsCanSeeGuests\":false,"
+                "\"anyoneCanAddSelf\":false,"
+                "\"visibility\":\"private\","
+                "\"transparency\":\"opaque\","
+        
+                "\"start\": {"
+                "\"dateTime\": \"2009-04-29T17:30:00.000\","
+                "\"timeZone\": \"America/New_York\""
+                "},"
+                "\"end\": {"
+                "\"dateTime\": \"2009-04-29T17:30:00.000\","
+                "\"timeZone\": \"America/New_York\""
+                "},"
+                "\"recurrence\": ["
+                "\"RRULE:FREQ=WEEKLY;BYDAY=TU,TH\""
+                "],"
+                "\"iCalUID\": \"kcbn6pik8tco9tds1hofbbj1m8@google.com\","
+                "\"sequence\": 0,"
+                "\"reminders\": {"
+                "\"overrides\":"
+                                "[{\"method\":\"popup\",\"minutes\":30},"
+                                "{\"method\":\"email\",\"minutes\":120},"
+                                "{\"method\":\"sms\",\"minutes\":1440}]},"
+                "\"attendees\":[{\"email\":\"libgdata.test@googlemail.com\","
+                                "\"displayName\":\"John Smith‽\","
+                                "\"organizer\":true}]"
+                "}", -1, &error));
+	g_assert_no_error (error);
+	g_assert (GDATA_IS_ENTRY (event));
+	g_clear_error (&error);
+
+	/* Check the original event */
+	g_assert (gdata_calendar_event_is_exception (event) == TRUE);
+
+	gdata_calendar_event_get_original_event_details (event, &id, &uri);
+	g_assert_cmpstr (id, ==, "g5928e82rrch95b25f8ud0dlsg");
+	//g_assert_cmpstr (uri, ==, "http://www.google.com/calendar/feeds/libgdata.test@googlemail.com/private/full/");
+
+	g_free (id);
+	g_free (uri);
+	g_object_unref (event);
+}
+
+
+static void
+test_calendar_escaping_json (void)
+{
+	GDataCalendarCalendar *calendar;
+
+	calendar = gdata_calendar_calendar_new (NULL);
+	gdata_calendar_calendar_set_timezone (calendar, "<timezone>");
+        gdata_calendar_calendar_set_description(calendar, "<description>");
+        gdata_calendar_calendar_set_location(calendar, "<location>");
+
+
+	gdata_test_assert_json (calendar,
+		"{\"kind\":\"calendar#calendar\","
+                "\"timeZone\":\"<timezone>\","
+                "\"location\":\"<location>\","
+                "\"description\":\"<description>\"}");
+	g_object_unref (calendar);
+}
+
 int
 main (int argc, char *argv[])
-{
+{ 
 	gint retval;
 	GDataAuthorizer *authorizer = NULL;
 	GDataService *service = NULL;
@@ -1520,23 +1836,30 @@ main (int argc, char *argv[])
 	g_test_add ("/calendar/batch/async/cancellation", BatchAsyncData, service, setup_batch_async, test_batch_async_cancellation,
 	            teardown_batch_async);
 
-	g_test_add_func ("/calendar/event/xml", test_event_xml);
-	g_test_add_func ("/calendar/event/xml/dates", test_event_xml_dates);
-	g_test_add_func ("/calendar/event/xml/recurrence", test_event_xml_recurrence);
-	g_test_add_func ("/calendar/event/escaping", test_event_escaping);
+	//g_test_add_func ("/calendar/event/xml", test_event_xml);
+	//g_test_add_func ("/calendar/event/xml/dates", test_event_xml_dates);
+	//g_test_add_func ("/calendar/event/xml/recurrence", test_event_xml_recurrence);
+        g_test_add_func ("/calendar/event/json", test_event_json);
+        g_test_add_func("/calendar/event/json/dates", test_event_json_dates);
+        g_test_add_func("/calendar/event/json/recurrence", test_event_json_recurrence);
+        g_test_add_func("/calendar/event/json/escaping", test_calendar_escaping_json);
+        
+	//g_test_add_func ("/calendar/event/escaping", test_event_escaping);
 
-	g_test_add_func ("/calendar/calendar/escaping", test_calendar_escaping);
+	//g_test_add_func ("/calendar/calendar/escaping", test_calendar_escaping);
 
-	g_test_add_func ("/calendar/access-rule/properties", test_access_rule_properties);
-	g_test_add_func ("/calendar/access-rule/xml", test_access_rule_xml);
+	//g_test_add_func ("/calendar/access-rule/properties", test_access_rule_properties);
+	//g_test_add_func ("/calendar/access-rule/xml", test_access_rule_xml);
 
-	g_test_add_func ("/calendar/query/uri", test_query_uri);
-	g_test_add_func ("/calendar/query/etag", test_query_etag);
+	//g_test_add_func ("/calendar/query/uri", test_query_uri);
+	//g_test_add_func ("/calendar/query/etag", test_query_etag);
 
 	retval = g_test_run ();
 
 	if (service != NULL)
 		g_object_unref (service);
-
+               
 	return retval;
 }
+
+
