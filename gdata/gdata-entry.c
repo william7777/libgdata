@@ -593,15 +593,39 @@ get_entry_uri (const gchar *id)
 static gboolean
 parse_json (GDataParsable *parsable, JsonReader *reader, gpointer user_data, GError **error)
 {
+    
 	gboolean success;
 	GDataEntryPrivate *priv = GDATA_ENTRY (parsable)->priv;
-
-	if (gdata_parser_string_from_json_member (reader, "title", P_DEFAULT | P_NO_DUPES, &(priv->title), &success, error) == TRUE ||
-	    gdata_parser_string_from_json_member (reader, "id", P_NON_EMPTY | P_NO_DUPES, &(priv->id), &success, error) == TRUE ||
-	    gdata_parser_int64_time_from_json_member (reader, "updated", P_REQUIRED | P_NO_DUPES, &(priv->updated), &success, error) == TRUE ||
-	    gdata_parser_string_from_json_member (reader, "etag", P_NON_EMPTY | P_NO_DUPES, &(priv->etag), &success, error) == TRUE) {
-		return success;
-	} else if (g_strcmp0 (json_reader_get_member_name (reader), "selfLink") == 0) {
+        GDataEntryClass *klass = GDATA_ENTRY_GET_CLASS (GDATA_ENTRY(parsable));
+        gboolean is_event;
+        gboolean is_calendar;
+        
+        is_event = FALSE;
+        is_calendar = FALSE;
+        
+        if(klass->kind_term != NULL && 
+           g_strcmp0(klass->kind_term, "http://schemas.google.com/g/2005#event")== 0){
+             is_event = TRUE;     
+        }
+        if(klass->kind_term != NULL && 
+           g_strcmp0(klass->kind_term, "http://schemas.google.com/gCal/2005#calendarmeta")== 0){
+             is_calendar = TRUE;     
+        }
+        
+        if( (is_event || is_calendar) && 
+           gdata_parser_string_from_json_member (reader, "summary", P_DEFAULT | P_NO_DUPES, &(priv->title), &success, error) == TRUE){
+            return success;
+        }
+        else if(gdata_parser_string_from_json_member (reader, "title", P_DEFAULT | P_NO_DUPES, &(priv->title), &success, error) == TRUE){
+            return success;
+        }
+        
+	else if (gdata_parser_string_from_json_member (reader, "id", P_NON_EMPTY | P_NO_DUPES, &(priv->id), &success, error) == TRUE ||
+            gdata_parser_int64_time_from_json_member (reader, "updated", P_REQUIRED | P_NO_DUPES, &(priv->updated), &success, error) == TRUE ||
+            gdata_parser_string_from_json_member (reader, "etag", P_NON_EMPTY | P_NO_DUPES, &(priv->etag), &success, error) == TRUE) {
+                return success;
+	} 
+        else if (((!is_event && g_strcmp0 (json_reader_get_member_name (reader), "selfLink") == 0) || (is_event && g_strcmp0 (json_reader_get_member_name (reader), "htmlLink") == 0)) == TRUE) {
 		GDataLink *_link;
 		const gchar *uri;
 
@@ -616,8 +640,9 @@ parse_json (GDataParsable *parsable, JsonReader *reader, gpointer user_data, GEr
 		g_object_unref (_link);
 
 		return TRUE;
-	} else if (g_strcmp0 (json_reader_get_member_name (reader), "kind") == 0) {
-		GDataCategory *category;
+	} 
+        else if (g_strcmp0 (json_reader_get_member_name (reader), "kind") == 0) {
+                GDataCategory *category;
 		const gchar *kind;
 
 		/* Empty kind? */
@@ -625,7 +650,13 @@ parse_json (GDataParsable *parsable, JsonReader *reader, gpointer user_data, GEr
 		if (kind == NULL || *kind == '\0') {
 			return gdata_parser_error_required_json_content_missing (reader, error);
 		}
-
+                
+                if(is_event == TRUE){
+                    if(g_strcmp0(kind, "calendar#event") == 0)
+                        return TRUE;
+                    else
+                        return FALSE;
+                }
 		category = gdata_category_new (kind, "http://schemas.google.com/g/2005#kind", NULL);
 		gdata_entry_add_category (GDATA_ENTRY (parsable), category);
 		g_object_unref (category);
@@ -642,9 +673,28 @@ get_json (GDataParsable *parsable, JsonBuilder *builder)
 	GDataEntryPrivate *priv = GDATA_ENTRY (parsable)->priv;
 	GList *i;
 	GDataLink *_link;
+        gboolean is_event;
+        gboolean is_calendar;
 
-	json_builder_set_member_name (builder, "title");
-	json_builder_add_string_value (builder, priv->title);
+        GDataEntryClass *klass = GDATA_ENTRY_GET_CLASS (GDATA_ENTRY(parsable));
+        is_event = FALSE;
+        is_calendar = FALSE;
+        
+        if(klass->kind_term != NULL && g_strcmp0(klass->kind_term, "http://schemas.google.com/g/2005#event")== 0)
+            is_event = TRUE;
+        if(klass->kind_term != NULL && g_strcmp0(klass->kind_term, "http://schemas.google.com/gCal/2005#calendarmeta")== 0)
+            is_calendar = TRUE;
+        
+        if(priv->title != NULL){
+            if(is_event || is_calendar){
+                json_builder_set_member_name (builder, "summary");
+                json_builder_add_string_value (builder, priv->title);
+            }
+            else{
+                json_builder_set_member_name (builder, "title");
+                json_builder_add_string_value (builder, priv->title);
+            }
+        }
 
 	if (priv->id != NULL) {
 		json_builder_set_member_name (builder, "id");
@@ -652,7 +702,7 @@ get_json (GDataParsable *parsable, JsonBuilder *builder)
 	}
 
 	if (priv->updated != -1) {
-		gchar *updated = gdata_parser_int64_to_json_iso8601 (priv->updated);
+		gchar *updated = gdata_parser_int64_to_iso8601 (priv->updated);
 		json_builder_set_member_name (builder, "updated");
 		json_builder_add_string_value (builder, updated);
 		g_free (updated);
@@ -663,10 +713,20 @@ get_json (GDataParsable *parsable, JsonBuilder *builder)
 		GDataCategory *category = GDATA_CATEGORY (i->data);
 
 		if (g_strcmp0 (gdata_category_get_scheme (category), "http://schemas.google.com/g/2005#kind") == 0) {
-			json_builder_set_member_name (builder, "kind");
-			json_builder_add_string_value (builder, gdata_category_get_term (category));
-		}
-	}
+                    if(is_event == TRUE){
+                        json_builder_set_member_name (builder, "kind");
+                        json_builder_add_string_value (builder, "calendar#event");
+                    }
+                    else if(is_calendar == TRUE){
+                        json_builder_set_member_name(builder, "kind");
+                        json_builder_add_string_value(builder, "calendar#calendar");
+                    }
+                    else{
+                        json_builder_set_member_name (builder, "kind");
+                        json_builder_add_string_value (builder, gdata_category_get_term (category));
+                    }
+                }			
+        }
 
 	/* Add the ETag, if available. */
 	if (gdata_entry_get_etag (GDATA_ENTRY (parsable)) != NULL) {
@@ -677,8 +737,14 @@ get_json (GDataParsable *parsable, JsonBuilder *builder)
 	/* Add the self-link. */
 	_link = gdata_entry_look_up_link (GDATA_ENTRY (parsable), GDATA_LINK_SELF);
 	if (_link != NULL) {
-		json_builder_set_member_name (builder, "selfLink");
+            if(is_event == TRUE){
+                json_builder_set_member_name (builder, "htmlLink");
 		json_builder_add_string_value (builder, gdata_link_get_uri (_link));
+            }
+            else{
+                json_builder_set_member_name (builder, "selfLink");
+		json_builder_add_string_value (builder, gdata_link_get_uri (_link));
+            }		
 	}
 }
 
