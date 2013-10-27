@@ -38,6 +38,24 @@ G_BEGIN_DECLS
 #define GDATA_IS_CALENDAR_EVENT_CLASS(k)	(G_TYPE_CHECK_CLASS_TYPE ((k), GDATA_TYPE_CALENDAR_EVENT))
 #define GDATA_CALENDAR_EVENT_GET_CLASS(o)	(G_TYPE_INSTANCE_GET_CLASS ((o), GDATA_TYPE_CALENDAR_EVENT, GDataCalendarEventClass))
 
+//newly added
+#define GDATA_CALENDAR_EVENT_VISIBILITY_DEFAULT "defaulst"
+#define GDATA_CALENDAR_EVENT_VISIBILITY_PUBLIC  "public"
+#define GDATA_CALENDAR_EVENT_VISIBILITY_PRIVATE "private"
+#define GDATA_CALENDAR_EVENT_VISIBILITY_CONFIDENTIAL "confidential"
+
+#define GDATA_CALENDAR_EVENT_TRANSPARENCY_OPAQUE "opaque"
+#define GDATA_CALENDAR_EVENT_TRANSPARENCY_TRANSPARENT   "transparent"
+
+#define GDATA_CALENDAR_EVENT_STATUS_CONFIRMED   "confirmed"
+#define GDATA_CALENDAR_EVENT_STATUS_TENTATIVE   "tentative"
+#define GDATA_CALENDAR_EVENT_STATUS_CANCELLED   "cancelled"
+
+#define GDATA_CALENDAR_EVENT_RESPONSE_STATUS_NEEDSACTION        "needsAction";
+#define GDATA_CALENDAR_EVENT_RESPONSE_STATUS_DECLINED   "declined"
+#define GDATA_CALENDAR_EVENT_RESPONSE_STATUS_TENTATIVE  "tentative"
+#define GDATA_CALENDAR_EVENT_RESPONSE_STATUS_ACCEPTED   "accepted"
+
 typedef struct _GDataCalendarEventPrivate	GDataCalendarEventPrivate;
 
 /**
@@ -94,6 +112,12 @@ const gchar *gdata_calendar_event_get_recurrence (GDataCalendarEvent *self) G_GN
 void gdata_calendar_event_set_recurrence (GDataCalendarEvent *self, const gchar *recurrence);
 void gdata_calendar_event_get_original_event_details (GDataCalendarEvent *self, gchar **event_id, gchar **event_uri);
 gboolean gdata_calendar_event_is_exception (GDataCalendarEvent *self) G_GNUC_PURE;
+
+const gchar* gdata_calendar_event_get_description(GDataCalendarEvent *self) G_GNUC_PURE;
+void gdata_calendar_event_set_description(GDataCalendarEvent *self, const gchar* description);
+
+const char* gdata_calendear_event_get_calendar_id (GDataCalendarEvent *self) G_GNUC_PURE;
+void gdata_calendar_event_set_color_id(GDataCalendarEvent *self, const char* color_id);
 
 G_END_DECLS
 
