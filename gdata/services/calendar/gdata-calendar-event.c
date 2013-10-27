@@ -103,6 +103,19 @@ static void get_xml (GDataParsable *parsable, GString *xml_string);
 static gboolean parse_xml (GDataParsable *parsable, xmlDoc *doc, xmlNode *node, gpointer user_data, GError **error);
 static void get_namespaces (GDataParsable *parsable, GHashTable *namespaces);
 
+//newly added
+static void get_json (GDataParsable *parsable, JsonBuilder *builder);
+static gboolean parse_json (GDataParsable *parsable, JsonReader *reader, gpointer user_data, GError **error);
+static gboolean parse_json_when (GDataParsable *parsable, JsonReader *reader, gboolean *success, GError **error);
+static gboolean parse_json_who (GDataParsable *parsable, JsonReader *reader, gboolean *success,GError **error);
+static gboolean parse_json_where (GDataParsable *parsable, JsonReader *reader, gboolean *success,GError **error);
+static gboolean parse_json_recurrence (GDataParsable *parsable, JsonReader *reader, gboolean *success,GError **error);
+static gboolean parse_json_reminders (GDataParsable *parsable, JsonReader *reader, gboolean *success,GError **error);
+
+static void get_json_when (GDataParsable *parsable, JsonBuilder *builder);
+static void get_json_where (GDataParsable *parsable, JsonBuilder *builder);
+static void get_json_who (GDataParsable *parsable, JsonBuilder *builder);
+
 struct _GDataCalendarEventPrivate {
 	gint64 edited;
 	gchar *status;
@@ -120,6 +133,8 @@ struct _GDataCalendarEventPrivate {
 	gchar *recurrence;
 	gchar *original_event_id;
 	gchar *original_event_uri;
+        gchar *description;
+        gchar *color_id;
 };
 
 enum {
@@ -135,7 +150,9 @@ enum {
 	PROP_ANYONE_CAN_ADD_SELF,
 	PROP_RECURRENCE,
 	PROP_ORIGINAL_EVENT_ID,
-	PROP_ORIGINAL_EVENT_URI
+	PROP_ORIGINAL_EVENT_URI,
+        PROP_DESCRIPTION,
+        PROP_COLOR_ID
 };
 
 G_DEFINE_TYPE (GDataCalendarEvent, gdata_calendar_event, GDATA_TYPE_ENTRY)
@@ -158,6 +175,11 @@ gdata_calendar_event_class_init (GDataCalendarEventClass *klass)
 	parsable_class->parse_xml = parse_xml;
 	parsable_class->get_xml = get_xml;
 	parsable_class->get_namespaces = get_namespaces;
+        
+        
+        //newly added
+        parsable_class->parse_json = parse_json;
+        parsable_class->get_json = get_json;
 
 	entry_class->kind_term = "http://schemas.google.com/g/2005#event";
 
@@ -342,6 +364,16 @@ gdata_calendar_event_class_init (GDataCalendarEventClass *klass)
 	                                                      "Original event URI", "The event URI for the original event.",
 	                                                      NULL,
 	                                                      G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+        g_object_class_install_property (gobject_class, PROP_DESCRIPTION,
+                                         g_param_spec_string ("description",
+                                                             "Description", "Description of the event", 
+                                                             NULL,
+                                                             G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+        g_object_class_install_property (gobject_class, PROP_COLOR_ID,
+	                                 g_param_spec_string ("color-id",
+	                                                     "Color ID", "The color used to highlight the event in the user's browser.",
+	                                                     NULL,
+	                                                     G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 }
 
 static void
@@ -461,6 +493,12 @@ gdata_calendar_event_get_property (GObject *object, guint property_id, GValue *v
 		case PROP_ORIGINAL_EVENT_URI:
 			g_value_set_string (value, priv->original_event_uri);
 			break;
+                case PROP_DESCRIPTION:
+                        g_value_set_string (value, priv->description);
+                        break;     
+                case PROP_COLOR_ID:
+                        g_value_set_string (value, priv->color_id);
+                        break;
 		default:
 			/* We don't have any other property... */
 			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -504,6 +542,12 @@ gdata_calendar_event_set_property (GObject *object, guint property_id, const GVa
 		case PROP_RECURRENCE:
 			gdata_calendar_event_set_recurrence (self, g_value_get_string (value));
 			break;
+                case PROP_DESCRIPTION:
+                        gdata_calendar_event_set_description (self, g_value_get_string (value));
+                        break;
+                case PROP_COLOR_ID:
+                        gdata_calendar_event_set_color_id (self, g_value_get_string (value));
+                        break;
 		default:
 			/* We don't have any other property... */
 			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -1252,4 +1296,924 @@ gdata_calendar_event_is_exception (GDataCalendarEvent *self)
 {
 	g_return_val_if_fail (GDATA_IS_CALENDAR_EVENT (self), FALSE);
 	return (self->priv->original_event_id != NULL && self->priv->original_event_uri != NULL) ? TRUE : FALSE;
+}
+
+
+
+void 
+get_json (GDataParsable *parsable, JsonBuilder *builder){
+    
+        GDataCalendarEvent *self = GDATA_CALENDAR_EVENT (parsable);
+        GDataCalendarEventPrivate *priv = self->priv;
+
+        /* Chain up to the parent class */  
+        GDATA_PARSABLE_CLASS (gdata_calendar_event_parent_class)->get_json (parsable, builder);
+
+        get_json_when (parsable, builder);
+        get_json_where (parsable, builder);
+        get_json_who (parsable, builder);
+    
+     
+
+        if (priv->status != NULL) {
+                json_builder_set_member_name (builder, "status");
+                json_builder_add_string_value (builder, priv->status);
+        }
+        if (priv->visibility != NULL) {
+                json_builder_set_member_name (builder, "visibility");
+                json_builder_add_string_value (builder, priv->visibility);
+        }
+        if (priv->transparency != NULL){
+                json_builder_set_member_name (builder, "transparency");
+                json_builder_add_string_value (builder, priv->transparency);
+        }
+        if (priv->uid != NULL){
+                json_builder_set_member_name (builder, "uid");
+                json_builder_add_string_value (builder, priv->uid);
+        }
+        if (priv->sequence != 0){
+                json_builder_set_member_name (builder, "sequence");
+                json_builder_add_int_value (builder, priv->sequence);
+        }
+
+        if (priv->guests_can_modify == TRUE){
+                json_builder_set_member_name (builder, "guestsCanModify");
+                json_builder_add_boolean_value (builder, TRUE);
+        }
+        else{
+                json_builder_set_member_name (builder, "guestsCanModify");
+                json_builder_add_boolean_value (builder, FALSE);
+        }
+
+        if (priv->guests_can_invite_others == TRUE){
+                json_builder_set_member_name (builder, "guestsCanInviteOthers");
+                json_builder_add_boolean_value (builder, TRUE);
+        }
+        else{
+                json_builder_set_member_name (builder, "guestsCanInviteOthers");
+                json_builder_add_boolean_value (builder, FALSE);
+        }
+
+        if (priv->guests_can_see_guests == TRUE){
+                json_builder_set_member_name (builder, "guestsCanSeeGuests");
+                json_builder_add_boolean_value (builder, TRUE);
+        }
+        else{
+                json_builder_set_member_name (builder, "guestsCanSeeGuests");
+                json_builder_add_boolean_value (builder, FALSE);
+        }
+
+        if (priv->anyone_can_add_self == TRUE){
+                json_builder_set_member_name (builder, "anyoneCanAddSelf");
+                json_builder_add_boolean_value (builder, TRUE);
+        }
+        else{
+                json_builder_set_member_name (builder, "anyoneCanAddSelf");
+                json_builder_add_boolean_value (builder, FALSE);
+        }
+
+        if (priv->description != NULL){
+                json_builder_set_member_name (builder, "description");
+                json_builder_add_string_value (builder, priv->description);
+        }
+        if (priv->color_id != NULL){
+                json_builder_set_member_name (builder, "colorId");
+                json_builder_add_string_value (builder, priv->color_id);
+        }
+
+
+        //todo extended properties
+        //todo: gadget
+        //original Start TIme
+        //source
+    
+}
+
+const gchar * 
+gdata_calendar_event_get_description (GDataCalendarEvent *self){
+        g_return_val_if_fail (GDATA_IS_CALENDAR_EVENT (self), NULL);
+        return self->priv->description;
+}
+
+void 
+gdata_calendar_event_set_description (GDataCalendarEvent *self, const gchar* description){
+        g_return_if_fail (GDATA_IS_CALENDAR_EVENT (self));
+        g_free (self->priv->description);
+        self->priv->description = g_strdup (description);
+        g_object_notify (G_OBJECT (self), "description");
+}
+
+
+static gboolean 
+parse_json (GDataParsable *parsable, JsonReader *reader, gpointer user_data, GError **error){
+        gboolean success;
+        gboolean guests_can_modify, guests_can_invite_others, guests_can_see_guests, anyone_can_add_self;
+        
+        GDataCalendarEvent *self = GDATA_CALENDAR_EVENT (parsable);
+        success = TRUE;
+
+        if (gdata_parser_int64_time_from_json_member(reader, "updated", P_DEFAULT, &(self->priv->edited), &success, error) == TRUE || 
+            gdata_parser_string_from_json_member (reader, "status", P_DEFAULT, &(self->priv->status), &success, error) == TRUE ||
+            gdata_parser_string_from_json_member (reader, "visibility", P_DEFAULT, &(self->priv->visibility), &success, error) == TRUE ||
+            gdata_parser_string_from_json_member (reader, "transparency", P_DEFAULT, &(self->priv->transparency), &success, error) == TRUE ||
+            gdata_parser_string_from_json_member (reader, "iCalUID", P_DEFAULT, &(self->priv->uid), &success, error) == TRUE ||
+            gdata_parser_string_from_json_member (reader, "description", P_DEFAULT, &(self->priv->description), &success, error) == TRUE ||
+            gdata_parser_string_from_json_member (reader, "recurringEventId", P_DEFAULT, &(self->priv->original_event_id), &success, error) == TRUE ||
+            gdata_parser_string_from_json_member (reader, "originalStartTime", P_DEFAULT, &(self->priv->original_event_uri), &success, error) == TRUE ||
+            gdata_parser_string_from_json_member (reader, "colorId", P_DEFAULT, &(self->priv->color_id), &success, error) == TRUE ){
+                
+                return success;
+        }    
+        else if(parse_json_when (parsable, reader, &success, error) == TRUE || 
+                parse_json_who (parsable, reader,  &success, error) == TRUE || 
+                parse_json_where (parsable, reader, &success, error) == TRUE||
+                parse_json_reminders (parsable, reader, &success, error) == TRUE ||
+                parse_json_recurrence (parsable, reader, &success, error) == TRUE){           
+                return success;
+        }
+        else if(g_strcmp0 (json_reader_get_member_name(reader), "sequence") == 0){       
+                self->priv->sequence = json_reader_get_int_value (reader);
+                if(json_reader_get_error (reader) == NULL)
+                   success = TRUE;
+                else    
+                    success = FALSE;
+                return success;
+        }
+        else if(gdata_parser_boolean_from_json_member (reader, "guestsCanModify", P_DEFAULT, &(guests_can_modify), &success, error) == TRUE){
+                if(success == TRUE)
+                        self->priv->guests_can_modify = guests_can_modify;
+                 return success;
+        }
+        else if(gdata_parser_boolean_from_json_member (reader, "guestsCanInviteOthers", P_DEFAULT, &(guests_can_invite_others), &success, error) == TRUE){
+                 if(success == TRUE)
+                         self->priv->guests_can_invite_others = guests_can_invite_others;
+                 return success;
+        }
+        else if(gdata_parser_boolean_from_json_member (reader, "guestsCanSeeGuests", P_DEFAULT, &(guests_can_see_guests), &success, error) == TRUE){
+                 if(success == TRUE)
+                         self->priv->guests_can_see_guests = guests_can_see_guests;
+                return success;
+        }
+        else if(gdata_parser_boolean_from_json_member (reader, "anyoneCanAddSelf", P_DEFAULT, &(anyone_can_add_self), &success, error) == TRUE){
+                 if(success == TRUE)
+                         self->priv->anyone_can_add_self = anyone_can_add_self;
+                 return success;
+        } 
+        /*
+        else if(gdata_parser_string_from_json_member (reader, "colorId", P_DEFAULT, &color_value, &success, error) == TRUE){
+                 printf("\n colorvalue is %s, and result is %d \n", color_value, success);
+                 fflush(NULL);
+                 if(success && gdata_color_from_string((gchar*)color_value, &self->priv->color)==TRUE){
+                     return TRUE;
+                }
+                else
+                    return FALSE;
+        }
+         * */
+
+        /*omit list*/
+        else if(g_strcmp0 (json_reader_get_member_name (reader), "attendeesOmitted") == 0 ||
+                g_strcmp0 (json_reader_get_member_name (reader), "extendedProperties") == 0 ||
+                g_strcmp0 (json_reader_get_member_name (reader), "gadget") == 0 ||
+                g_strcmp0 (json_reader_get_member_name (reader), "privateCopy") == 0 ||
+                g_strcmp0 (json_reader_get_member_name (reader), "endTimeUnspecified") == 0 ||
+                g_strcmp0 (json_reader_get_member_name (reader), "locked") == 0 ||
+                g_strcmp0 (json_reader_get_member_name (reader), "hangoutLink") == 0 ||
+                g_strcmp0 (json_reader_get_member_name (reader), "source") == 0){
+            return TRUE;
+        }
+
+        else
+            return GDATA_PARSABLE_CLASS (gdata_calendar_event_parent_class)->parse_json (parsable, reader, user_data, error);
+}
+
+static gboolean parse_json_when (GDataParsable *parsable, JsonReader *reader, gboolean *success, GError **error){
+    
+        GDataCalendarEvent *self = GDATA_CALENDAR_EVENT (parsable);
+
+        GDataGDWhen *when;
+        GList *when_list;   
+        gchar* start_time, *end_time, *start_timezone, *end_timezone;
+        gint64 start_time_64, end_time_64;
+        gboolean is_date;
+        gint iterator;
+
+        start_time = NULL;
+        end_time = NULL;
+        start_timezone = NULL;
+        end_timezone = NULL;
+        is_date = FALSE;
+
+
+        if (g_strcmp0 (json_reader_get_member_name(reader), "start") != 0 && g_strcmp0 (json_reader_get_member_name(reader), "end") != 0){
+                return FALSE;
+        }
+        else if (g_strcmp0 (json_reader_get_member_name (reader), "start") == 0){ 
+            g_assert (json_reader_is_object(reader));
+
+            for (iterator = 0; iterator != json_reader_count_members (reader); iterator++){
+                if (json_reader_read_element (reader, iterator) == FALSE){
+                    json_reader_end_element (reader);
+                    *success = FALSE;
+                    g_set_error (error, GDATA_SERVICE_ERROR, GDATA_SERVICE_ERROR_PROTOCOL_ERROR,
+                                 /* Translators: the parameter is an error message. */
+                                 _("Member %d in \"start\" cannot be read\n"), iterator);
+                    return TRUE;
+                } 
+
+                if (gdata_parser_string_from_json_member (reader, (gchar*)"date", P_DEFAULT, &start_time, success, error) == TRUE && 
+                   *success == TRUE && gdata_parser_int64_from_date (start_time, &start_time_64) == TRUE){
+                    is_date = TRUE;   
+                }
+                else if (gdata_parser_int64_time_from_json_member (reader, (gchar*)"dateTime", P_DEFAULT, &start_time_64, success, error) == TRUE && *success == TRUE){
+                    is_date = FALSE;
+                }
+                else if (gdata_parser_string_from_json_member (reader, (gchar*)"timeZone", P_DEFAULT, &start_timezone, success, error) == TRUE && *success == TRUE){
+                    ;
+                }
+                else{
+                    g_set_error (error, GDATA_SERVICE_ERROR, GDATA_SERVICE_ERROR_PROTOCOL_ERROR,
+                                 /* Translators: the parameter is an error message. */
+                                 _("Invalid JSON titled %s in \"start\" was received from the server"), json_reader_get_member_name(reader));
+                    *success = FALSE;
+                    return TRUE;
+                }   
+
+                *error = NULL;
+                if (json_reader_get_error (reader) != NULL){
+                    *error = g_error_copy (json_reader_get_error (reader));
+                    *success = FALSE;
+                    return TRUE;
+                }
+
+                json_reader_end_member (reader);           
+            }
+
+            when_list = gdata_calendar_event_get_times (self);
+            if (when_list == NULL){
+                when = gdata_gd_when_new (start_time_64, -1, is_date);
+            }
+            else{
+                when = GDATA_GD_WHEN (when_list->data);
+                gdata_gd_when_set_start_time (when, start_time_64);
+                gdata_gd_when_set_is_date (when, is_date);
+            }
+            gdata_gd_when_set_start_timezone (when, start_timezone);
+
+            g_list_free (self->priv->times);
+            self->priv->times = NULL;
+            self->priv->times = g_list_append (self->priv->times, g_object_ref (when));
+
+            g_free(start_timezone);
+            g_free(start_time);
+
+            *success = TRUE;
+            *error = NULL;
+            return TRUE;
+        }
+
+
+        else{
+            g_assert (json_reader_is_object(reader));
+
+            for(iterator = 0; iterator != json_reader_count_members (reader); iterator++){
+                if (json_reader_read_element (reader, iterator) == FALSE){
+                    *success = FALSE;
+                    g_set_error (error, GDATA_SERVICE_ERROR, GDATA_SERVICE_ERROR_PROTOCOL_ERROR,
+                                 /* Translators: the parameter is an error message. */
+                                 _("Member %d in \"end\" cannot be read\n"), iterator);
+                    return TRUE;
+                }       
+
+                if (gdata_parser_string_from_json_member (reader, (gchar*)"date", P_DEFAULT, &end_time, success, error) == TRUE && 
+                   *success == TRUE && gdata_parser_int64_from_date (end_time, &end_time_64) == TRUE){
+                    is_date = TRUE;
+                }
+                else if (gdata_parser_int64_time_from_json_member (reader, (gchar*)"dateTime", P_DEFAULT, &end_time_64, success, error) == TRUE && *success == TRUE){
+                    is_date = FALSE;
+                }
+                else if (gdata_parser_string_from_json_member (reader, (gchar*)"timeZone", P_DEFAULT, &end_timezone, success, error) == TRUE && *success == TRUE){
+                }
+                else{
+                    g_set_error (error, GDATA_SERVICE_ERROR, GDATA_SERVICE_ERROR_PROTOCOL_ERROR,
+                                 /* Translators: the parameter is an error message. */
+                                 _("Invalid JSON titled %s in \"end\" was received from the server"), json_reader_get_member_name(reader));
+                    *success = FALSE;
+                    return TRUE;
+                }   
+
+                *error = NULL;
+                if (json_reader_get_error (reader) != NULL){
+                    *error = g_error_copy (json_reader_get_error (reader));
+                    *success = FALSE;
+                    return TRUE;
+                }
+
+                json_reader_end_member (reader);
+            }
+
+            when_list = gdata_calendar_event_get_times (self);
+            if (when_list == NULL){
+                when = gdata_gd_when_new (0, end_time_64, is_date);
+            }
+            else{
+                when = GDATA_GD_WHEN (when_list->data);
+                gdata_gd_when_set_end_time (when, end_time_64);
+                gdata_gd_when_set_is_date (when, is_date);
+            }
+            gdata_gd_when_set_end_timezone (when, end_timezone);
+
+            g_list_free (self->priv->times);
+            self->priv->times = NULL;
+            self->priv->times = g_list_append (self->priv->times, g_object_ref (when));
+
+            g_free (end_time);
+            g_free (end_timezone);
+            
+            *success = TRUE;
+            *error = NULL;
+            return TRUE;
+        }
+}
+
+static gboolean parse_json_reminders (GDataParsable *parsable, JsonReader *reader, gboolean *success, GError **error){
+    
+    GDataCalendarEvent *self = GDATA_CALENDAR_EVENT(parsable);
+    
+    gboolean useDefault;
+    gchar *method;
+    gint minutes;
+    GDataGDReminder *reminder;
+    GDataGDWhen *when;
+    GList* when_list;
+    gint iterator, i, j;
+    
+    method = NULL;
+    
+    if (g_strcmp0 (json_reader_get_member_name(reader), "reminders")!= 0)
+        return FALSE;
+
+    
+    when_list = gdata_calendar_event_get_times(self);   
+    if(when_list != NULL){
+        when = GDATA_GD_WHEN (when_list->data);
+    }
+    else{
+        when = gdata_gd_when_new(0, -1, 0);
+    }
+    
+    g_assert (json_reader_is_object (reader));
+    
+    for (iterator = 0; iterator < json_reader_count_members (reader); iterator++){
+        if (json_reader_read_element (reader, iterator) == FALSE){
+            *success = FALSE;
+            g_set_error (error, GDATA_SERVICE_ERROR, GDATA_SERVICE_ERROR_PROTOCOL_ERROR,
+                         /* Translators: the parameter is an error message. */
+                         _("Member %d in \"reminder\" cannot be read\n"), iterator);
+            return TRUE;
+        }
+        
+        if (gdata_parser_boolean_from_json_member (reader, "useDefault", P_DEFAULT, &useDefault, success, error) == TRUE && *success == TRUE && useDefault == TRUE){
+            reminder = gdata_gd_reminder_new (GDATA_GD_REMINDER_ALERT, -1, 30);
+            gdata_gd_when_add_reminder (when, reminder);
+            g_object_unref (reminder);
+
+            reminder = gdata_gd_reminder_new (GDATA_GD_REMINDER_EMAIL, -1, 30);
+            gdata_gd_when_add_reminder (when, reminder);
+            g_object_unref (reminder); 
+            
+            g_list_free (self->priv->times);
+            self->priv->times = NULL;
+            self->priv->times = g_list_append (self->priv->times, g_object_ref(when));
+            
+            json_reader_end_member (reader);
+            
+            g_free (method);
+            *success = TRUE;
+            *error = NULL;
+            return TRUE;
+        }
+        else if (g_strcmp0 (json_reader_get_member_name (reader), "overrides") == 0){
+            *success = TRUE;
+
+            g_assert (json_reader_is_array(reader));
+            
+            for (i=0; i < json_reader_count_elements (reader); ++i){
+                if (json_reader_read_element (reader, i) == FALSE){
+                    *success = FALSE;
+                    g_set_error (error, GDATA_SERVICE_ERROR, GDATA_SERVICE_ERROR_PROTOCOL_ERROR,
+                                 /* Translators: the parameter is an error message. */
+                                 _("Member %d in \"reminder_overrides\" cannot be read\n"), i);
+                    return TRUE;
+                }
+                
+                g_assert (json_reader_is_object (reader));
+                
+                for (j = 0; j < json_reader_count_members (reader); j++){
+                    if (json_reader_read_element (reader, j) == FALSE){
+                        json_reader_end_element (reader);
+                        *success = FALSE;
+                        g_set_error (error, GDATA_SERVICE_ERROR, GDATA_SERVICE_ERROR_PROTOCOL_ERROR,
+                                     /* Translators: the parameter is an error message. */
+                                     _("Member %d in \"overrides\" cannot be read\n"), iterator);
+                        return TRUE;
+                    } 
+                    
+                    if(gdata_parser_string_from_json_member (reader, "method", P_DEFAULT, &method, success, error) == TRUE && *success == TRUE)
+                        ;
+                    else if (g_strcmp0 (json_reader_get_member_name (reader), "minutes") == 0){
+                        minutes = json_reader_get_int_value (reader);
+                    }
+                    else{
+                        g_set_error (error, GDATA_SERVICE_ERROR, GDATA_SERVICE_ERROR_PROTOCOL_ERROR,
+                             /* Translators: the parameter is an error message. */
+                             _("Invalid JSON titled %s in \"reminders\"was received from the server"), json_reader_get_member_name(reader));
+                        *success = FALSE;
+                        return TRUE;
+                    }
+
+                     *error = NULL;
+                    if (json_reader_get_error (reader) != NULL){
+                        *error = g_error_copy (json_reader_get_error(reader));
+                        *success = FALSE;
+                        return TRUE;
+                    }
+
+                    json_reader_end_member (reader);
+                }
+
+                if (g_strcmp0 (method, "popup") == 0){
+                    reminder = gdata_gd_reminder_new (GDATA_GD_REMINDER_ALERT, -1, minutes);
+                }
+                else{
+                    reminder = gdata_gd_reminder_new (method, -1, minutes);
+                }
+
+                gdata_gd_when_add_reminder (when, reminder);
+                g_object_unref (reminder);
+
+                 *error = NULL;
+                if (json_reader_get_error (reader) != NULL){
+                    *error = g_error_copy (json_reader_get_error (reader));
+                    *success = FALSE;
+                    return TRUE;
+                }
+
+                json_reader_end_element (reader);
+            }
+            
+            g_list_free (self->priv->times);
+            self->priv->times = NULL;
+            self->priv->times = g_list_append (self->priv->times, g_object_ref (when));
+            
+        }
+        else{
+            ;
+        }
+    
+        json_reader_end_member (reader);
+    }
+    
+    g_free (method);
+    *error = NULL;
+    *success = TRUE;
+    return TRUE;
+}
+
+static gboolean parse_json_recurrence (GDataParsable *parsable, JsonReader *reader, gboolean *success, GError **error){   
+    
+    GDataCalendarEvent *self = GDATA_CALENDAR_EVENT (parsable);
+    gint iterator;
+    gchar *element;
+    gchar *tmp;
+
+    element = NULL;
+    tmp = NULL;
+
+    if  (g_strcmp0 (json_reader_get_member_name (reader), "recurrence") != 0) {
+        return FALSE;
+    }
+
+    g_assert (json_reader_is_array (reader));
+
+    g_free (self->priv->recurrence);
+    self->priv->recurrence = NULL;
+    for  (iterator = 0; iterator < json_reader_count_elements (reader); iterator++) {
+        if  (json_reader_read_element (reader, iterator) == FALSE) {
+            *success = FALSE;
+            g_set_error (error, GDATA_SERVICE_ERROR, GDATA_SERVICE_ERROR_PROTOCOL_ERROR,
+                    /* Translators: the parameter is an error message. */
+                    _ ("Member %d in \"recurrence\" cannot be read\n"), iterator);
+            return TRUE;
+        }
+        element = g_strdup (json_reader_get_string_value (reader));
+        tmp = g_strdup (self->priv->recurrence);
+        g_free (self->priv->recurrence);
+        self->priv->recurrence = g_strconcat (element, ";", tmp, NULL);
+
+        *error = NULL;
+        if  (json_reader_get_error (reader) != NULL) {
+            *error = g_error_copy (json_reader_get_error (reader));
+            *success = FALSE;
+            return TRUE;
+        }
+
+        json_reader_end_element (reader);
+    }
+
+    g_free (element);
+    g_free (tmp);
+    *error = NULL;
+    *success = TRUE;
+    return TRUE;
+}
+
+static gboolean parse_json_who (GDataParsable *parsable, JsonReader *reader, gboolean *success, GError **error) {
+
+    GDataGDWho *who;
+    gchar* email;
+    gchar* rel;
+    gchar* display_name;
+    gboolean org;
+    gint iterator;
+    gboolean optional;
+    gchar *response_status;
+    gchar *comment;
+    gint additional_guests;
+    gint i;
+    GDataCalendarEvent *self = GDATA_CALENDAR_EVENT (parsable);
+
+    if  (g_strcmp0 (json_reader_get_member_name (reader), "attendees") != 0)
+        return FALSE;
+
+    g_assert (json_reader_is_array (reader));
+
+    for  (iterator = 0; iterator < json_reader_count_elements (reader); iterator++) {
+
+        email = NULL;
+        rel = NULL;
+        display_name = NULL;
+        response_status = NULL;
+        comment = NULL;
+
+        if  (json_reader_read_element (reader, iterator) == FALSE) {
+            *success = FALSE;
+            g_set_error (error, GDATA_SERVICE_ERROR, GDATA_SERVICE_ERROR_PROTOCOL_ERROR,
+                    /* Translators: the parameter is an error message. */
+                    _ ("Member %d in \"attendees\" cannot be read\n"), iterator);
+            return TRUE;
+        }
+
+        g_assert (json_reader_is_object (reader));
+
+        who = gdata_gd_who_new (NULL, NULL, NULL);
+
+        for  (i = 0; i < json_reader_count_members (reader); i++) {
+
+            if  (json_reader_read_element (reader, i) == FALSE) {
+                *success = FALSE;
+                g_set_error (error, GDATA_SERVICE_ERROR, GDATA_SERVICE_ERROR_PROTOCOL_ERROR,
+                        /* Translators: the parameter is an error message. */
+                        _ ("Member %d in \"attendee [%d]\" cannot be read\n"), i, iterator);
+                return TRUE;
+            }
+
+            if  (g_strcmp0 (json_reader_get_member_name (reader), "email") == 0) {
+                email = g_strdup (json_reader_get_string_value (reader));
+                gdata_gd_who_set_email_address (who, email);
+                g_free (email);
+            }
+            else if  (g_strcmp0 (json_reader_get_member_name (reader), "displayName") == 0) {
+                display_name = g_strdup (json_reader_get_string_value (reader));
+                gdata_gd_who_set_value_string (who, display_name);
+                g_free (display_name);
+            }
+            else if  (g_strcmp0 (json_reader_get_member_name (reader), "organizer") == 0) {
+                org = json_reader_get_boolean_value (reader);
+                if  (org == TRUE) {
+                    rel = g_strdup ("organizer");
+                } else
+                    rel = g_strdup ("attendee");
+                gdata_gd_who_set_relation_type (who, rel);
+            }
+            else if  (g_strcmp0 (json_reader_get_member_name (reader), "optional") == 0) {
+                optional = json_reader_get_boolean_value (reader);
+                gdata_gd_who_set_is_optional (who, optional);
+            }
+            else if  (g_strcmp0 (json_reader_get_member_name (reader), "responseStatus") == 0) {
+                response_status = g_strdup (json_reader_get_string_value (reader));
+                gdata_gd_who_set_response_status (who, response_status);
+                g_free (response_status);
+            }
+            else if  (g_strcmp0 (json_reader_get_member_name (reader), "comment") == 0) {
+                comment = g_strdup (json_reader_get_string_value (reader));
+                gdata_gd_who_set_comment (who, comment);
+                g_free (comment);
+            }
+            else if  (g_strcmp0 (json_reader_get_member_name (reader), "additionalGuests") == 0) {
+                additional_guests = json_reader_get_int_value (reader);
+                gdata_gd_who_set_additional_guests (who, additional_guests);
+            } else {
+                ;
+            }
+
+            *error = NULL;
+            if  (json_reader_get_error (reader) != NULL) {
+                *error = g_error_copy (json_reader_get_error (reader));
+                *success = FALSE;
+                return TRUE;
+            }
+
+            json_reader_end_member (reader);
+        }
+
+        gdata_calendar_event_add_person (self, who);
+        g_object_unref (who);
+        *error = NULL;
+        if  (json_reader_get_error (reader) != NULL) {
+            *error = g_error_copy (json_reader_get_error (reader));
+            *success = FALSE;
+            return TRUE;
+        }
+        json_reader_end_element (reader);
+    }
+
+    *success = TRUE;
+    *error = NULL;
+    return TRUE;
+}
+
+static gboolean parse_json_where (GDataParsable *parsable, JsonReader *reader, gboolean *success, GError **error) {
+
+    GDataCalendarEvent *self = GDATA_CALENDAR_EVENT (parsable);
+
+    GDataGDWhere *where;
+    gchar* location;
+
+    if  (g_strcmp0 (json_reader_get_member_name (reader), "location") != 0)
+        return FALSE;
+
+    location = g_strdup (json_reader_get_string_value (reader));
+    where = gdata_gd_where_new ("GDataCalendarEvent", location, NULL);
+
+    *error = NULL;
+    if  (json_reader_get_error (reader) != NULL) {
+        *error = g_error_copy (json_reader_get_error (reader));
+        *success = FALSE;
+        return TRUE;
+    }
+
+    gdata_calendar_event_add_place (self, where);
+
+    g_free (location);
+    g_object_unref (where);
+    *success = TRUE;
+    *error = NULL;
+    return TRUE;
+}
+
+static void get_json_when (GDataParsable *parsable, JsonBuilder *builder) {
+    gint64 start_time_64;
+    gint64 end_time_64;
+    gchar *start_time;
+    gchar *end_time;
+    GList* when_list;
+    GDataGDWhen *when;
+    gboolean is_date;
+    GList *reminder_list;
+    GDataGDReminder *reminder;
+    gchar *method;
+    gboolean is_absolute_time;
+    gint time_length;
+    gboolean is_end;
+    gchar* start_timezone;
+    gchar* end_timezone;
+
+    GDataCalendarEvent *self = GDATA_CALENDAR_EVENT (parsable);
+    GDataCalendarEventPrivate *priv = self->priv;
+
+
+    when_list = gdata_calendar_event_get_times (self);
+    while  (when_list != NULL) {
+        when = GDATA_GD_WHEN (when_list->data);
+        start_time_64 = gdata_gd_when_get_start_time (when);
+        end_time_64 = gdata_gd_when_get_end_time (when);
+        if  (end_time_64 == -1)
+            is_end = FALSE;
+        else
+            is_end = TRUE;
+        is_date = gdata_gd_when_is_date (when);
+
+        if  (is_date) {
+            start_time = gdata_parser_date_from_int64 (start_time_64);
+            if  (is_end)
+                end_time = gdata_parser_date_from_int64 (end_time_64);
+        } else {
+            start_time = gdata_parser_int64_to_iso8601 (start_time_64);
+            if  (is_end)
+                end_time = gdata_parser_int64_to_iso8601 (end_time_64);
+        }
+        json_builder_set_member_name (builder, "start");
+        json_builder_begin_object (builder);
+        if  (is_date) {
+            json_builder_set_member_name (builder, "date");
+        } else {
+            json_builder_set_member_name (builder, "dateTime");
+        }
+        json_builder_add_string_value (builder, start_time);
+        start_timezone = gdata_gd_when_get_start_timezone (when);
+        if  (start_timezone != NULL) {
+            json_builder_set_member_name (builder, "timeZone");
+            json_builder_add_string_value (builder, start_timezone);
+        }
+        json_builder_end_object (builder);
+
+        if  (is_end == TRUE) {
+            json_builder_set_member_name (builder, "end");
+            json_builder_begin_object (builder);
+            if  (is_date) {
+                json_builder_set_member_name (builder, "date");
+            } else {
+                json_builder_set_member_name (builder, "dateTime");
+            }
+            json_builder_add_string_value (builder, end_time);
+            end_timezone = gdata_gd_when_get_end_timezone (when);
+            if  (end_timezone != NULL) {
+                json_builder_set_member_name (builder, "timeZone");
+                json_builder_add_string_value (builder, end_timezone);
+            }
+            json_builder_end_object (builder);
+        }
+
+        //processing reminders
+        reminder_list = gdata_gd_when_get_reminders (when);
+        if  (reminder_list != NULL) {
+            json_builder_set_member_name (builder, "reminders");
+            json_builder_begin_object (builder);
+            json_builder_set_member_name (builder, "overrides");
+            json_builder_begin_array (builder);
+
+            while  (reminder_list != NULL) {
+                reminder = GDATA_GD_REMINDER (reminder_list->data);
+                is_absolute_time = gdata_gd_reminder_is_absolute_time (reminder);
+                if  (is_absolute_time) {
+                    time_length = gdata_gd_reminder_get_absolute_time (reminder) - start_time_64;
+                } else {
+                    time_length = gdata_gd_reminder_get_relative_time (reminder);
+                }
+
+                g_assert (time_length >= 0);
+
+                method = g_strdup (gdata_gd_reminder_get_method (reminder));
+                if  (g_strcmp0 (method, GDATA_GD_REMINDER_ALERT) == 0) {
+                    method = g_strdup ("popup");
+                }
+
+                json_builder_begin_object (builder);
+                json_builder_set_member_name (builder, "method");
+                json_builder_add_string_value (builder, method);
+                json_builder_set_member_name (builder, "minutes");
+                json_builder_add_int_value (builder, time_length);
+                json_builder_end_object (builder);
+                ;
+                g_free (method);
+                g_object_unref (reminder);
+
+                reminder_list = reminder_list->next;
+            }
+
+            json_builder_end_array (builder);
+            json_builder_end_object (builder);
+
+        }
+
+
+        g_free (start_time);
+        if  (is_end == TRUE)
+            g_free (end_time);
+
+        when_list = when_list->next;
+    }
+
+    if  (priv->recurrence != NULL) {
+        json_builder_set_member_name (builder, "recurrence");
+        json_builder_begin_array (builder);
+        json_builder_add_string_value (builder, priv->recurrence);
+        json_builder_end_array (builder);
+    }
+}
+
+static void get_json_where (GDataParsable *parsable, JsonBuilder *builder) {
+    GList *where_list;
+    GDataGDWhere *where;
+    gchar* location;
+
+    GDataCalendarEvent *self = GDATA_CALENDAR_EVENT (parsable);
+
+    where_list = gdata_calendar_event_get_places (self);
+    while  (where_list != NULL) {
+        where = GDATA_GD_WHERE (where_list->data);
+        location = g_strdup (gdata_gd_where_get_value_string (where));
+        json_builder_set_member_name (builder, "location");
+        json_builder_add_string_value (builder, location);
+        ;
+
+        g_object_unref (where);
+        g_free (location);
+
+        where_list = where_list->next;
+    }
+}
+
+static void get_json_who (GDataParsable *parsable, JsonBuilder *builder) {
+    GList *who_list;
+    GDataGDWho *who;
+    gboolean additional_guests;
+    gchar* comment;
+    gchar* display_name;
+    gboolean optional;
+    gchar* response_status;
+    gchar* email_address;
+
+    GDataCalendarEvent *self = GDATA_CALENDAR_EVENT (parsable);
+
+    who_list = gdata_calendar_event_get_people (self);
+    if  (who_list != NULL) {
+        json_builder_set_member_name (builder, "attendees");
+        json_builder_begin_array (builder);
+        while  (who_list != NULL) {
+            who = GDATA_GD_WHO (who_list->data);
+
+            email_address = g_strdup (gdata_gd_who_get_email_address (who));
+            additional_guests = gdata_gd_who_get_additional_guests (who);
+            comment = g_strdup (gdata_gd_who_get_comment (who));
+            display_name = g_strdup (gdata_gd_who_get_value_string (who));
+            optional = gdata_gd_who_is_optional (who);
+            response_status = g_strdup (gdata_gd_who_get_response_status (who));
+
+            g_assert (email_address != NULL);
+
+            json_builder_begin_object (builder);
+            json_builder_set_member_name (builder, "email");
+            json_builder_add_string_value (builder, email_address);
+
+            if  (additional_guests > 0) {
+                json_builder_set_member_name (builder, "additionalGuests");
+                json_builder_add_int_value (builder, additional_guests);
+            }
+
+            if  (comment != NULL) {
+                json_builder_set_member_name (builder, "comment");
+                json_builder_add_string_value (builder, comment);
+                g_free (comment);
+            }
+
+            if  (display_name != NULL) {
+                json_builder_set_member_name (builder, "displayName");
+                json_builder_add_string_value (builder, display_name);
+                g_free (display_name);
+            }
+
+            if  (optional == TRUE) {
+                json_builder_set_member_name (builder, "optional");
+                json_builder_add_boolean_value (builder, TRUE);
+            }
+
+            if  (response_status != NULL && g_strcmp0 (response_status, "needsAction") == 0) {
+                json_builder_set_member_name (builder, "responseStatus");
+
+                if  (g_strcmp0 (response_status, "declined") == 0)
+                    json_builder_add_string_value (builder, "declined");
+                else if  (g_strcmp0 (response_status, "tentative") == 0)
+                    json_builder_add_string_value (builder, "tentative");
+                else if  (g_strcmp0 (response_status, "accepted") == 0)
+                    json_builder_add_string_value (builder, "accepted");
+                else {
+                    //should be error handling here.
+                    //This is temporary solution
+                    json_builder_add_string_value (builder, response_status);
+                }
+
+                g_free (response_status);
+            }
+            json_builder_end_object (builder);
+            g_object_unref (who);
+            who_list = who_list->next;
+        }
+        json_builder_end_array (builder);
+    }
+}
+
+const char * 
+gdata_calendear_event_get_calendar_id (GDataCalendarEvent *self){
+    g_return_val_if_fail (GDATA_IS_CALENDAR_EVENT (self), NULL);
+    return self->priv->color_id;
+}
+
+void 
+gdata_calendar_event_set_color_id(GDataCalendarEvent *self, const char* color_id){
+    g_return_if_fail (GDATA_IS_CALENDAR_EVENT (self));
+    g_free (self->priv->color_id);
+    self->priv->color_id = g_strdup (color_id);
+    g_object_notify (G_OBJECT (self), "color-id");
 }
