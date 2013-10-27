@@ -51,12 +51,23 @@ struct _GDataGDWhoPrivate {
 	gchar *relation_type;
 	gchar *value_string;
 	gchar *email_address;
+        
+        //For calendar use
+        gboolean is_optional;
+        gchar *response_status;
+        gchar *comment;
+        gint additional_guests;
+       
 };
 
 enum {
 	PROP_RELATION_TYPE = 1,
 	PROP_VALUE_STRING,
-	PROP_EMAIL_ADDRESS
+	PROP_EMAIL_ADDRESS,
+        PROP_ADDITIONAL_GUESTS,
+        PROP_COMMENT,
+        PROP_RESPONSE_STATUS,
+        PROP_IS_OPTIONAL      
 };
 
 G_DEFINE_TYPE_WITH_CODE (GDataGDWho, gdata_gd_who, GDATA_TYPE_PARSABLE,
@@ -130,6 +141,35 @@ gdata_gd_who_class_init (GDataGDWhoClass *klass)
 	                                                      "E-mail address", "The e-mail address of the person represented by the #GDataGDWho.",
 	                                                      NULL,
 	                                                      G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+        
+        /*below for calendar use */
+        g_object_class_install_property (gobject_class, PROP_ADDITIONAL_GUESTS,
+                                        g_param_spec_int ("additional-guests",
+                                                          "Additional guests", "Number of additional guests", 
+                                                          0, 10000, 0, 
+                                                          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+        g_object_class_install_property (gobject_class, PROP_COMMENT,
+                                        g_param_spec_string ("comment",
+                                                             "Comment", "The attendee's response comment.", 
+                                                             NULL, 
+                                                             G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+        //Four values:
+        //"needsAction" - The attendee has not responded to the invitation.
+        //"declined" - The attendee has declined the invitation.
+        //"tentative" - The attendee has tentatively accepted the invitation.
+        //"accepted" - The attendee has accepted the invitation.
+        g_object_class_install_property(gobject_class, PROP_RESPONSE_STATUS,
+                                        g_param_spec_string("response-status",
+                                                            "Response status", "The attendee's response status", 
+                                                            NULL, 
+                                                            G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+        g_object_class_install_property(gobject_class, PROP_IS_OPTIONAL,
+                                        g_param_spec_boolean("is-optional",
+                                                            "Optional?", "Whether this is an optional attendee", 
+                                                            FALSE, 
+                                                            G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+        
 }
 
 static gint
@@ -182,6 +222,18 @@ gdata_gd_who_get_property (GObject *object, guint property_id, GValue *value, GP
 		case PROP_EMAIL_ADDRESS:
 			g_value_set_string (value, priv->email_address);
 			break;
+                case PROP_IS_OPTIONAL:
+                        g_value_set_boolean(value, priv->is_optional);
+                        break;
+                case PROP_RESPONSE_STATUS:
+                        g_value_set_string(value, priv->response_status);
+                        break;
+                case PROP_COMMENT:
+                        g_value_set_string(value, priv->comment);
+                        break;
+                case PROP_ADDITIONAL_GUESTS:
+                        g_value_set_int(value, priv->additional_guests);
+                        break;
 		default:
 			/* We don't have any other property... */
 			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -204,6 +256,18 @@ gdata_gd_who_set_property (GObject *object, guint property_id, const GValue *val
 		case PROP_EMAIL_ADDRESS:
 			gdata_gd_who_set_email_address (self, g_value_get_string (value));
 			break;
+                case PROP_IS_OPTIONAL:
+                    gdata_gd_who_set_is_optional(self, g_value_get_boolean(value));
+                    break;
+                case PROP_RESPONSE_STATUS:
+                    gdata_gd_who_set_response_status(self, g_value_get_string(value));
+                    break;
+                case PROP_COMMENT:
+                    gdata_gd_who_set_comment(self, g_value_get_string(value));
+                    break;
+                case PROP_ADDITIONAL_GUESTS:
+                    gdata_gd_who_set_additional_guests(self, g_value_get_int(value));
+                    break;
 		default:
 			/* We don't have any other property... */
 			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -411,4 +475,66 @@ gdata_gd_who_set_email_address (GDataGDWho *self, const gchar *email_address)
 	g_free (self->priv->email_address);
 	self->priv->email_address = g_strdup (email_address);
 	g_object_notify (G_OBJECT (self), "email-address");
+}
+
+gint
+gdata_gd_who_get_additional_guests (GDataGDWho *self)
+{
+	g_return_val_if_fail (GDATA_IS_GD_WHO (self), -1);
+	return self->priv->additional_guests;
+}
+
+void
+gdata_gd_who_set_additional_guests (GDataGDWho *self, const gint additional_guests){
+        g_return_if_fail (GDATA_IS_GD_WHO (self));
+        g_return_if_fail (additional_guests >= 0);
+        self->priv->additional_guests = additional_guests;
+        g_object_notify (G_OBJECT (self), "additional_guests");
+}
+
+const gchar*
+gdata_gd_who_get_comment (GDataGDWho *self)
+{
+	g_return_val_if_fail (GDATA_IS_GD_WHO (self), NULL);
+	return self->priv->comment;
+}
+
+void
+gdata_gd_who_set_comment (GDataGDWho *self, const gchar* comment){
+        g_return_if_fail (GDATA_IS_GD_WHO (self));
+        g_return_if_fail (comment == NULL || *comment != '\0');
+        self->priv->comment = g_strdup (comment);
+        g_object_notify (G_OBJECT (self), "comment");
+}
+
+
+gboolean
+gdata_gd_who_is_optional (GDataGDWho *self)
+{
+	g_return_val_if_fail (GDATA_IS_GD_WHO (self), FALSE);
+	return self->priv->is_optional;
+}
+
+void
+gdata_gd_who_set_is_optional (GDataGDWho *self, const gboolean is_optional){
+        g_return_if_fail (GDATA_IS_GD_WHO (self));
+
+        self->priv->additional_guests = is_optional;
+        g_object_notify (G_OBJECT (self), "is_optional");
+}
+
+const gchar*
+gdata_gd_who_get_response_status (GDataGDWho *self)
+{
+	g_return_val_if_fail (GDATA_IS_GD_WHO (self), NULL);
+	return self->priv->response_status;
+}
+
+void
+gdata_gd_who_set_response_status (GDataGDWho *self, const gchar* response_status){
+        g_return_if_fail (GDATA_IS_GD_WHO (self));
+        g_return_if_fail (response_status == NULL || *response_status != '\0');
+
+        self->priv->response_status = g_strdup (response_status);
+        g_object_notify (G_OBJECT (self), "response_status");
 }
