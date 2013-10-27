@@ -119,6 +119,12 @@ void gdata_calendar_calendar_set_is_selected (GDataCalendarCalendar *self, gbool
 const gchar *gdata_calendar_calendar_get_access_level (GDataCalendarCalendar *self) G_GNUC_PURE;
 gint64 gdata_calendar_calendar_get_edited (GDataCalendarCalendar *self);
 
+void gdata_calendar_calendar_set_location (GDataCalendarCalendar *self, const gchar* location);
+const gchar *gdata_calendar_calendar_get_location (GDataCalendarCalendar *self) G_GNUC_PURE;
+
+void gdata_calendar_calendar_set_description (GDataCalendarCalendar *self, const gchar* description);
+const gchar* gdata_calendar_calendar_get_description (GDataCalendarCalendar *self) G_GNUC_PURE;
+
 G_END_DECLS
 
 #endif /* !GDATA_CALENDAR_CALENDAR_H */
