@@ -44,8 +44,8 @@ typedef struct {
 GType gdata_color_get_type (void) G_GNUC_CONST;
 gboolean gdata_color_from_hexadecimal (const gchar *hexadecimal, GDataColor *color);
 gchar *gdata_color_to_hexadecimal (const GDataColor *color) G_GNUC_WARN_UNUSED_RESULT G_GNUC_MALLOC;
-gboolean gdata_color_from_string(const gchar* color_value, GDataColor *color);
-gchar* gdata_color_to_string(const GDataColor* color) G_GNUC_WARN_UNUSED_RESULT G_GNUC_MALLOC;
+gboolean gdata_color_from_color_id (const gchar *color_id, GDataColor *color);
+gchar *gdata_color_to_color_id (const GDataColor *color) G_GNUC_WARN_UNUSED_RESULT G_GNUC_MALLOC;
 
 G_END_DECLS
 
