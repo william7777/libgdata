@@ -112,22 +112,17 @@ void gdata_gd_who_set_value_string (GDataGDWho *self, const gchar *value_string)
 const gchar *gdata_gd_who_get_email_address (GDataGDWho *self) G_GNUC_PURE;
 void gdata_gd_who_set_email_address (GDataGDWho *self, const gchar *email_address);
 
+guint gdata_gd_who_get_additional_guests (GDataGDWho *self) G_GNUC_PURE;
+void gdata_gd_who_set_additional_guests (GDataGDWho *self, guint additional_guests);
 
-gint gdata_gd_who_get_additional_guests (GDataGDWho *self) G_GNUC_PURE;
-
-void gdata_gd_who_set_additional_guests(GDataGDWho *self, const gint additional_guests) G_GNUC_PURE;
-
-const gchar* gdata_gd_who_get_comment (GDataGDWho *self) G_GNUC_PURE;
-
-void gdata_gd_who_set_comment(GDataGDWho *self, const gchar* comment) G_GNUC_PURE;
+const gchar *gdata_gd_who_get_comment (GDataGDWho *self) G_GNUC_PURE;
+void gdata_gd_who_set_comment (GDataGDWho *self, const gchar *comment);
 
 gboolean gdata_gd_who_is_optional (GDataGDWho *self) G_GNUC_PURE;
+void gdata_gd_who_set_is_optional (GDataGDWho *self, const gboolean optional);
 
-void gdata_gd_who_set_is_optional(GDataGDWho *self, const gboolean optional) G_GNUC_PURE;
-
-const gchar* gdata_gd_who_get_response_status (GDataGDWho *self) G_GNUC_PURE;
-
-void gdata_gd_who_set_response_status(GDataGDWho *self, const gchar* response_status) G_GNUC_PURE;
+const gchar *gdata_gd_who_get_response_status (GDataGDWho *self) G_GNUC_PURE;
+void gdata_gd_who_set_response_status (GDataGDWho *self, const gchar *response_status);
 
 G_END_DECLS
 
