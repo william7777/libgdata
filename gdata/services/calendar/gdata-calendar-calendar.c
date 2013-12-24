@@ -108,7 +108,7 @@ struct _GDataCalendarCalendarPrivate {
 	GDataColor colour;
 	gboolean is_selected;
 	gchar *access_level;
-        
+       
 	gint64 edited;
         gchar* location;
         gchar* description;
@@ -148,11 +148,10 @@ gdata_calendar_calendar_class_init (GDataCalendarCalendarClass *klass)
 	parsable_class->get_xml = get_xml;
 	parsable_class->get_namespaces = get_namespaces;
         
-        //newly added
         parsable_class->get_json = get_json;
         parsable_class->parse_json = parse_json;
 
-	entry_class->kind_term = "http://schemas.google.com/gCal/2005#calendarmeta";
+	entry_class->kind_term = "calendar#calendar";
 
 	/**
 	 * GDataCalendarCalendar:timezone:
@@ -243,19 +242,35 @@ gdata_calendar_calendar_class_init (GDataCalendarCalendarClass *klass)
 	                                                     G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
         
 	/* Override the ETag property since ETags don't seem to be supported for calendars. */
-	//g_object_class_override_property (gobject_class, PROP_ETAG, "etag");
+	g_object_class_override_property (gobject_class, PROP_ETAG, "etag");
+	
+	/**
+	 * GDataCalendarCalendar:location:
+	 *
+	 * Geographic location of the calendar as free-form text. Optional.
+	 *
+	 * For more information, see the <ulink type="http" url="https://developers.google.com/google-apps/calendar/v3/reference/calendars">
+	 * Google Calendar API</ulink>.
+	 **/
+	g_object_class_install_property (gobject_class, PROP_LOCATION, 
+                                         g_param_spec_string ("location",
+                                                              "Location", "Geographic location of the calendar as free-form text. Optional.", 
+                                                              NULL, 
+                                                              G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
         
-        g_object_class_install_property (gobject_class, PROP_LOCATION, 
-                                        g_param_spec_string ("location",
-                                                             "Location", "Indicate the location of this calendar", 
-                                                             NULL, 
-                                                             G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
-        
+	/**
+	 * GDataCalendarCalendar:description:
+	 *
+	 * Description of the calendar. Optional.
+	 *
+	 * For more information, see the <ulink type="http" url="https://developers.google.com/google-apps/calendar/v3/reference/calendars">
+	 * Google Calendar API</ulink>.
+	 **/
         g_object_class_install_property (gobject_class, PROP_DESCRIPTION,
-                                        g_param_spec_string ("description",
-                                                             "Description", "Indicate the description of the calendar",
-                                                             NULL,
-                                                             G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+                                         g_param_spec_string ("description",
+                                                              "Description", "Description of the calendar. Optional.",
+                                                              NULL,
+                                                              G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 }
 
 static gboolean
@@ -698,77 +713,120 @@ gdata_calendar_calendar_get_edited (GDataCalendarCalendar *self)
 	return self->priv->edited;
 }
 
-//newly added
-//replace static void get_xml(GDataParsable *parsable, GString *xml_string)
+/**
+ * gdata_calendar_calendar_set_location:
+ * @self: a #GDataCalendarCalendar
+ * @location: (allow-none): a new calendar location, or %NULL
+ *
+ * Sets the #GDataCalendarCalendar:location property to the new location, @location.
+ *
+ * Set @location to %NULL to unset the property in the event.
+ * 
+ * Since: UNRELEASED
+ **/
+void 
+gdata_calendar_calendar_set_location (GDataCalendarCalendar *self, const gchar *location)
+{
+        g_return_if_fail (GDATA_IS_CALENDAR_CALENDAR (self));
+	g_return_if_fail (location == NULL || *location != '\0');
+	
+	gchar *new_location;
+	new_location = g_strdup (location);
+        g_free (self->priv->location);
+	self->priv->location = new_location;
+        g_object_notify (G_OBJECT (self), "location");
+}
+
+/**
+ * gdata_calendar_calendar_get_location:
+ * @self: a #GDataCalendarCalendar
+ *
+ * Gets the #GDataCalendarCalendar:location property.
+ *
+ * Return value: the calendar's location, or %NULL
+ * 
+ * Since: UNRELEASED
+ **/
+const gchar *
+gdata_calendar_calendar_get_location (GDataCalendarCalendar *self)
+{
+        g_return_val_if_fail (GDATA_IS_CALENDAR_CALENDAR (self), NULL);
+	return self->priv->location;
+}
+
+/**
+ * gdata_calendar_calendar_set_description:
+ * @self: a #GDataCalendarCalendar
+ * @description: (allow-none): a new calendar description, or %NULL
+ *
+ * Sets the #GDataCalendarCalendar:description property to the new description, @description.
+ *
+ * Set @description to %NULL to unset the property in the event.
+ * 
+ * Since: UNRELEASED
+ **/
+void 
+gdata_calendar_calendar_set_description (GDataCalendarCalendar *self, const gchar *description)
+{
+	g_return_if_fail (GDATA_IS_CALENDAR_CALENDAR (self));
+	g_return_if_fail (description == NULL || *description != '\0');
+
+	gchar *new_description;
+	new_description = g_strdup (description);
+	g_free (self->priv->description);
+	self->priv->description = new_description;
+	g_object_notify (G_OBJECT (self), "description");
+}
+
+/**
+ * gdata_calendar_calendar_get_description:
+ * @self: a #GDataCalendarCalendar
+ *
+ * Gets the #GDataCalendarCalendar:description property.
+ *
+ * Return value: the calendar's description, or %NULL
+ * 
+ * Since: UNRELEASED
+ **/
+const gchar * 
+gdata_calendar_calendar_get_description (GDataCalendarCalendar *self)
+{
+	g_return_val_if_fail (GDATA_IS_CALENDAR_CALENDAR (self), NULL);
+	return self->priv->description;
+}
 
 static void 
-get_json (GDataParsable *parsable, JsonBuilder *builder){
-
+get_json (GDataParsable *parsable, JsonBuilder *builder)
+{
 	GDataCalendarCalendarPrivate *priv = GDATA_CALENDAR_CALENDAR (parsable)->priv;
-
 	GDATA_PARSABLE_CLASS (gdata_calendar_calendar_parent_class)->get_json (parsable, builder);
-
 
 	if (priv->timezone != NULL) {
 		json_builder_set_member_name (builder, "timeZone");
 		json_builder_add_string_value (builder, priv->timezone);
-	}
-
-	
-        if (priv->location != NULL){
+	}	
+        if (priv->location != NULL) {
             json_builder_set_member_name (builder, "location");
             json_builder_add_string_value (builder, priv->location);
-        }
-        
-        if (priv->description != NULL){
+        }       
+        if (priv->description != NULL) {
             json_builder_set_member_name (builder, "description");
             json_builder_add_string_value (builder, priv->description);
-        }
-        
+        }       
 }
 
-
-//newly added
 static gboolean
 parse_json (GDataParsable *parsable, JsonReader *reader, gpointer user_data, GError **error)
 {
 	gboolean success;
 	GDataCalendarCalendar *self = GDATA_CALENDAR_CALENDAR (parsable);
         
-	if (gdata_parser_string_from_json_member (reader, "timeZone", P_DEFAULT, &(self->priv->times_cleaned), &success, error) == TRUE ||
+	if (gdata_parser_string_from_json_member (reader, "timeZone", P_DEFAULT, &(self->priv->timezone), &success, error) == TRUE ||
             gdata_parser_string_from_json_member (reader, "description", P_DEFAULT, &(self->priv->description), &success, error) == TRUE ||
             gdata_parser_string_from_json_member (reader, "location", P_DEFAULT, &(self->priv->location), &success, error) == TRUE) {
 		return success;
-	} 
-        else {
+	} else {
 		return GDATA_PARSABLE_CLASS (gdata_calendar_calendar_parent_class)->parse_json (parsable, reader, user_data, error);
-	}
-        
+	}       
 	return TRUE;
-}
-
-void 
-gdata_calendar_calendar_set_location (GDataCalendarCalendar *self, const gchar* location){
-        g_return_if_fail (GDATA_IS_CALENDAR_CALENDAR (self));
-        g_free (self->priv->location);
-	self->priv->location = g_strdup (location);
-        g_object_notify (G_OBJECT (self), "location");
-}
-const gchar *
-gdata_calendar_calendar_get_location (GDataCalendarCalendar *self){
-        g_return_val_if_fail (GDATA_IS_CALENDAR_CALENDAR (self), NULL);
-	return self->priv->location;
-}
-
-void 
-gdata_calendar_calendar_set_description (GDataCalendarCalendar *self, const gchar* description){
-    g_return_if_fail (GDATA_IS_CALENDAR_CALENDAR (self));
-    g_free (self->priv->description);
-    self->priv->description = g_strdup (description);
-    g_object_notify (G_OBJECT (self), "description");
-}
-const gchar * 
-gdata_calendar_calendar_get_description (GDataCalendarCalendar *self){
-    g_return_val_if_fail (GDATA_IS_CALENDAR_CALENDAR (self), NULL);
-    return self->priv->description;
 }
