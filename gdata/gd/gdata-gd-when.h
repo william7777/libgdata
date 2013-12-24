@@ -162,11 +162,11 @@ GList *gdata_gd_when_get_reminders (GDataGDWhen *self) G_GNUC_PURE;
 void gdata_gd_when_add_reminder (GDataGDWhen *self, GDataGDReminder *reminder);
 /* TODO: More reminder API */
 
-const gchar* gdata_gd_when_get_start_timezone (GDataGDWhen *self) G_GNUC_PURE;
-void gdata_gd_when_set_start_timezone (GDataGDWhen *self, const gchar* start_timezone);
+const gchar *gdata_gd_when_get_start_timezone (GDataGDWhen *self) G_GNUC_PURE;
+void gdata_gd_when_set_start_timezone (GDataGDWhen *self, const gchar *start_timezone);
 
-const gchar* gdata_gd_when_get_end_timezone (GDataGDWhen *self) G_GNUC_PURE;
-void gdata_gd_when_set_end_timezone (GDataGDWhen *self, const gchar* end_timezone);
+const gchar *gdata_gd_when_get_end_timezone (GDataGDWhen *self) G_GNUC_PURE;
+void gdata_gd_when_set_end_timezone (GDataGDWhen *self, const gchar *end_timezone);
 
 G_END_DECLS
 
