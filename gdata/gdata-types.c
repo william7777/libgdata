@@ -133,92 +133,92 @@ gdata_color_to_hexadecimal (const GDataColor *color)
 	return g_strdup_printf ("#%02x%02x%02x", color->red, color->green, color->blue);
 }
 
+/**
+ * gdata_color_from_color_id:
+ * @color_id: a color_id color string
+ * @color: (out caller-allocates): a #GDataColor
+ *
+ * Parses @color_id and returns a #GDataColor describing it in @color.
+ *
+ * @color_id should be a string representing a number ranging from 1 to 11. 
+ * For more information, see the <ulink type="http" url="https://developers.google.com/google-apps/calendar/v3/reference/events?hl=en">
+ * 
+ * Return value: %TRUE on success, %FALSE otherwise
+ * 
+ * Since: UNRELEASED
+ **/
 gboolean 
-gdata_color_from_string(const gchar* color_value, GDataColor *color){
-    gchar *hex;
-
-	g_return_val_if_fail (color_value != NULL, FALSE);
+gdata_color_from_color_id (const gchar *color_id, GDataColor *color)
+{
+	g_return_val_if_fail (color_id != NULL, FALSE);
 	g_return_val_if_fail (color != NULL, FALSE);
-        
-        if(g_strcmp0(color_value, "1") == 0){
-            hex = g_strdup("#A4BDFC");
-        }
-        else if(g_strcmp0(color_value, "2") == 0){
-            hex = g_strdup("#7AE8BF");
-        }
-        else if(g_strcmp0(color_value, "3") == 0){
-            hex = g_strdup("#DBADFF");
-        }
-        else if(g_strcmp0(color_value, "4") == 0){
-            hex = g_strdup("#FF887C");
-        }
-        else if(g_strcmp0(color_value, "5") == 0){
-            hex = g_strdup("#FBD75B");
-        }
-        else if(g_strcmp0(color_value, "6") == 0){
-            hex = g_strdup("#FFB878");
-        }
-        else if(g_strcmp0(color_value, "7") == 0){
-            hex = g_strdup("#46D6DB");
-        }
-        else if(g_strcmp0(color_value, "8") == 0){
-            hex = g_strdup("#E1E1E1");
-        }
-        else if(g_strcmp0(color_value, "9") == 0){
-            hex = g_strdup("#5484ED");
-        }
-        else if(g_strcmp0(color_value, "10") == 0){
-            hex = g_strdup("#51B749");
-        }
-        else if(g_strcmp0(color_value, "11") == 0){
-            hex = g_strdup("#DC2127");
-        }
-        else{
-            return FALSE;
-        }
-        
-        return gdata_color_from_hexadecimal(hex, color);       
+	
+	guint64 parsed_color_value;
+	gchar *end_ptr;
+	const gchar *hex;
+	static const gchar *hex_colors[] = {
+		"#A4BDFC",
+		"#7AE8BF",
+		"#DBADFF",
+		"#FF887C",
+		"#FBD75B",
+		"#FFB878",
+		"#46D6DB",
+		"#E1E1E1",
+		"#5484ED",
+		"#51B749",
+		"#DC2127",
+	};
+	
+	parsed_color_value = g_ascii_strtoull(color_id, &end_ptr, 10);		
+	if (parsed_color_value == 0 || (*end_ptr) != '\0' || parsed_color_value > G_N_ELEMENTS (hex_colors)){
+		return FALSE;
+	}
+	
+	hex = hex_colors[parsed_color_value-1];
+	return gdata_color_from_hexadecimal (hex, color); 	      
 }
 
-gchar* gdata_color_to_string(const GDataColor* color){
-    gchar *hexstr;
-    hexstr = gdata_color_to_hexadecimal(color);
-    
-    if(g_strcmp0(hexstr, "#A4BDFC") == 0){
-        return g_strdup("1");
-    }
-    else if(g_strcmp0(hexstr, "#7AE8BF")){
-        return g_strdup("2");
-    }
-    else if(g_strcmp0(hexstr, "#DBADFF")){
-        return g_strdup("3");
-    }
-    else if(g_strcmp0(hexstr, "#FF887C")){
-        return g_strdup("4");
-    }
-    else if(g_strcmp0(hexstr, "#FBD75B")){
-        return g_strdup("5");
-    }
-    else if(g_strcmp0(hexstr, "#FFB878")){
-        return g_strdup("6");
-    }
-    else if(g_strcmp0(hexstr, "#46D6DB")){
-        return g_strdup("7");
-    }
-    else if(g_strcmp0(hexstr, "#E1E1E1")){
-        return g_strdup("8");
-    }
-    else if(g_strcmp0(hexstr, "#5484ED")){
-        return g_strdup("9");
-    }
-    else if(g_strcmp0(hexstr, "#51B749")){
-        return g_strdup("10");
-    }
-    else if(g_strcmp0(hexstr, "#DC2127")){
-        return g_strdup("11");
-    }
-    else{
-        return NULL;
-    }
-    
+/**
+ * gdata_color_to_color_id:
+ * @color: a #GDataColor
+ *
+ * Returns a string describing @color in color_id form; color_id is a string representing an integer ranging from 1 to 11;
+ * 
+ * For more information, see the <ulink type="http" url="https://developers.google.com/google-apps/calendar/v3/reference/events?hl=en">
+ *
+ * Return value: the color_id string; free with g_free()
+ *
+ * Since: UNRELEASED
+ **/
+gchar * 
+gdata_color_to_color_id (const GDataColor *color)
+{
+	guint iter;
+	gchar *hexstr;
+	static const gchar *hex_colors[] = {
+		"#A4BDFC",
+		"#7AE8BF",
+		"#DBADFF",
+		"#FF887C",
+		"#FBD75B",
+		"#FFB878",
+		"#46D6DB",
+		"#E1E1E1",
+		"#5484ED",
+		"#51B749",
+		"#DC2127",
+	};
+	
+	hexstr = gdata_color_to_hexadecimal (color);
+	
+	for (iter = 0; iter < G_N_ELEMENTS (hex_colors); iter++){
+		if (g_strcmp0 (hexstr, hex_colors[iter]) == 0){
+			g_free (hexstr);
+			return g_strdup_printf ("%d", iter+1);
+		}
+	}
+	
+	g_free (hexstr);
+	return NULL;
 }
