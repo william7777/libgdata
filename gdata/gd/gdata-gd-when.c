@@ -55,20 +55,20 @@ static void get_namespaces (GDataParsable *parsable, GHashTable *namespaces);
 struct _GDataGDWhenPrivate {
 	gint64 start_time;
 	gint64 end_time;
-        gchar* start_timezone;
-        gchar* end_timezone;
 	gboolean is_date;
 	gchar *value_string;
 	GList *reminders;
+	gchar *start_timezone;
+	gchar *end_timezone;
 };
 
 enum {
 	PROP_START_TIME = 1,
 	PROP_END_TIME,
-        PROP_START_TIMEZONE,
-        PROP_END_TIMEZONE,
 	PROP_IS_DATE,
-	PROP_VALUE_STRING
+	PROP_VALUE_STRING,
+	PROP_START_TIMEZONE,
+	PROP_END_TIMEZONE,
 };
 
 G_DEFINE_TYPE_WITH_CODE (GDataGDWhen, gdata_gd_when, GDATA_TYPE_PARSABLE,
@@ -128,18 +128,6 @@ gdata_gd_when_class_init (GDataGDWhenClass *klass)
 	                                                     -1, G_MAXINT64, -1,
 	                                                     G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
         
-        g_object_class_install_property (gobject_class, PROP_START_TIMEZONE, 
-                                        g_param_spec_string ("start-timezone",
-                                                             "Start timezone", "The timezone for start time",
-                                                             NULL,
-                                                             G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-        g_object_class_install_property (gobject_class, PROP_END_TIMEZONE, 
-                                        g_param_spec_string ("end-timezone",
-                                                             "End timezone", "The timezone for end time",
-                                                             NULL,
-                                                             G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-        
-
 	/**
 	 * GDataGDWhen:is-date:
 	 *
@@ -172,6 +160,37 @@ gdata_gd_when_class_init (GDataGDWhenClass *klass)
 	                                                      "Value string", "A simple string value used to name this when.",
 	                                                      NULL,
 	                                                      G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+	/**
+	 *  GDataGDWhen:start-timezone:
+	 *
+	 * The name of the time zone in which the time is specified (e.g. "Europe/Zurich").
+	 *
+	 * For more information, see the
+	 * <ulink type="http" url="https://developers.google.com/google-apps/calendar/v3/reference/events">GData specification</ulink>.
+	 *
+	 * Since: UNRELEASED
+	 **/
+        g_object_class_install_property (gobject_class, PROP_START_TIMEZONE, 
+                                         g_param_spec_string ("start-timezone",
+                                                              "Start timezone", "The name of the time zone in which the time is specified (e.g. \"Europe/Zurich\").",
+                                                              NULL,
+                                                              G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+	
+	/**
+	 * GDataGDWhen:end-timezone:
+	 *
+	 * The name of the time zone in which the time is specified (e.g. "Europe/Zurich").
+	 *
+	 * For more information, see the
+	 * <ulink type="http" url="https://developers.google.com/google-apps/calendar/v3/reference/events">GData specification</ulink>.
+	 *
+	 * Since: UNRELEASED
+	 **/
+        g_object_class_install_property (gobject_class, PROP_END_TIMEZONE, 
+                                         g_param_spec_string ("end-timezone",
+                                                              "End timezone", "The name of the time zone in which the time is specified (e.g. \"Europe/Zurich\").",
+                                                              NULL,
+                                                              G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 }
 
 static gint
@@ -242,17 +261,17 @@ gdata_gd_when_get_property (GObject *object, guint property_id, GValue *value, G
 		case PROP_END_TIME:
 			g_value_set_int64 (value, priv->end_time);
 			break;
-                case PROP_START_TIMEZONE:
-                        g_value_set_string (value, priv->start_timezone);
-                        break;
-                case PROP_END_TIMEZONE:
-                        g_value_set_string (value, priv->end_timezone);
-                        break;
 		case PROP_IS_DATE:
 			g_value_set_boolean (value, priv->is_date);
 			break;
 		case PROP_VALUE_STRING:
 			g_value_set_string (value, priv->value_string);
+			break;		
+		case PROP_START_TIMEZONE:
+			g_value_set_string (value, priv->start_timezone);
+			break;
+		case PROP_END_TIMEZONE:
+			g_value_set_string (value, priv->end_timezone);
 			break;
 		default:
 			/* We don't have any other property... */
@@ -273,17 +292,17 @@ gdata_gd_when_set_property (GObject *object, guint property_id, const GValue *va
 		case PROP_END_TIME:
 			gdata_gd_when_set_end_time (self, g_value_get_int64 (value));
 			break;
-                case PROP_START_TIMEZONE:
-                        gdata_gd_when_set_start_timezone (self, g_value_get_string (value));
-                        break;
-                case PROP_END_TIMEZONE:
-                        gdata_gd_when_set_end_timezone (self, g_value_get_string (value));
-                        break;
 		case PROP_IS_DATE:
 			gdata_gd_when_set_is_date (self, g_value_get_boolean (value));
 			break;
 		case PROP_VALUE_STRING:
 			gdata_gd_when_set_value_string (self, g_value_get_string (value));
+			break;			
+		case PROP_START_TIMEZONE:
+			gdata_gd_when_set_start_timezone (self, g_value_get_string (value));
+			break;
+		case PROP_END_TIMEZONE:
+			gdata_gd_when_set_end_timezone (self, g_value_get_string (value));
 			break;
 		default:
 			/* We don't have any other property... */
@@ -623,32 +642,84 @@ gdata_gd_when_add_reminder (GDataGDWhen *self, GDataGDReminder *reminder)
 		self->priv->reminders = g_list_append (self->priv->reminders, g_object_ref (reminder));
 }
 
-const gchar* gdata_gd_when_get_start_timezone (GDataGDWhen *self)
+/**
+ * gdata_gd_when_get_start_timezone:
+ * @self: a #GDataGDWhen
+ *
+ * Gets the #GDataGDWhen:start-timezone property.
+ *
+ * Return value: the timezone for start time, or %NULL
+ *
+ * Since: UNRELEASED
+ **/
+const gchar *
+gdata_gd_when_get_start_timezone (GDataGDWhen *self)
 {
-    g_return_val_if_fail (GDATA_IS_GD_WHEN (self), NULL);
-    
-    return self->priv->start_timezone;
+	g_return_val_if_fail (GDATA_IS_GD_WHEN (self), NULL);    
+	return self->priv->start_timezone;
 }
 
-void gdata_gd_when_set_start_timezone (GDataGDWhen *self, const gchar* start_timezone)
+/**
+ * gdata_gd_when_set_start_timezone:
+ * @self: a #GDataGDWhen
+ * @start_timezone: (allow-none): the new start timezone, or %NULL
+ *
+ * Sets the #GDataGDWhen:start-timezone property to @start_timezone.
+ *
+ * Set @start_timezone to %NULL to unset the property.
+ *
+ * Since: UNRELEASED
+ **/
+void 
+gdata_gd_when_set_start_timezone (GDataGDWhen *self, const gchar* start_timezone)
 {
-    g_return_if_fail (GDATA_IS_GD_WHEN (self));
-    
-    g_free (self->priv->start_timezone);
-    self->priv->start_timezone = g_strdup (start_timezone);
+	g_return_if_fail (GDATA_IS_GD_WHEN (self));
+	g_return_if_fail (start_timezone == NULL || *start_timezone != '\0');
+	
+	gchar *new_start_timezone;
+	new_start_timezone = g_strdup(start_timezone);
+	g_free (self->priv->start_timezone);
+	self->priv->start_timezone = new_start_timezone;
+	g_object_notify (G_OBJECT(self), "start-timezone");
 }
 
-const gchar* gdata_gd_when_get_end_timezone (GDataGDWhen *self)
+/**
+ * gdata_gd_when_get_end_timezone:
+ * @self: a #GDataGDWhen
+ *
+ * Gets the #GDataGDWhen:end-timezone property.
+ *
+ * Return value: the timezone for end time, or %NULL
+ *
+ * Since: UNRELEASED
+ **/
+const gchar * 
+gdata_gd_when_get_end_timezone (GDataGDWhen *self)
 {
-    g_return_val_if_fail (GDATA_IS_GD_WHEN (self), NULL);
-    
-    return self->priv->end_timezone;
+	g_return_val_if_fail (GDATA_IS_GD_WHEN (self), NULL);   
+	return self->priv->end_timezone;
 }
 
-void gdata_gd_when_set_end_timezone (GDataGDWhen *self, const gchar* end_timezone)
+/**
+ * gdata_gd_when_set_end_timezone:
+ * @self: a #GDataGDWhen
+ * @end_timezone: (allow-none): the new end timezone, or %NULL
+ *
+ * Sets the #GDataGDWhen:end-timezone property to @end_timezone.
+ *
+ * Set @end_timezone to %NULL to unset the property.
+ *
+ * Since: UNRELEASED
+ **/
+void 
+gdata_gd_when_set_end_timezone (GDataGDWhen *self, const gchar* end_timezone)
 {
-    g_return_if_fail (GDATA_IS_GD_WHEN (self));
-    
-    g_free (self->priv->end_timezone);
-    self->priv->end_timezone = g_strdup (end_timezone);
+	g_return_if_fail (GDATA_IS_GD_WHEN(self));
+	g_return_if_fail (end_timezone == NULL || *end_timezone != '\0');
+	
+	gchar *new_end_timezone;
+	new_end_timezone = g_strdup(end_timezone);
+	g_free (self->priv->end_timezone);
+	self->priv->end_timezone = new_end_timezone;
+	g_object_notify (G_OBJECT(self), "end-timezone");
 }
