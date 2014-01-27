@@ -1997,7 +1997,7 @@ void
 gdata_calendar_event_set_gadget_type (GDataCalendarEvent *self, const gchar *gadget_type)
 {
         g_return_if_fail (GDATA_IS_CALENDAR_EVENT (self));
-	g_return_if_fail (gadget_type == NULL && *gadget_type != '\0');
+	g_return_if_fail (gadget_type == NULL || *gadget_type != '\0');
 	
 	gchar *new_gadget_type;
 	new_gadget_type = g_strdup (gadget_type);
@@ -2073,7 +2073,7 @@ gdata_calendar_event_set_gadget_width (GDataCalendarEvent *self, guint gadget_wi
  *
  * Gets the #GDataCalendarEvent:hangout-link property.
  *
- * Return value: An absolute link to the Google+ hangout associated with this event, or %NULL
+ * Return value: (allow-none): An absolute link to the Google+ hangout associated with this event, or %NULL
  * 
  * Since: UNRELEASED
  **/
@@ -2090,7 +2090,7 @@ gdata_calendar_event_get_hangout_link (GDataCalendarEvent *self)
  *
  * Gets the #GDataEntry:summary property.
  *
- * Return value: the event's summary, or %NULL
+ * Return value: (allow-none): the event's summary, or %NULL
  * 
  * Since: UNRELEASED
  **/
@@ -2251,7 +2251,7 @@ gdata_calendar_event_is_locked(GDataCalendarEvent *self)
  *
  * Gets the value of an private extended property of the event.
  *
- * Return value: the property's value, or %NULL
+ * Return value: (allow-none): the property's value, or %NULL
  *
  * Since: UNRELEASED
  **/
@@ -2323,7 +2323,7 @@ gboolean gdata_calendar_event_set_extended_property_private (GDataCalendarEvent 
  *
  * Gets the value of an shared extended property of the event.
  *
- * Return value: the property's value, or %NULL
+ * Return value: (allow-none): the property's value, or %NULL
  *
  * Since: UNRELEASED
  **/
@@ -2395,7 +2395,7 @@ gboolean gdata_calendar_event_set_extended_property_shared (GDataCalendarEvent *
  *
  * Gets the value of a gadget preference of the event.
  *
- * Return value: the preference's value, or %NULL
+ * Return value: (allow-none): the preference's value, or %NULL
  *
  * Since: UNRELEASED
  **/
