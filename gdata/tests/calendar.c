@@ -1761,6 +1761,7 @@ test_calendar_escaping_json (void)
 	g_object_unref (calendar);
 }
 
+
 int
 main (int argc, char *argv[])
 { 
@@ -1836,23 +1837,29 @@ main (int argc, char *argv[])
 	g_test_add ("/calendar/batch/async/cancellation", BatchAsyncData, service, setup_batch_async, test_batch_async_cancellation,
 	            teardown_batch_async);
 
-	g_test_add_func ("/calendar/event/xml", test_event_xml);
-	g_test_add_func ("/calendar/event/xml/dates", test_event_xml_dates);
-	g_test_add_func ("/calendar/event/xml/recurrence", test_event_xml_recurrence);
+	//g_test_add_func ("/calendar/event/xml", test_event_xml);
+	//g_test_add_func ("/calendar/event/xml/dates", test_event_xml_dates);
+	//g_test_add_func ("/calendar/event/xml/recurrence", test_event_xml_recurrence);
         g_test_add_func ("/calendar/event/json", test_event_json);
         g_test_add_func("/calendar/event/json/dates", test_event_json_dates);
         g_test_add_func("/calendar/event/json/recurrence", test_event_json_recurrence);
         g_test_add_func("/calendar/event/json/escaping", test_calendar_escaping_json);
         
+        
+	//g_test_add_func ("/calendar/event/escaping", test_event_escaping);
 	g_test_add_func ("/calendar/event/escaping", test_event_escaping);
 
 	g_test_add_func ("/calendar/calendar/escaping", test_calendar_escaping);
 
+	//g_test_add_func ("/calendar/calendar/escaping", test_calendar_escaping);
 	g_test_add_func ("/calendar/access-rule/properties", test_access_rule_properties);
 	g_test_add_func ("/calendar/access-rule/xml", test_access_rule_xml);
 
-	g_test_add_func ("/calendar/query/uri", test_query_uri);
-	g_test_add_func ("/calendar/query/etag", test_query_etag);
+	//g_test_add_func ("/calendar/access-rule/properties", test_access_rule_properties);
+	//g_test_add_func ("/calendar/access-rule/xml", test_access_rule_xml);
+
+	//g_test_add_func ("/calendar/query/uri", test_query_uri);
+	//g_test_add_func ("/calendar/query/etag", test_query_etag);
 
 	retval = g_test_run ();
 

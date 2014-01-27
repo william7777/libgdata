@@ -50,6 +50,11 @@ G_BEGIN_DECLS
 #define GDATA_CALENDAR_EVENT_STATUS_TENTATIVE           "tentative"
 #define GDATA_CALENDAR_EVENT_STATUS_CANCELLED           "cancelled"
 
+#define GDATA_CALENDAR_EVENT_RESPONSE_STATUS_NEEDSACTION        "needsAction";
+#define GDATA_CALENDAR_EVENT_RESPONSE_STATUS_DECLINED           "declined"
+#define GDATA_CALENDAR_EVENT_RESPONSE_STATUS_TENTATIVE          "tentative"
+#define GDATA_CALENDAR_EVENT_RESPONSE_STATUS_ACCEPTED           "accepted"
+
 typedef struct _GDataCalendarEventPrivate	GDataCalendarEventPrivate;
 
 /**

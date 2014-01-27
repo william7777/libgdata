@@ -298,6 +298,14 @@ gdatayoutubeinclude_HEADERS = \
 	$(gdata_youtube_headers)			\
 	gdata/services/youtube/gdata-youtube-enums.h
 
+gdatatasksincludedir = $(gdataincludedir)/services/tasks
+gdatatasksinclude_HEADERS = 						\
+	gdata/services/tasks/gdata-tasks-service.h		\
+	gdata/services/tasks/gdata-tasks-tasklist.h		\
+	gdata/services/tasks/gdata-tasks-task.h			\
+	gdata/services/tasks/gdata-tasks-query.h
+
+
 gdata_sources = \
 	gdata/gdata-entry.c		\
 	gdata/gdata-feed.c		\
@@ -400,7 +408,12 @@ gdata_sources = \
 	gdata/services/youtube/gdata-youtube-state.c		\
 	gdata/services/youtube/gdata-youtube-control.c		\
 	gdata/services/youtube/gdata-youtube-category.c		\
-	gdata/services/youtube/gdata-youtube-comment.c
+	gdata/services/youtube/gdata-youtube-comment.c		\
+	\
+	gdata/services/tasks/gdata-tasks-service.c			\
+	gdata/services/tasks/gdata-tasks-tasklist.c			\
+	gdata/services/tasks/gdata-tasks-task.c				\
+	gdata/services/tasks/gdata-tasks-query.c
 
 if ENABLE_GOA
 gdata_sources += \
@@ -420,7 +433,8 @@ public_headers = \
 	$(gdatacontactsinclude_HEADERS)		\
 	$(gdatadocumentsinclude_HEADERS)	\
 	$(gdatapicasawebinclude_HEADERS)	\
-	$(gdatayoutubeinclude_HEADERS)
+	$(gdatayoutubeinclude_HEADERS)		\
+	$(gdatatasksinclude_HEADERS)
 
 gdata_libgdata_la_SOURCES = \
 	$(GDATA_MARSHAL_FILES)		\
@@ -631,7 +645,7 @@ ChangeLog: $(srcdir)/ChangeLog
 $(srcdir)/ChangeLog:
 	@echo Creating $@
 	@if test -d "$(srcdir)/.git"; then \
-	  (GIT_DIR=$(top_srcdir)/.git ./missing --run \
+	  (GIT_DIR=$(top_srcdir)/.git ./build-aux/missing --run \
 	   git log --stat) | fmt --split-only > $@.tmp \
 	  && mv -f $@.tmp $@ \
 	  || ($(RM) $@.tmp; \

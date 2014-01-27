@@ -207,6 +207,12 @@ gdata_gd_who_class_init (GDataGDWhoClass *klass)
                                                               FALSE, 
                                                               G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));   
 	        
+        g_object_class_install_property (gobject_class, PROP_IS_OPTIONAL,
+                                         g_param_spec_boolean("is-optional",
+                                                              "Optional?", "Whether this is an optional attendee.", 
+                                                              FALSE, 
+                                                              G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));   
+	        
 }
 
 static gint
