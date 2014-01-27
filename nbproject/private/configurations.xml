@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="89">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <df root="." name="libgdata">
+      <df name="autom4te.cache">
+      </df>
+      <df name="build-aux">
+      </df>
+      <df name="demos">
+        <df name="scrapbook">
+          <in>scrapbook.c</in>
+          <in>scrapbook.h</in>
+        </df>
+      </df>
+      <df name="docs">
+        <df name="reference">
+          <df name="html">
+          </df>
+          <df name="xml">
+          </df>
+        </df>
+      </df>
+      <df name="gdata">
+        <df name="app">
+          <in>gdata-app-categories.c</in>
+          <in>gdata-app-categories.h</in>
+        </df>
+        <df name="atom">
+          <in>gdata-author.c</in>
+          <in>gdata-author.h</in>
+          <in>gdata-category.c</in>
+          <in>gdata-category.h</in>
+          <in>gdata-generator.c</in>
+          <in>gdata-generator.h</in>
+          <in>gdata-link.c</in>
+          <in>gdata-link.h</in>
+        </df>
+        <df name="exif">
+          <in>gdata-exif-tags.c</in>
+          <in>gdata-exif-tags.h</in>
+        </df>
+        <df name="gcontact">
+          <in>gdata-gcontact-calendar.c</in>
+          <in>gdata-gcontact-calendar.h</in>
+          <in>gdata-gcontact-event.c</in>
+          <in>gdata-gcontact-event.h</in>
+          <in>gdata-gcontact-external-id.c</in>
+          <in>gdata-gcontact-external-id.h</in>
+          <in>gdata-gcontact-jot.c</in>
+          <in>gdata-gcontact-jot.h</in>
+          <in>gdata-gcontact-language.c</in>
+          <in>gdata-gcontact-language.h</in>
+          <in>gdata-gcontact-relation.c</in>
+          <in>gdata-gcontact-relation.h</in>
+          <in>gdata-gcontact-website.c</in>
+          <in>gdata-gcontact-website.h</in>
+        </df>
+        <df name="gd">
+          <in>gdata-gd-email-address.c</in>
+          <in>gdata-gd-email-address.h</in>
+          <in>gdata-gd-feed-link.c</in>
+          <in>gdata-gd-feed-link.h</in>
+          <in>gdata-gd-im-address.c</in>
+          <in>gdata-gd-im-address.h</in>
+          <in>gdata-gd-name.c</in>
+          <in>gdata-gd-name.h</in>
+          <in>gdata-gd-organization.c</in>
+          <in>gdata-gd-organization.h</in>
+          <in>gdata-gd-phone-number.c</in>
+          <in>gdata-gd-phone-number.h</in>
+          <in>gdata-gd-postal-address.c</in>
+          <in>gdata-gd-postal-address.h</in>
+          <in>gdata-gd-reminder.c</in>
+          <in>gdata-gd-reminder.h</in>
+          <in>gdata-gd-when.c</in>
+          <in>gdata-gd-when.h</in>
+          <in>gdata-gd-where.c</in>
+          <in>gdata-gd-where.h</in>
+          <in>gdata-gd-who.c</in>
+          <in>gdata-gd-who.h</in>
+        </df>
+        <df name="georss">
+          <in>gdata-georss-where.c</in>
+          <in>gdata-georss-where.h</in>
+        </df>
+        <df name="media">
+          <in>gdata-media-category.c</in>
+          <in>gdata-media-category.h</in>
+          <in>gdata-media-content.c</in>
+          <in>gdata-media-content.h</in>
+          <in>gdata-media-credit.c</in>
+          <in>gdata-media-credit.h</in>
+          <in>gdata-media-enums.c</in>
+          <in>gdata-media-enums.h</in>
+          <in>gdata-media-group.c</in>
+          <in>gdata-media-group.h</in>
+          <in>gdata-media-thumbnail.c</in>
+          <in>gdata-media-thumbnail.h</in>
+        </df>
+        <df name="services">
+          <df name="calendar">
+            <in>gdata-calendar-calendar.c</in>
+            <in>gdata-calendar-calendar.h</in>
+            <in>gdata-calendar-event.c</in>
+            <in>gdata-calendar-event.h</in>
+            <in>gdata-calendar-feed.c</in>
+            <in>gdata-calendar-feed.h</in>
+            <in>gdata-calendar-query.c</in>
+            <in>gdata-calendar-query.h</in>
+            <in>gdata-calendar-service.c</in>
+            <in>gdata-calendar-service.h</in>
+            <in>test.cpp</in>
+          </df>
+          <df name="contacts">
+            <in>gdata-contacts-contact.c</in>
+            <in>gdata-contacts-contact.h</in>
+            <in>gdata-contacts-group.c</in>
+            <in>gdata-contacts-group.h</in>
+            <in>gdata-contacts-query.c</in>
+            <in>gdata-contacts-query.h</in>
+            <in>gdata-contacts-service.c</in>
+            <in>gdata-contacts-service.h</in>
+          </df>
+          <df name="documents">
+            <in>gdata-documents-document.c</in>
+            <in>gdata-documents-document.h</in>
+            <in>gdata-documents-drawing.c</in>
+            <in>gdata-documents-drawing.h</in>
+            <in>gdata-documents-entry.c</in>
+            <in>gdata-documents-entry.h</in>
+            <in>gdata-documents-enums.c</in>
+            <in>gdata-documents-enums.h</in>
+            <in>gdata-documents-feed.c</in>
+            <in>gdata-documents-feed.h</in>
+            <in>gdata-documents-folder.c</in>
+            <in>gdata-documents-folder.h</in>
+            <in>gdata-documents-pdf.c</in>
+            <in>gdata-documents-pdf.h</in>
+            <in>gdata-documents-presentation.c</in>
+            <in>gdata-documents-presentation.h</in>
+            <in>gdata-documents-query.c</in>
+            <in>gdata-documents-query.h</in>
+            <in>gdata-documents-service.c</in>
+            <in>gdata-documents-service.h</in>
+            <in>gdata-documents-spreadsheet.c</in>
+            <in>gdata-documents-spreadsheet.h</in>
+            <in>gdata-documents-text.c</in>
+            <in>gdata-documents-text.h</in>
+            <in>gdata-documents-upload-query.c</in>
+            <in>gdata-documents-upload-query.h</in>
+          </df>
+          <df name="picasaweb">
+            <in>gdata-picasaweb-album.c</in>
+            <in>gdata-picasaweb-album.h</in>
+            <in>gdata-picasaweb-comment.c</in>
+            <in>gdata-picasaweb-comment.h</in>
+            <in>gdata-picasaweb-enums.c</in>
+            <in>gdata-picasaweb-enums.h</in>
+            <in>gdata-picasaweb-feed.c</in>
+            <in>gdata-picasaweb-feed.h</in>
+            <in>gdata-picasaweb-file.c</in>
+            <in>gdata-picasaweb-file.h</in>
+            <in>gdata-picasaweb-query.c</in>
+            <in>gdata-picasaweb-query.h</in>
+            <in>gdata-picasaweb-service.c</in>
+            <in>gdata-picasaweb-service.h</in>
+            <in>gdata-picasaweb-user.c</in>
+            <in>gdata-picasaweb-user.h</in>
+          </df>
+          <df name="youtube">
+            <in>gdata-youtube-category.c</in>
+            <in>gdata-youtube-category.h</in>
+            <in>gdata-youtube-comment.c</in>
+            <in>gdata-youtube-comment.h</in>
+            <in>gdata-youtube-content.c</in>
+            <in>gdata-youtube-content.h</in>
+            <in>gdata-youtube-control.c</in>
+            <in>gdata-youtube-control.h</in>
+            <in>gdata-youtube-credit.c</in>
+            <in>gdata-youtube-credit.h</in>
+            <in>gdata-youtube-enums.c</in>
+            <in>gdata-youtube-enums.h</in>
+            <in>gdata-youtube-group.c</in>
+            <in>gdata-youtube-group.h</in>
+            <in>gdata-youtube-query.c</in>
+            <in>gdata-youtube-query.h</in>
+            <in>gdata-youtube-service.c</in>
+            <in>gdata-youtube-service.h</in>
+            <in>gdata-youtube-state.c</in>
+            <in>gdata-youtube-state.h</in>
+            <in>gdata-youtube-video.c</in>
+            <in>gdata-youtube-video.h</in>
+          </df>
+        </df>
+        <df name="tests">
+          <df name="traces">
+            <df name="calendar">
+            </df>
+            <df name="client-login-authorizer">
+            </df>
+            <df name="contacts">
+            </df>
+            <df name="documents">
+            </df>
+            <df name="oauth1-authorizer">
+            </df>
+            <df name="picasaweb">
+            </df>
+            <df name="youtube">
+            </df>
+          </df>
+          <in>authorization.c</in>
+          <in>calendar.c</in>
+          <in>client-login-authorizer.c</in>
+          <in>common.c</in>
+          <in>common.h</in>
+          <in>contacts.c</in>
+          <in>documents.c</in>
+          <in>general.c</in>
+          <in>memory.c</in>
+          <in>mock-resolver.c</in>
+          <in>mock-resolver.h</in>
+          <in>mock-server.c</in>
+          <in>mock-server.h</in>
+          <in>oauth1-authorizer.c</in>
+          <in>perf.c</in>
+          <in>picasaweb.c</in>
+          <in>streams.c</in>
+          <in>youtube.c</in>
+        </df>
+        <in>gdata-access-handler.c</in>
+        <in>gdata-access-handler.h</in>
+        <in>gdata-access-rule.c</in>
+        <in>gdata-access-rule.h</in>
+        <in>gdata-authorization-domain.c</in>
+        <in>gdata-authorization-domain.h</in>
+        <in>gdata-authorizer.c</in>
+        <in>gdata-authorizer.h</in>
+        <in>gdata-batch-feed.c</in>
+        <in>gdata-batch-feed.h</in>
+        <in>gdata-batch-operation.c</in>
+        <in>gdata-batch-operation.h</in>
+        <in>gdata-batch-private.h</in>
+        <in>gdata-batchable.c</in>
+        <in>gdata-batchable.h</in>
+        <in>gdata-buffer.c</in>
+        <in>gdata-buffer.h</in>
+        <in>gdata-client-login-authorizer.c</in>
+        <in>gdata-client-login-authorizer.h</in>
+        <in>gdata-comment.c</in>
+        <in>gdata-comment.h</in>
+        <in>gdata-commentable.c</in>
+        <in>gdata-commentable.h</in>
+        <in>gdata-comparable.c</in>
+        <in>gdata-comparable.h</in>
+        <in>gdata-download-stream.c</in>
+        <in>gdata-download-stream.h</in>
+        <in>gdata-entry.c</in>
+        <in>gdata-entry.h</in>
+        <in>gdata-enums.c</in>
+        <in>gdata-enums.h</in>
+        <in>gdata-feed.c</in>
+        <in>gdata-feed.h</in>
+        <in>gdata-goa-authorizer.c</in>
+        <in>gdata-goa-authorizer.h</in>
+        <in>gdata-marshal.c</in>
+        <in>gdata-marshal.h</in>
+        <in>gdata-oauth1-authorizer.c</in>
+        <in>gdata-oauth1-authorizer.h</in>
+        <in>gdata-parsable.c</in>
+        <in>gdata-parsable.h</in>
+        <in>gdata-parser.c</in>
+        <in>gdata-parser.h</in>
+        <in>gdata-private.h</in>
+        <in>gdata-query.c</in>
+        <in>gdata-query.h</in>
+        <in>gdata-service.c</in>
+        <in>gdata-service.h</in>
+        <in>gdata-types.c</in>
+        <in>gdata-types.h</in>
+        <in>gdata-upload-stream.c</in>
+        <in>gdata-upload-stream.h</in>
+        <in>gdata-version.h</in>
+        <in>gdata.h</in>
+      </df>
+      <df name="m4">
+      </df>
+      <df name="po">
+      </df>
+      <df name="tmp-introspectfcdQ2L">
+        <in>GData-0.0.c</in>
+      </df>
+      <df name="tmp-introspectPu6dgU">
+        <in>GData-0.0.c</in>
+      </df>
+      <in>TMP.cpp</in>
+      <in>config.h</in>
+    </df>
+  </logicalFolder>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Default" type="0">
+      <toolsSet>
+        <developmentServer>localhost</developmentServer>
+        <platform>2</platform>
+      </toolsSet>
+      <compile>
+        <compiledirpicklist>
+          <compiledirpicklistitem>.</compiledirpicklistitem>
+          <compiledirpicklistitem>${AUTO_FOLDER}</compiledirpicklistitem>
+        </compiledirpicklist>
+        <compiledir>${AUTO_FOLDER}</compiledir>
+        <compilecommandpicklist>
+          <compilecommandpicklistitem>${MAKE} ${ITEM_NAME}.o</compilecommandpicklistitem>
+          <compilecommandpicklistitem>${AUTO_COMPILE}</compilecommandpicklistitem>
+        </compilecommandpicklist>
+        <compilecommand>${AUTO_COMPILE}</compilecommand>
+      </compile>
+      <dbx_gdbdebugger version="1">
+        <gdb_pathmaps>
+        </gdb_pathmaps>
+        <gdb_interceptlist>
+          <gdbinterceptoptions gdb_all="false" gdb_unhandled="true" gdb_unexpected="true"/>
+        </gdb_interceptlist>
+        <gdb_options>
+          <DebugOptions>
+          </DebugOptions>
+        </gdb_options>
+        <gdb_buildfirst gdb_buildfirst_overriden="false" gdb_buildfirst_old="false"/>
+      </dbx_gdbdebugger>
+      <nativedebugger version="1">
+        <engine>gdb</engine>
+      </nativedebugger>
+      <runprofile version="9">
+        <runcommandpicklist>
+          <runcommandpicklistitem>"${OUTPUT_PATH}"</runcommandpicklistitem>
+        </runcommandpicklist>
+        <runcommand>"${OUTPUT_PATH}"</runcommand>
+        <rundir>.</rundir>
+        <buildfirst>false</buildfirst>
+        <terminal-type>0</terminal-type>
+        <remove-instrumentation>0</remove-instrumentation>
+        <environment>
+        </environment>
+      </runprofile>
+    </conf>
+  </confs>
+</configurationDescriptor>

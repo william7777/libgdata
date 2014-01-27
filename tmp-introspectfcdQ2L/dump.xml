@@ -1,0 +1,678 @@
+<?xml version="1.0"?>
+<dump>
+  <class name="GDataParsable" get-type="gdata_parsable_get_type" parents="GObject" abstract="1">
+    <property name="constructed-from-xml" type="gboolean" flags="235"/>
+  </class>
+  <class name="GDataCategory" get-type="gdata_category_get_type" parents="GDataParsable,GObject">
+    <implements name="GDataComparable"/>
+    <property name="term" type="gchararray" flags="227"/>
+    <property name="scheme" type="gchararray" flags="227"/>
+    <property name="label" type="gchararray" flags="227"/>
+  </class>
+  <class name="GDataLink" get-type="gdata_link_get_type" parents="GDataParsable,GObject">
+    <implements name="GDataComparable"/>
+    <property name="uri" type="gchararray" flags="227"/>
+    <property name="relation-type" type="gchararray" flags="227"/>
+    <property name="content-type" type="gchararray" flags="227"/>
+    <property name="language" type="gchararray" flags="227"/>
+    <property name="title" type="gchararray" flags="227"/>
+    <property name="length" type="gint" flags="227"/>
+  </class>
+  <class name="GDataAuthor" get-type="gdata_author_get_type" parents="GDataParsable,GObject">
+    <implements name="GDataComparable"/>
+    <property name="name" type="gchararray" flags="227"/>
+    <property name="uri" type="gchararray" flags="227"/>
+    <property name="email-address" type="gchararray" flags="227"/>
+  </class>
+  <class name="GDataEntry" get-type="gdata_entry_get_type" parents="GDataParsable,GObject">
+    <property name="title" type="gchararray" flags="227"/>
+    <property name="summary" type="gchararray" flags="227"/>
+    <property name="etag" type="gchararray" flags="235"/>
+    <property name="id" type="gchararray" flags="235"/>
+    <property name="updated" type="gint64" flags="225"/>
+    <property name="published" type="gint64" flags="225"/>
+    <property name="content" type="gchararray" flags="227"/>
+    <property name="is-inserted" type="gboolean" flags="225"/>
+    <property name="rights" type="gchararray" flags="227"/>
+    <property name="content-uri" type="gchararray" flags="227"/>
+  </class>
+  <class name="GDataGenerator" get-type="gdata_generator_get_type" parents="GDataParsable,GObject">
+    <implements name="GDataComparable"/>
+    <property name="name" type="gchararray" flags="225"/>
+    <property name="uri" type="gchararray" flags="225"/>
+    <property name="version" type="gchararray" flags="225"/>
+  </class>
+  <class name="GDataFeed" get-type="gdata_feed_get_type" parents="GDataParsable,GObject">
+    <property name="id" type="gchararray" flags="225"/>
+    <property name="etag" type="gchararray" flags="225"/>
+    <property name="updated" type="gint64" flags="225"/>
+    <property name="title" type="gchararray" flags="225"/>
+    <property name="subtitle" type="gchararray" flags="225"/>
+    <property name="logo" type="gchararray" flags="225"/>
+    <property name="icon" type="gchararray" flags="225"/>
+    <property name="generator" type="GDataGenerator" flags="225"/>
+    <property name="items-per-page" type="guint" flags="225"/>
+    <property name="start-index" type="guint" flags="225"/>
+    <property name="total-results" type="guint" flags="225"/>
+    <property name="rights" type="gchararray" flags="225"/>
+  </class>
+  <class name="GDataAuthorizationDomain" get-type="gdata_authorization_domain_get_type" parents="GObject">
+    <property name="service-name" type="gchararray" flags="235"/>
+    <property name="scope" type="gchararray" flags="235"/>
+  </class>
+  <interface name="GDataAuthorizer" get-type="gdata_authorizer_get_type">
+  </interface>
+  <class name="GDataService" get-type="gdata_service_get_type" parents="GObject">
+    <property name="proxy-uri" type="SoupURI" flags="227"/>
+    <property name="timeout" type="guint" flags="227"/>
+    <property name="locale" type="gchararray" flags="227"/>
+    <property name="authorizer" type="GDataAuthorizer" flags="227"/>
+  </class>
+  <class name="GDataQuery" get-type="gdata_query_get_type" parents="GObject">
+    <property name="q" type="gchararray" flags="227"/>
+    <property name="categories" type="gchararray" flags="227"/>
+    <property name="author" type="gchararray" flags="227"/>
+    <property name="updated-min" type="gint64" flags="227"/>
+    <property name="updated-max" type="gint64" flags="227"/>
+    <property name="published-min" type="gint64" flags="227"/>
+    <property name="published-max" type="gint64" flags="227"/>
+    <property name="start-index" type="guint" flags="227"/>
+    <property name="is-strict" type="gboolean" flags="227"/>
+    <property name="max-results" type="guint" flags="227"/>
+    <property name="etag" type="gchararray" flags="227"/>
+  </class>
+  <boxed name="GDataColor" get-type="gdata_color_get_type"/>
+  <enum name="GDataOperationType" get-type="gdata_operation_type_get_type">
+    <member name="GDATA_OPERATION_QUERY" nick="query" value="1"/>
+    <member name="GDATA_OPERATION_INSERTION" nick="insertion" value="2"/>
+    <member name="GDATA_OPERATION_UPDATE" nick="update" value="3"/>
+    <member name="GDATA_OPERATION_DELETION" nick="deletion" value="4"/>
+    <member name="GDATA_OPERATION_DOWNLOAD" nick="download" value="5"/>
+    <member name="GDATA_OPERATION_UPLOAD" nick="upload" value="6"/>
+    <member name="GDATA_OPERATION_AUTHENTICATION" nick="authentication" value="7"/>
+    <member name="GDATA_OPERATION_BATCH" nick="batch" value="8"/>
+  </enum>  <enum name="GDataServiceError" get-type="gdata_service_error_get_type">
+    <member name="GDATA_SERVICE_ERROR_UNAVAILABLE" nick="unavailable" value="1"/>
+    <member name="GDATA_SERVICE_ERROR_PROTOCOL_ERROR" nick="protocol-error" value="2"/>
+    <member name="GDATA_SERVICE_ERROR_ENTRY_ALREADY_INSERTED" nick="entry-already-inserted" value="3"/>
+    <member name="GDATA_SERVICE_ERROR_AUTHENTICATION_REQUIRED" nick="authentication-required" value="4"/>
+    <member name="GDATA_SERVICE_ERROR_NOT_FOUND" nick="not-found" value="5"/>
+    <member name="GDATA_SERVICE_ERROR_CONFLICT" nick="conflict" value="6"/>
+    <member name="GDATA_SERVICE_ERROR_FORBIDDEN" nick="forbidden" value="7"/>
+    <member name="GDATA_SERVICE_ERROR_BAD_QUERY_PARAMETER" nick="bad-query-parameter" value="8"/>
+    <member name="GDATA_SERVICE_ERROR_NETWORK_ERROR" nick="network-error" value="9"/>
+    <member name="GDATA_SERVICE_ERROR_PROXY_ERROR" nick="proxy-error" value="10"/>
+    <member name="GDATA_SERVICE_ERROR_WITH_BATCH_OPERATION" nick="with-batch-operation" value="11"/>
+  </enum>  <enum name="GDataParserError" get-type="gdata_parser_error_get_type">
+    <member name="GDATA_PARSER_ERROR_PARSING_STRING" nick="parsing-string" value="1"/>
+    <member name="GDATA_PARSER_ERROR_EMPTY_DOCUMENT" nick="empty-document" value="2"/>
+  </enum>  <enum name="GDataBatchOperationType" get-type="gdata_batch_operation_type_get_type">
+    <member name="GDATA_BATCH_OPERATION_QUERY" nick="query" value="0"/>
+    <member name="GDATA_BATCH_OPERATION_INSERTION" nick="insertion" value="1"/>
+    <member name="GDATA_BATCH_OPERATION_UPDATE" nick="update" value="2"/>
+    <member name="GDATA_BATCH_OPERATION_DELETION" nick="deletion" value="3"/>
+  </enum>  <enum name="GDataClientLoginAuthorizerError" get-type="gdata_client_login_authorizer_error_get_type">
+    <member name="GDATA_CLIENT_LOGIN_AUTHORIZER_ERROR_BAD_AUTHENTICATION" nick="bad-authentication" value="1"/>
+    <member name="GDATA_CLIENT_LOGIN_AUTHORIZER_ERROR_NOT_VERIFIED" nick="not-verified" value="2"/>
+    <member name="GDATA_CLIENT_LOGIN_AUTHORIZER_ERROR_TERMS_NOT_AGREED" nick="terms-not-agreed" value="3"/>
+    <member name="GDATA_CLIENT_LOGIN_AUTHORIZER_ERROR_CAPTCHA_REQUIRED" nick="captcha-required" value="4"/>
+    <member name="GDATA_CLIENT_LOGIN_AUTHORIZER_ERROR_ACCOUNT_DELETED" nick="account-deleted" value="5"/>
+    <member name="GDATA_CLIENT_LOGIN_AUTHORIZER_ERROR_ACCOUNT_DISABLED" nick="account-disabled" value="6"/>
+    <member name="GDATA_CLIENT_LOGIN_AUTHORIZER_ERROR_SERVICE_DISABLED" nick="service-disabled" value="7"/>
+    <member name="GDATA_CLIENT_LOGIN_AUTHORIZER_ERROR_ACCOUNT_MIGRATED" nick="account-migrated" value="8"/>
+    <member name="GDATA_CLIENT_LOGIN_AUTHORIZER_ERROR_INVALID_SECOND_FACTOR" nick="invalid-second-factor" value="9"/>
+  </enum>  <class name="GDataAccessRule" get-type="gdata_access_rule_get_type" parents="GDataEntry,GDataParsable,GObject">
+    <property name="role" type="gchararray" flags="227"/>
+    <property name="scope-type" type="gchararray" flags="227"/>
+    <property name="scope-value" type="gchararray" flags="227"/>
+    <property name="edited" type="gint64" flags="225"/>
+  </class>
+  <interface name="GDataAccessHandler" get-type="gdata_access_handler_get_type">
+    <prerequisite name="GDataEntry"/>
+  </interface>
+  <class name="GDataDownloadStream" get-type="gdata_download_stream_get_type" parents="GInputStream,GObject">
+    <implements name="GSeekable"/>
+    <property name="service" type="GDataService" flags="235"/>
+    <property name="download-uri" type="gchararray" flags="235"/>
+    <property name="content-type" type="gchararray" flags="225"/>
+    <property name="content-length" type="glong" flags="225"/>
+    <property name="cancellable" type="GCancellable" flags="235"/>
+    <property name="authorization-domain" type="GDataAuthorizationDomain" flags="235"/>
+  </class>
+  <class name="GDataUploadStream" get-type="gdata_upload_stream_get_type" parents="GOutputStream,GObject">
+    <property name="service" type="GDataService" flags="235"/>
+    <property name="upload-uri" type="gchararray" flags="235"/>
+    <property name="entry" type="GDataEntry" flags="235"/>
+    <property name="slug" type="gchararray" flags="235"/>
+    <property name="content-type" type="gchararray" flags="235"/>
+    <property name="method" type="gchararray" flags="235"/>
+    <property name="cancellable" type="GCancellable" flags="235"/>
+    <property name="authorization-domain" type="GDataAuthorizationDomain" flags="235"/>
+    <property name="content-length" type="gint64" flags="235"/>
+  </class>
+  <interface name="GDataComparable" get-type="gdata_comparable_get_type">
+  </interface>
+  <class name="GDataBatchOperation" get-type="gdata_batch_operation_get_type" parents="GObject">
+    <property name="service" type="GDataService" flags="235"/>
+    <property name="feed-uri" type="gchararray" flags="235"/>
+    <property name="authorization-domain" type="GDataAuthorizationDomain" flags="235"/>
+  </class>
+  <interface name="GDataBatchable" get-type="gdata_batchable_get_type">
+    <prerequisite name="GDataService"/>
+  </interface>
+  <class name="GDataClientLoginAuthorizer" get-type="gdata_client_login_authorizer_get_type" parents="GObject">
+    <implements name="GDataAuthorizer"/>
+    <property name="client-id" type="gchararray" flags="235"/>
+    <property name="username" type="gchararray" flags="225"/>
+    <property name="password" type="gchararray" flags="225"/>
+    <property name="proxy-uri" type="SoupURI" flags="227"/>
+    <property name="timeout" type="guint" flags="227"/>
+    <signal name="captcha-challenge" return="gchararray" when="last">
+      <param type="gchararray"/>
+    </signal>
+  </class>
+  <class name="GDataOAuth1Authorizer" get-type="gdata_oauth1_authorizer_get_type" parents="GObject">
+    <implements name="GDataAuthorizer"/>
+    <property name="application-name" type="gchararray" flags="235"/>
+    <property name="locale" type="gchararray" flags="227"/>
+    <property name="proxy-uri" type="SoupURI" flags="227"/>
+    <property name="timeout" type="guint" flags="227"/>
+  </class>
+  <class name="GDataComment" get-type="gdata_comment_get_type" parents="GDataEntry,GDataParsable,GObject" abstract="1">
+  </class>
+  <interface name="GDataCommentable" get-type="gdata_commentable_get_type">
+    <prerequisite name="GDataEntry"/>
+  </interface>
+  <class name="GDataAPPCategories" get-type="gdata_app_categories_get_type" parents="GDataParsable,GObject">
+    <property name="is-fixed" type="gboolean" flags="225"/>
+  </class>
+  <class name="GDataGDEmailAddress" get-type="gdata_gd_email_address_get_type" parents="GDataParsable,GObject">
+    <implements name="GDataComparable"/>
+    <property name="address" type="gchararray" flags="227"/>
+    <property name="relation-type" type="gchararray" flags="227"/>
+    <property name="label" type="gchararray" flags="227"/>
+    <property name="is-primary" type="gboolean" flags="227"/>
+    <property name="display-name" type="gchararray" flags="227"/>
+  </class>
+  <class name="GDataGDIMAddress" get-type="gdata_gd_im_address_get_type" parents="GDataParsable,GObject">
+    <implements name="GDataComparable"/>
+    <property name="address" type="gchararray" flags="227"/>
+    <property name="protocol" type="gchararray" flags="227"/>
+    <property name="relation-type" type="gchararray" flags="227"/>
+    <property name="label" type="gchararray" flags="227"/>
+    <property name="is-primary" type="gboolean" flags="227"/>
+  </class>
+  <class name="GDataGDName" get-type="gdata_gd_name_get_type" parents="GDataParsable,GObject">
+    <implements name="GDataComparable"/>
+    <property name="given-name" type="gchararray" flags="227"/>
+    <property name="additional-name" type="gchararray" flags="227"/>
+    <property name="family-name" type="gchararray" flags="227"/>
+    <property name="prefix" type="gchararray" flags="227"/>
+    <property name="suffix" type="gchararray" flags="227"/>
+    <property name="full-name" type="gchararray" flags="227"/>
+  </class>
+  <class name="GDataGDWhere" get-type="gdata_gd_where_get_type" parents="GDataParsable,GObject">
+    <implements name="GDataComparable"/>
+    <property name="relation-type" type="gchararray" flags="227"/>
+    <property name="value-string" type="gchararray" flags="227"/>
+    <property name="label" type="gchararray" flags="227"/>
+  </class>
+  <class name="GDataGDOrganization" get-type="gdata_gd_organization_get_type" parents="GDataParsable,GObject">
+    <implements name="GDataComparable"/>
+    <property name="name" type="gchararray" flags="227"/>
+    <property name="title" type="gchararray" flags="227"/>
+    <property name="relation-type" type="gchararray" flags="227"/>
+    <property name="label" type="gchararray" flags="227"/>
+    <property name="is-primary" type="gboolean" flags="227"/>
+    <property name="department" type="gchararray" flags="227"/>
+    <property name="job-description" type="gchararray" flags="227"/>
+    <property name="symbol" type="gchararray" flags="227"/>
+    <property name="location" type="GDataGDWhere" flags="227"/>
+  </class>
+  <class name="GDataGDPhoneNumber" get-type="gdata_gd_phone_number_get_type" parents="GDataParsable,GObject">
+    <implements name="GDataComparable"/>
+    <property name="number" type="gchararray" flags="227"/>
+    <property name="uri" type="gchararray" flags="227"/>
+    <property name="relation-type" type="gchararray" flags="227"/>
+    <property name="label" type="gchararray" flags="227"/>
+    <property name="is-primary" type="gboolean" flags="227"/>
+  </class>
+  <class name="GDataGDPostalAddress" get-type="gdata_gd_postal_address_get_type" parents="GDataParsable,GObject">
+    <implements name="GDataComparable"/>
+    <property name="address" type="gchararray" flags="227"/>
+    <property name="relation-type" type="gchararray" flags="227"/>
+    <property name="label" type="gchararray" flags="227"/>
+    <property name="is-primary" type="gboolean" flags="227"/>
+    <property name="mail-class" type="gchararray" flags="227"/>
+    <property name="usage" type="gchararray" flags="227"/>
+    <property name="agent" type="gchararray" flags="227"/>
+    <property name="house-name" type="gchararray" flags="227"/>
+    <property name="street" type="gchararray" flags="227"/>
+    <property name="po-box" type="gchararray" flags="227"/>
+    <property name="neighborhood" type="gchararray" flags="227"/>
+    <property name="city" type="gchararray" flags="227"/>
+    <property name="subregion" type="gchararray" flags="227"/>
+    <property name="region" type="gchararray" flags="227"/>
+    <property name="postcode" type="gchararray" flags="227"/>
+    <property name="country" type="gchararray" flags="225"/>
+    <property name="country-code" type="gchararray" flags="225"/>
+  </class>
+  <class name="GDataGDReminder" get-type="gdata_gd_reminder_get_type" parents="GDataParsable,GObject">
+    <implements name="GDataComparable"/>
+    <property name="method" type="gchararray" flags="227"/>
+    <property name="absolute-time" type="gint64" flags="227"/>
+    <property name="is-absolute-time" type="gboolean" flags="225"/>
+    <property name="relative-time" type="gint" flags="227"/>
+  </class>
+  <class name="GDataGDWhen" get-type="gdata_gd_when_get_type" parents="GDataParsable,GObject">
+    <implements name="GDataComparable"/>
+    <property name="start-time" type="gint64" flags="227"/>
+    <property name="end-time" type="gint64" flags="227"/>
+    <property name="start-timezone" type="gchararray" flags="227"/>
+    <property name="end-timezone" type="gchararray" flags="227"/>
+    <property name="is-date" type="gboolean" flags="227"/>
+    <property name="value-string" type="gchararray" flags="227"/>
+  </class>
+  <class name="GDataGDWho" get-type="gdata_gd_who_get_type" parents="GDataParsable,GObject">
+    <implements name="GDataComparable"/>
+    <property name="relation-type" type="gchararray" flags="227"/>
+    <property name="value-string" type="gchararray" flags="227"/>
+    <property name="email-address" type="gchararray" flags="227"/>
+    <property name="additional-guests" type="gint" flags="227"/>
+    <property name="comment" type="gchararray" flags="227"/>
+    <property name="response-status" type="gchararray" flags="227"/>
+    <property name="optional" type="gboolean" flags="227"/>
+  </class>
+  <class name="GDataGContactCalendar" get-type="gdata_gcontact_calendar_get_type" parents="GDataParsable,GObject">
+    <implements name="GDataComparable"/>
+    <property name="uri" type="gchararray" flags="227"/>
+    <property name="relation-type" type="gchararray" flags="227"/>
+    <property name="label" type="gchararray" flags="227"/>
+    <property name="is-primary" type="gboolean" flags="227"/>
+  </class>
+  <class name="GDataGContactEvent" get-type="gdata_gcontact_event_get_type" parents="GDataParsable,GObject">
+    <property name="date" type="GDate" flags="227"/>
+    <property name="relation-type" type="gchararray" flags="227"/>
+    <property name="label" type="gchararray" flags="227"/>
+  </class>
+  <class name="GDataGContactExternalID" get-type="gdata_gcontact_external_id_get_type" parents="GDataParsable,GObject">
+    <implements name="GDataComparable"/>
+    <property name="value" type="gchararray" flags="227"/>
+    <property name="relation-type" type="gchararray" flags="227"/>
+    <property name="label" type="gchararray" flags="227"/>
+  </class>
+  <class name="GDataGContactJot" get-type="gdata_gcontact_jot_get_type" parents="GDataParsable,GObject">
+    <property name="content" type="gchararray" flags="227"/>
+    <property name="relation-type" type="gchararray" flags="227"/>
+  </class>
+  <class name="GDataGContactLanguage" get-type="gdata_gcontact_language_get_type" parents="GDataParsable,GObject">
+    <implements name="GDataComparable"/>
+    <property name="code" type="gchararray" flags="227"/>
+    <property name="label" type="gchararray" flags="227"/>
+  </class>
+  <class name="GDataGContactRelation" get-type="gdata_gcontact_relation_get_type" parents="GDataParsable,GObject">
+    <property name="name" type="gchararray" flags="227"/>
+    <property name="relation-type" type="gchararray" flags="227"/>
+    <property name="label" type="gchararray" flags="227"/>
+  </class>
+  <class name="GDataGContactWebsite" get-type="gdata_gcontact_website_get_type" parents="GDataParsable,GObject">
+    <implements name="GDataComparable"/>
+    <property name="uri" type="gchararray" flags="227"/>
+    <property name="relation-type" type="gchararray" flags="227"/>
+    <property name="label" type="gchararray" flags="227"/>
+    <property name="is-primary" type="gboolean" flags="227"/>
+  </class>
+  <class name="GDataMediaCategory" get-type="gdata_media_category_get_type" parents="GDataParsable,GObject">
+    <property name="category" type="gchararray" flags="227"/>
+    <property name="scheme" type="gchararray" flags="227"/>
+    <property name="label" type="gchararray" flags="227"/>
+  </class>
+  <class name="GDataMediaContent" get-type="gdata_media_content_get_type" parents="GDataParsable,GObject">
+    <property name="uri" type="gchararray" flags="225"/>
+    <property name="filesize" type="gulong" flags="225"/>
+    <property name="content-type" type="gchararray" flags="225"/>
+    <property name="medium" type="GDataMediaMedium" flags="225"/>
+    <property name="is-default" type="gboolean" flags="225"/>
+    <property name="expression" type="GDataMediaExpression" flags="225"/>
+    <property name="duration" type="gint64" flags="225"/>
+    <property name="height" type="guint" flags="225"/>
+    <property name="width" type="guint" flags="225"/>
+  </class>
+  <class name="GDataMediaCredit" get-type="gdata_media_credit_get_type" parents="GDataParsable,GObject">
+    <property name="credit" type="gchararray" flags="225"/>
+    <property name="scheme" type="gchararray" flags="225"/>
+    <property name="role" type="gchararray" flags="225"/>
+  </class>
+  <enum name="GDataMediaExpression" get-type="gdata_media_expression_get_type">
+    <member name="GDATA_MEDIA_EXPRESSION_SAMPLE" nick="sample" value="0"/>
+    <member name="GDATA_MEDIA_EXPRESSION_FULL" nick="full" value="1"/>
+    <member name="GDATA_MEDIA_EXPRESSION_NONSTOP" nick="nonstop" value="2"/>
+  </enum>  <enum name="GDataMediaMedium" get-type="gdata_media_medium_get_type">
+    <member name="GDATA_MEDIA_UNKNOWN" nick="unknown" value="0"/>
+    <member name="GDATA_MEDIA_IMAGE" nick="image" value="1"/>
+    <member name="GDATA_MEDIA_AUDIO" nick="audio" value="2"/>
+    <member name="GDATA_MEDIA_VIDEO" nick="video" value="3"/>
+    <member name="GDATA_MEDIA_DOCUMENT" nick="document" value="4"/>
+    <member name="GDATA_MEDIA_EXECUTABLE" nick="executable" value="5"/>
+  </enum>  <class name="GDataMediaThumbnail" get-type="gdata_media_thumbnail_get_type" parents="GDataParsable,GObject">
+    <property name="uri" type="gchararray" flags="225"/>
+    <property name="height" type="guint" flags="225"/>
+    <property name="width" type="guint" flags="225"/>
+    <property name="time" type="gint64" flags="225"/>
+  </class>
+  <class name="GDataYouTubeContent" get-type="gdata_youtube_content_get_type" parents="GDataMediaContent,GDataParsable,GObject">
+    <property name="format" type="GDataYouTubeFormat" flags="225"/>
+  </class>
+  <class name="GDataYouTubeCredit" get-type="gdata_youtube_credit_get_type" parents="GDataMediaCredit,GDataParsable,GObject">
+    <property name="entity-type" type="gchararray" flags="225"/>
+  </class>
+  <class name="GDataYouTubeState" get-type="gdata_youtube_state_get_type" parents="GDataParsable,GObject">
+    <property name="name" type="gchararray" flags="225"/>
+    <property name="reason-code" type="gchararray" flags="225"/>
+    <property name="help-uri" type="gchararray" flags="225"/>
+    <property name="message" type="gchararray" flags="225"/>
+  </class>
+  <class name="GDataYouTubeVideo" get-type="gdata_youtube_video_get_type" parents="GDataEntry,GDataParsable,GObject">
+    <implements name="GDataCommentable"/>
+    <property name="view-count" type="guint" flags="225"/>
+    <property name="favorite-count" type="guint" flags="225"/>
+    <property name="location" type="gchararray" flags="227"/>
+    <property name="min-rating" type="guint" flags="225"/>
+    <property name="max-rating" type="guint" flags="225"/>
+    <property name="rating-count" type="guint" flags="225"/>
+    <property name="average-rating" type="gdouble" flags="225"/>
+    <property name="keywords" type="GStrv" flags="227"/>
+    <property name="player-uri" type="gchararray" flags="225"/>
+    <property name="category" type="GDataMediaCategory" flags="227"/>
+    <property name="credit" type="GDataYouTubeCredit" flags="225"/>
+    <property name="description" type="gchararray" flags="227"/>
+    <property name="duration" type="guint" flags="225"/>
+    <property name="is-private" type="gboolean" flags="227"/>
+    <property name="uploaded" type="gint64" flags="225"/>
+    <property name="video-id" type="gchararray" flags="225"/>
+    <property name="is-draft" type="gboolean" flags="227"/>
+    <property name="state" type="GDataYouTubeState" flags="225"/>
+    <property name="recorded" type="gint64" flags="227"/>
+    <property name="aspect-ratio" type="gchararray" flags="227"/>
+    <property name="latitude" type="gdouble" flags="227"/>
+    <property name="longitude" type="gdouble" flags="227"/>
+  </class>
+  <class name="GDataYouTubeService" get-type="gdata_youtube_service_get_type" parents="GDataService,GObject">
+    <implements name="GDataBatchable"/>
+    <property name="developer-key" type="gchararray" flags="235"/>
+  </class>
+  <enum name="GDataYouTubeStandardFeedType" get-type="gdata_youtube_standard_feed_type_get_type">
+    <member name="GDATA_YOUTUBE_TOP_RATED_FEED" nick="top-rated-feed" value="0"/>
+    <member name="GDATA_YOUTUBE_TOP_FAVORITES_FEED" nick="top-favorites-feed" value="1"/>
+    <member name="GDATA_YOUTUBE_MOST_VIEWED_FEED" nick="most-viewed-feed" value="2"/>
+    <member name="GDATA_YOUTUBE_MOST_POPULAR_FEED" nick="most-popular-feed" value="3"/>
+    <member name="GDATA_YOUTUBE_MOST_RECENT_FEED" nick="most-recent-feed" value="4"/>
+    <member name="GDATA_YOUTUBE_MOST_DISCUSSED_FEED" nick="most-discussed-feed" value="5"/>
+    <member name="GDATA_YOUTUBE_MOST_LINKED_FEED" nick="most-linked-feed" value="6"/>
+    <member name="GDATA_YOUTUBE_MOST_RESPONDED_FEED" nick="most-responded-feed" value="7"/>
+    <member name="GDATA_YOUTUBE_RECENTLY_FEATURED_FEED" nick="recently-featured-feed" value="8"/>
+    <member name="GDATA_YOUTUBE_WATCH_ON_MOBILE_FEED" nick="watch-on-mobile-feed" value="9"/>
+  </enum>  <enum name="GDataYouTubeServiceError" get-type="gdata_youtube_service_error_get_type">
+    <member name="GDATA_YOUTUBE_SERVICE_ERROR_API_QUOTA_EXCEEDED" nick="api-quota-exceeded" value="0"/>
+    <member name="GDATA_YOUTUBE_SERVICE_ERROR_ENTRY_QUOTA_EXCEEDED" nick="entry-quota-exceeded" value="1"/>
+    <member name="GDATA_YOUTUBE_SERVICE_ERROR_CHANNEL_REQUIRED" nick="channel-required" value="2"/>
+  </enum>  <enum name="GDataYouTubePermission" get-type="gdata_youtube_permission_get_type">
+    <member name="GDATA_YOUTUBE_PERMISSION_ALLOWED" nick="allowed" value="0"/>
+    <member name="GDATA_YOUTUBE_PERMISSION_DENIED" nick="denied" value="1"/>
+    <member name="GDATA_YOUTUBE_PERMISSION_MODERATED" nick="moderated" value="2"/>
+  </enum>  <enum name="GDataYouTubeFormat" get-type="gdata_youtube_format_get_type">
+    <member name="GDATA_YOUTUBE_FORMAT_UNKNOWN" nick="unknown" value="0"/>
+    <member name="GDATA_YOUTUBE_FORMAT_RTSP_H263_AMR" nick="rtsp-h263-amr" value="1"/>
+    <member name="GDATA_YOUTUBE_FORMAT_HTTP_SWF" nick="http-swf" value="5"/>
+    <member name="GDATA_YOUTUBE_FORMAT_RTSP_MPEG4_AAC" nick="rtsp-mpeg4-aac" value="6"/>
+  </enum>  <enum name="GDataYouTubeSafeSearch" get-type="gdata_youtube_safe_search_get_type">
+    <member name="GDATA_YOUTUBE_SAFE_SEARCH_NONE" nick="none" value="0"/>
+    <member name="GDATA_YOUTUBE_SAFE_SEARCH_MODERATE" nick="moderate" value="1"/>
+    <member name="GDATA_YOUTUBE_SAFE_SEARCH_STRICT" nick="strict" value="2"/>
+  </enum>  <enum name="GDataYouTubeSortOrder" get-type="gdata_youtube_sort_order_get_type">
+    <member name="GDATA_YOUTUBE_SORT_NONE" nick="none" value="0"/>
+    <member name="GDATA_YOUTUBE_SORT_ASCENDING" nick="ascending" value="1"/>
+    <member name="GDATA_YOUTUBE_SORT_DESCENDING" nick="descending" value="2"/>
+  </enum>  <enum name="GDataYouTubeAge" get-type="gdata_youtube_age_get_type">
+    <member name="GDATA_YOUTUBE_AGE_ALL_TIME" nick="all-time" value="0"/>
+    <member name="GDATA_YOUTUBE_AGE_TODAY" nick="today" value="1"/>
+    <member name="GDATA_YOUTUBE_AGE_THIS_WEEK" nick="this-week" value="2"/>
+    <member name="GDATA_YOUTUBE_AGE_THIS_MONTH" nick="this-month" value="3"/>
+  </enum>  <enum name="GDataYouTubeUploader" get-type="gdata_youtube_uploader_get_type">
+    <member name="GDATA_YOUTUBE_UPLOADER_ALL" nick="all" value="0"/>
+    <member name="GDATA_YOUTUBE_UPLOADER_PARTNER" nick="partner" value="1"/>
+  </enum>  <class name="GDataYouTubeQuery" get-type="gdata_youtube_query_get_type" parents="GDataQuery,GObject">
+    <property name="format" type="GDataYouTubeFormat" flags="227"/>
+    <property name="latitude" type="gdouble" flags="227"/>
+    <property name="longitude" type="gdouble" flags="227"/>
+    <property name="location-radius" type="gdouble" flags="227"/>
+    <property name="has-location" type="gboolean" flags="227"/>
+    <property name="language" type="gchararray" flags="227"/>
+    <property name="order-by" type="gchararray" flags="227"/>
+    <property name="restriction" type="gchararray" flags="227"/>
+    <property name="safe-search" type="GDataYouTubeSafeSearch" flags="227"/>
+    <property name="sort-order" type="GDataYouTubeSortOrder" flags="227"/>
+    <property name="age" type="GDataYouTubeAge" flags="227"/>
+    <property name="uploader" type="GDataYouTubeUploader" flags="227"/>
+    <property name="license" type="gchararray" flags="227"/>
+  </class>
+  <class name="GDataYouTubeCategory" get-type="gdata_youtube_category_get_type" parents="GDataCategory,GDataParsable,GObject">
+    <implements name="GDataComparable"/>
+    <property name="is-assignable" type="gboolean" flags="225"/>
+    <property name="is-deprecated" type="gboolean" flags="225"/>
+  </class>
+  <class name="GDataYouTubeComment" get-type="gdata_youtube_comment_get_type" parents="GDataComment,GDataEntry,GDataParsable,GObject">
+    <property name="parent-comment-uri" type="gchararray" flags="227"/>
+  </class>
+  <class name="GDataCalendarCalendar" get-type="gdata_calendar_calendar_get_type" parents="GDataEntry,GDataParsable,GObject">
+    <implements name="GDataAccessHandler"/>
+    <property name="timezone" type="gchararray" flags="227"/>
+    <property name="times-cleaned" type="guint" flags="225"/>
+    <property name="is-hidden" type="gboolean" flags="227"/>
+    <property name="color" type="GDataColor" flags="227"/>
+    <property name="is-selected" type="gboolean" flags="227"/>
+    <property name="access-level" type="gchararray" flags="225"/>
+    <property name="edited" type="gint64" flags="225"/>
+  </class>
+  <class name="GDataCalendarService" get-type="gdata_calendar_service_get_type" parents="GDataService,GObject">
+    <implements name="GDataBatchable"/>
+  </class>
+  <class name="GDataCalendarEvent" get-type="gdata_calendar_event_get_type" parents="GDataEntry,GDataParsable,GObject">
+    <property name="edited" type="gint64" flags="225"/>
+    <property name="status" type="gchararray" flags="227"/>
+    <property name="visibility" type="gchararray" flags="227"/>
+    <property name="transparency" type="gchararray" flags="227"/>
+    <property name="uid" type="gchararray" flags="227"/>
+    <property name="sequence" type="guint" flags="227"/>
+    <property name="guests-can-modify" type="gboolean" flags="227"/>
+    <property name="guests-can-invite-others" type="gboolean" flags="227"/>
+    <property name="guests-can-see-guests" type="gboolean" flags="227"/>
+    <property name="anyone-can-add-self" type="gboolean" flags="227"/>
+    <property name="recurrence" type="gchararray" flags="227"/>
+    <property name="original-event-id" type="gchararray" flags="225"/>
+    <property name="original-event-uri" type="gchararray" flags="225"/>
+    <property name="description" type="gchararray" flags="225"/>
+  </class>
+  <class name="GDataCalendarFeed" get-type="gdata_calendar_feed_get_type" parents="GDataFeed,GDataParsable,GObject">
+    <property name="timezone" type="gchararray" flags="225"/>
+    <property name="times-cleaned" type="guint" flags="225"/>
+  </class>
+  <class name="GDataCalendarQuery" get-type="gdata_calendar_query_get_type" parents="GDataQuery,GObject">
+    <property name="future-events" type="gboolean" flags="227"/>
+    <property name="order-by" type="gchararray" flags="227"/>
+    <property name="recurrence-expansion-start" type="gint64" flags="227"/>
+    <property name="recurrence-expansion-end" type="gint64" flags="227"/>
+    <property name="single-events" type="gboolean" flags="227"/>
+    <property name="sort-order" type="gchararray" flags="227"/>
+    <property name="start-min" type="gint64" flags="227"/>
+    <property name="start-max" type="gint64" flags="227"/>
+    <property name="timezone" type="gchararray" flags="227"/>
+    <property name="max-attendees" type="guint" flags="227"/>
+    <property name="show-deleted" type="gboolean" flags="227"/>
+  </class>
+  <class name="GDataPicasaWebAlbum" get-type="gdata_picasaweb_album_get_type" parents="GDataEntry,GDataParsable,GObject">
+    <property name="user" type="gchararray" flags="225"/>
+    <property name="nickname" type="gchararray" flags="225"/>
+    <property name="edited" type="gint64" flags="225"/>
+    <property name="location" type="gchararray" flags="227"/>
+    <property name="visibility" type="GDataPicasaWebVisibility" flags="227"/>
+    <property name="timestamp" type="gint64" flags="227"/>
+    <property name="num-photos" type="guint" flags="225"/>
+    <property name="num-photos-remaining" type="guint" flags="225"/>
+    <property name="bytes-used" type="glong" flags="225"/>
+    <property name="is-commenting-enabled" type="gboolean" flags="227"/>
+    <property name="comment-count" type="guint" flags="225"/>
+    <property name="tags" type="GStrv" flags="227"/>
+    <property name="latitude" type="gdouble" flags="227"/>
+    <property name="longitude" type="gdouble" flags="227"/>
+    <property name="album-id" type="gchararray" flags="235"/>
+  </class>
+  <class name="GDataPicasaWebUser" get-type="gdata_picasaweb_user_get_type" parents="GDataEntry,GDataParsable,GObject">
+    <property name="user" type="gchararray" flags="225"/>
+    <property name="nickname" type="gchararray" flags="225"/>
+    <property name="quota-limit" type="gint64" flags="225"/>
+    <property name="quota-current" type="gint64" flags="225"/>
+    <property name="max-photos-per-album" type="gint" flags="225"/>
+    <property name="thumbnail-uri" type="gchararray" flags="225"/>
+  </class>
+  <class name="GDataPicasaWebService" get-type="gdata_picasaweb_service_get_type" parents="GDataService,GObject">
+  </class>
+  <class name="GDataPicasaWebQuery" get-type="gdata_picasaweb_query_get_type" parents="GDataQuery,GObject">
+    <property name="visibility" type="gint" flags="227"/>
+    <property name="thumbnail-size" type="gchararray" flags="227"/>
+    <property name="image-size" type="gchararray" flags="227"/>
+    <property name="tag" type="gchararray" flags="227"/>
+    <property name="location" type="gchararray" flags="227"/>
+  </class>
+  <class name="GDataPicasaWebFile" get-type="gdata_picasaweb_file_get_type" parents="GDataEntry,GDataParsable,GObject">
+    <implements name="GDataCommentable"/>
+    <property name="edited" type="gint64" flags="225"/>
+    <property name="version" type="gchararray" flags="235"/>
+    <property name="album-id" type="gchararray" flags="227"/>
+    <property name="width" type="guint" flags="225"/>
+    <property name="height" type="guint" flags="225"/>
+    <property name="size" type="gulong" flags="225"/>
+    <property name="checksum" type="gchararray" flags="227"/>
+    <property name="timestamp" type="gint64" flags="227"/>
+    <property name="is-commenting-enabled" type="gboolean" flags="227"/>
+    <property name="comment-count" type="guint" flags="225"/>
+    <property name="rotation" type="guint" flags="227"/>
+    <property name="video-status" type="gchararray" flags="225"/>
+    <property name="credit" type="gchararray" flags="225"/>
+    <property name="caption" type="gchararray" flags="227"/>
+    <property name="tags" type="GStrv" flags="227"/>
+    <property name="distance" type="gdouble" flags="225"/>
+    <property name="exposure" type="gdouble" flags="225"/>
+    <property name="flash" type="gboolean" flags="225"/>
+    <property name="focal-length" type="gdouble" flags="225"/>
+    <property name="fstop" type="gdouble" flags="225"/>
+    <property name="image-unique-id" type="gchararray" flags="225"/>
+    <property name="iso" type="glong" flags="225"/>
+    <property name="make" type="gchararray" flags="225"/>
+    <property name="model" type="gchararray" flags="225"/>
+    <property name="latitude" type="gdouble" flags="227"/>
+    <property name="longitude" type="gdouble" flags="227"/>
+    <property name="file-id" type="gchararray" flags="235"/>
+  </class>
+  <class name="GDataPicasaWebFeed" get-type="gdata_picasaweb_feed_get_type" parents="GDataFeed,GDataParsable,GObject">
+  </class>
+  <enum name="GDataPicasaWebVisibility" get-type="gdata_picasaweb_visibility_get_type">
+    <member name="GDATA_PICASAWEB_PUBLIC" nick="public" value="1"/>
+    <member name="GDATA_PICASAWEB_PRIVATE" nick="private" value="2"/>
+  </enum>  <class name="GDataPicasaWebComment" get-type="gdata_picasaweb_comment_get_type" parents="GDataComment,GDataEntry,GDataParsable,GObject">
+  </class>
+  <class name="GDataContactsService" get-type="gdata_contacts_service_get_type" parents="GDataService,GObject">
+    <implements name="GDataBatchable"/>
+  </class>
+  <class name="GDataContactsContact" get-type="gdata_contacts_contact_get_type" parents="GDataEntry,GDataParsable,GObject">
+    <property name="edited" type="gint64" flags="225"/>
+    <property name="deleted" type="gboolean" flags="225"/>
+    <property name="name" type="GDataGDName" flags="227"/>
+    <property name="nickname" type="gchararray" flags="227"/>
+    <property name="birthday" type="GDate" flags="227"/>
+    <property name="birthday-has-year" type="gboolean" flags="227"/>
+    <property name="billing-information" type="gchararray" flags="227"/>
+    <property name="directory-server" type="gchararray" flags="227"/>
+    <property name="gender" type="gchararray" flags="227"/>
+    <property name="initials" type="gchararray" flags="227"/>
+    <property name="maiden-name" type="gchararray" flags="227"/>
+    <property name="mileage" type="gchararray" flags="227"/>
+    <property name="occupation" type="gchararray" flags="227"/>
+    <property name="priority" type="gchararray" flags="227"/>
+    <property name="sensitivity" type="gchararray" flags="227"/>
+    <property name="short-name" type="gchararray" flags="227"/>
+    <property name="subject" type="gchararray" flags="227"/>
+    <property name="photo-etag" type="gchararray" flags="225"/>
+    <property name="file-as" type="gchararray" flags="227"/>
+  </class>
+  <class name="GDataContactsGroup" get-type="gdata_contacts_group_get_type" parents="GDataEntry,GDataParsable,GObject">
+    <property name="edited" type="gint64" flags="225"/>
+    <property name="deleted" type="gboolean" flags="225"/>
+    <property name="system-group-id" type="gchararray" flags="225"/>
+  </class>
+  <class name="GDataContactsQuery" get-type="gdata_contacts_query_get_type" parents="GDataQuery,GObject">
+    <property name="order-by" type="gchararray" flags="227"/>
+    <property name="show-deleted" type="gboolean" flags="227"/>
+    <property name="sort-order" type="gchararray" flags="227"/>
+    <property name="group" type="gchararray" flags="227"/>
+  </class>
+  <class name="GDataDocumentsEntry" get-type="gdata_documents_entry_get_type" parents="GDataEntry,GDataParsable,GObject" abstract="1">
+    <implements name="GDataAccessHandler"/>
+    <property name="edited" type="gint64" flags="225"/>
+    <property name="last-viewed" type="gint64" flags="225"/>
+    <property name="document-id" type="gchararray" flags="225"/>
+    <property name="last-modified-by" type="GDataAuthor" flags="225"/>
+    <property name="is-deleted" type="gboolean" flags="227"/>
+    <property name="writers-can-invite" type="gboolean" flags="227"/>
+    <property name="resource-id" type="gchararray" flags="225"/>
+    <property name="quota-used" type="gint64" flags="225"/>
+  </class>
+  <class name="GDataDocumentsDocument" get-type="gdata_documents_document_get_type" parents="GDataDocumentsEntry,GDataEntry,GDataParsable,GObject">
+    <implements name="GDataAccessHandler"/>
+  </class>
+  <class name="GDataDocumentsQuery" get-type="gdata_documents_query_get_type" parents="GDataQuery,GObject">
+    <property name="show-deleted" type="gboolean" flags="227"/>
+    <property name="show-folders" type="gboolean" flags="227"/>
+    <property name="exact-title" type="gboolean" flags="227"/>
+    <property name="folder-id" type="gchararray" flags="227"/>
+    <property name="title" type="gchararray" flags="227"/>
+  </class>
+  <class name="GDataDocumentsFeed" get-type="gdata_documents_feed_get_type" parents="GDataFeed,GDataParsable,GObject">
+  </class>
+  <class name="GDataDocumentsService" get-type="gdata_documents_service_get_type" parents="GDataService,GObject">
+    <implements name="GDataBatchable"/>
+  </class>
+  <class name="GDataDocumentsFolder" get-type="gdata_documents_folder_get_type" parents="GDataDocumentsEntry,GDataEntry,GDataParsable,GObject">
+    <implements name="GDataAccessHandler"/>
+  </class>
+  <class name="GDataDocumentsUploadQuery" get-type="gdata_documents_upload_query_get_type" parents="GObject">
+    <property name="folder" type="GDataDocumentsFolder" flags="227"/>
+    <property name="convert" type="gboolean" flags="227"/>
+  </class>
+  <class name="GDataDocumentsText" get-type="gdata_documents_text_get_type" parents="GDataDocumentsDocument,GDataDocumentsEntry,GDataEntry,GDataParsable,GObject">
+    <implements name="GDataAccessHandler"/>
+  </class>
+  <class name="GDataDocumentsSpreadsheet" get-type="gdata_documents_spreadsheet_get_type" parents="GDataDocumentsDocument,GDataDocumentsEntry,GDataEntry,GDataParsable,GObject">
+    <implements name="GDataAccessHandler"/>
+  </class>
+  <class name="GDataDocumentsPresentation" get-type="gdata_documents_presentation_get_type" parents="GDataDocumentsDocument,GDataDocumentsEntry,GDataEntry,GDataParsable,GObject">
+    <implements name="GDataAccessHandler"/>
+  </class>
+  <class name="GDataDocumentsDrawing" get-type="gdata_documents_drawing_get_type" parents="GDataDocumentsDocument,GDataDocumentsEntry,GDataEntry,GDataParsable,GObject">
+    <implements name="GDataAccessHandler"/>
+  </class>
+  <class name="GDataDocumentsPdf" get-type="gdata_documents_pdf_get_type" parents="GDataDocumentsDocument,GDataDocumentsEntry,GDataEntry,GDataParsable,GObject">
+    <implements name="GDataAccessHandler"/>
+  </class>
+  <enum name="GDataDocumentsServiceError" get-type="gdata_documents_service_error_get_type">
+    <member name="GDATA_DOCUMENTS_SERVICE_ERROR_INVALID_CONTENT_TYPE" nick="type" value="0"/>
+  </enum>  <class name="GDataGoaAuthorizer" get-type="gdata_goa_authorizer_get_type" parents="GObject">
+    <implements name="GDataAuthorizer"/>
+    <property name="goa-object" type="GoaObject" flags="235"/>
+  </class>
+  <error-quark function="gdata_parser_error_quark" domain="gdata-parser-error-quark"/>
+  <error-quark function="gdata_service_error_quark" domain="gdata-service-error-quark"/>
+  <error-quark function="gdata_client_login_authorizer_error_quark" domain="gdata-client-login-authorizer-error-quark"/>
+  <error-quark function="gdata_youtube_service_error_quark" domain="gdata-youtube-service-error-quark"/>
+  <error-quark function="gdata_documents_service_error_quark" domain="gdata-documents-service-error-quark"/>
+</dump>

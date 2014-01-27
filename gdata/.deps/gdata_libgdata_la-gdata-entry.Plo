@@ -1,0 +1,1180 @@
+gdata/gdata_libgdata_la-gdata-entry.lo: gdata/gdata-entry.c config.h \
+ /opt/gnome/include/glib-2.0/glib.h \
+ /opt/gnome/include/glib-2.0/glib/galloca.h \
+ /opt/gnome/include/glib-2.0/glib/gtypes.h \
+ /opt/gnome/lib64/glib-2.0/include/glibconfig.h \
+ /opt/gnome/include/glib-2.0/glib/gmacros.h \
+ /usr/lib/gcc/x86_64-linux-gnu/4.7/include/stddef.h \
+ /usr/lib/gcc/x86_64-linux-gnu/4.7/include-fixed/limits.h \
+ /usr/lib/gcc/x86_64-linux-gnu/4.7/include-fixed/syslimits.h \
+ /usr/include/limits.h /usr/include/features.h \
+ /usr/include/x86_64-linux-gnu/bits/predefs.h \
+ /usr/include/x86_64-linux-gnu/sys/cdefs.h \
+ /usr/include/x86_64-linux-gnu/bits/wordsize.h \
+ /usr/include/x86_64-linux-gnu/gnu/stubs.h \
+ /usr/include/x86_64-linux-gnu/gnu/stubs-64.h \
+ /usr/include/x86_64-linux-gnu/bits/posix1_lim.h \
+ /usr/include/x86_64-linux-gnu/bits/local_lim.h \
+ /usr/include/linux/limits.h \
+ /usr/include/x86_64-linux-gnu/bits/posix2_lim.h \
+ /usr/include/x86_64-linux-gnu/bits/xopen_lim.h \
+ /usr/include/x86_64-linux-gnu/bits/stdio_lim.h \
+ /usr/lib/gcc/x86_64-linux-gnu/4.7/include/float.h \
+ /opt/gnome/include/glib-2.0/glib/gversionmacros.h /usr/include/time.h \
+ /usr/include/x86_64-linux-gnu/bits/time.h \
+ /usr/include/x86_64-linux-gnu/bits/types.h \
+ /usr/include/x86_64-linux-gnu/bits/typesizes.h \
+ /usr/include/x86_64-linux-gnu/bits/timex.h /usr/include/xlocale.h \
+ /opt/gnome/include/glib-2.0/glib/garray.h \
+ /opt/gnome/include/glib-2.0/glib/gasyncqueue.h \
+ /opt/gnome/include/glib-2.0/glib/gthread.h \
+ /opt/gnome/include/glib-2.0/glib/gatomic.h \
+ /opt/gnome/include/glib-2.0/glib/gerror.h \
+ /usr/lib/gcc/x86_64-linux-gnu/4.7/include/stdarg.h \
+ /opt/gnome/include/glib-2.0/glib/gquark.h \
+ /opt/gnome/include/glib-2.0/glib/gbacktrace.h /usr/include/signal.h \
+ /usr/include/x86_64-linux-gnu/bits/sigset.h \
+ /usr/include/x86_64-linux-gnu/bits/signum.h \
+ /usr/include/x86_64-linux-gnu/bits/siginfo.h \
+ /usr/include/x86_64-linux-gnu/bits/sigaction.h \
+ /usr/include/x86_64-linux-gnu/bits/sigcontext.h \
+ /usr/include/x86_64-linux-gnu/bits/sigstack.h \
+ /usr/include/x86_64-linux-gnu/sys/ucontext.h \
+ /usr/include/x86_64-linux-gnu/bits/pthreadtypes.h \
+ /usr/include/x86_64-linux-gnu/bits/sigthread.h \
+ /opt/gnome/include/glib-2.0/glib/gbase64.h \
+ /opt/gnome/include/glib-2.0/glib/gbitlock.h \
+ /opt/gnome/include/glib-2.0/glib/gbookmarkfile.h \
+ /opt/gnome/include/glib-2.0/glib/gbytes.h \
+ /opt/gnome/include/glib-2.0/glib/gcharset.h \
+ /opt/gnome/include/glib-2.0/glib/gchecksum.h \
+ /opt/gnome/include/glib-2.0/glib/gconvert.h \
+ /opt/gnome/include/glib-2.0/glib/gdataset.h \
+ /opt/gnome/include/glib-2.0/glib/gdate.h \
+ /opt/gnome/include/glib-2.0/glib/gdatetime.h \
+ /opt/gnome/include/glib-2.0/glib/gtimezone.h \
+ /opt/gnome/include/glib-2.0/glib/gdir.h /usr/include/dirent.h \
+ /usr/include/x86_64-linux-gnu/bits/dirent.h \
+ /opt/gnome/include/glib-2.0/glib/genviron.h \
+ /opt/gnome/include/glib-2.0/glib/gfileutils.h \
+ /opt/gnome/include/glib-2.0/glib/ggettext.h \
+ /opt/gnome/include/glib-2.0/glib/ghash.h \
+ /opt/gnome/include/glib-2.0/glib/glist.h \
+ /opt/gnome/include/glib-2.0/glib/gmem.h \
+ /opt/gnome/include/glib-2.0/glib/gnode.h \
+ /opt/gnome/include/glib-2.0/glib/ghmac.h \
+ /opt/gnome/include/glib-2.0/glib/gchecksum.h \
+ /opt/gnome/include/glib-2.0/glib/ghook.h \
+ /opt/gnome/include/glib-2.0/glib/ghostutils.h \
+ /opt/gnome/include/glib-2.0/glib/giochannel.h \
+ /opt/gnome/include/glib-2.0/glib/gmain.h \
+ /opt/gnome/include/glib-2.0/glib/gpoll.h \
+ /opt/gnome/include/glib-2.0/glib/gslist.h \
+ /opt/gnome/include/glib-2.0/glib/gstring.h \
+ /opt/gnome/include/glib-2.0/glib/gunicode.h \
+ /opt/gnome/include/glib-2.0/glib/gutils.h \
+ /opt/gnome/include/glib-2.0/glib/gkeyfile.h \
+ /opt/gnome/include/glib-2.0/glib/gmappedfile.h \
+ /opt/gnome/include/glib-2.0/glib/gmarkup.h \
+ /opt/gnome/include/glib-2.0/glib/gmessages.h \
+ /opt/gnome/include/glib-2.0/glib/goption.h \
+ /opt/gnome/include/glib-2.0/glib/gpattern.h \
+ /opt/gnome/include/glib-2.0/glib/gprimes.h \
+ /opt/gnome/include/glib-2.0/glib/gqsort.h \
+ /opt/gnome/include/glib-2.0/glib/gqueue.h \
+ /opt/gnome/include/glib-2.0/glib/grand.h \
+ /opt/gnome/include/glib-2.0/glib/gregex.h \
+ /opt/gnome/include/glib-2.0/glib/gscanner.h \
+ /opt/gnome/include/glib-2.0/glib/gsequence.h \
+ /opt/gnome/include/glib-2.0/glib/gshell.h \
+ /opt/gnome/include/glib-2.0/glib/gslice.h \
+ /opt/gnome/include/glib-2.0/glib/gspawn.h \
+ /opt/gnome/include/glib-2.0/glib/gstrfuncs.h \
+ /opt/gnome/include/glib-2.0/glib/gstringchunk.h \
+ /opt/gnome/include/glib-2.0/glib/gtestutils.h \
+ /opt/gnome/include/glib-2.0/glib/gthreadpool.h \
+ /opt/gnome/include/glib-2.0/glib/gtimer.h \
+ /opt/gnome/include/glib-2.0/glib/gtrashstack.h \
+ /opt/gnome/include/glib-2.0/glib/gtree.h \
+ /opt/gnome/include/glib-2.0/glib/gurifuncs.h \
+ /opt/gnome/include/glib-2.0/glib/gvarianttype.h \
+ /opt/gnome/include/glib-2.0/glib/gvariant.h \
+ /opt/gnome/include/glib-2.0/glib/gversion.h \
+ /opt/gnome/include/glib-2.0/glib/deprecated/gallocator.h \
+ /opt/gnome/include/glib-2.0/glib/deprecated/gcache.h \
+ /opt/gnome/include/glib-2.0/glib/deprecated/gcompletion.h \
+ /opt/gnome/include/glib-2.0/glib/deprecated/gmain.h \
+ /opt/gnome/include/glib-2.0/glib/deprecated/grel.h \
+ /opt/gnome/include/glib-2.0/glib/deprecated/gthread.h \
+ /usr/include/pthread.h /usr/include/endian.h \
+ /usr/include/x86_64-linux-gnu/bits/endian.h \
+ /usr/include/x86_64-linux-gnu/bits/byteswap.h /usr/include/sched.h \
+ /usr/include/x86_64-linux-gnu/bits/sched.h \
+ /usr/include/x86_64-linux-gnu/bits/setjmp.h \
+ /opt/gnome/include/glib-2.0/glib/gi18n-lib.h /usr/include/libintl.h \
+ /usr/include/string.h /usr/include/libxml2/libxml/parser.h \
+ /usr/include/libxml2/libxml/xmlversion.h \
+ /usr/include/libxml2/libxml/xmlexports.h \
+ /usr/include/libxml2/libxml/tree.h /usr/include/stdio.h \
+ /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h \
+ /usr/include/x86_64-linux-gnu/bits/sys_errlist.h \
+ /usr/include/libxml2/libxml/xmlstring.h \
+ /usr/include/libxml2/libxml/xmlregexp.h \
+ /usr/include/libxml2/libxml/dict.h /usr/include/libxml2/libxml/hash.h \
+ /usr/include/libxml2/libxml/valid.h \
+ /usr/include/libxml2/libxml/xmlerror.h \
+ /usr/include/libxml2/libxml/list.h \
+ /usr/include/libxml2/libxml/xmlautomata.h \
+ /usr/include/libxml2/libxml/entities.h \
+ /usr/include/libxml2/libxml/encoding.h /usr/include/iconv.h \
+ /usr/include/libxml2/libxml/xmlIO.h \
+ /usr/include/libxml2/libxml/globals.h /usr/include/libxml2/libxml/SAX.h \
+ /usr/include/stdlib.h /usr/include/x86_64-linux-gnu/bits/waitflags.h \
+ /usr/include/x86_64-linux-gnu/bits/waitstatus.h \
+ /usr/include/x86_64-linux-gnu/sys/types.h \
+ /usr/include/x86_64-linux-gnu/sys/select.h \
+ /usr/include/x86_64-linux-gnu/bits/select.h \
+ /usr/include/x86_64-linux-gnu/sys/sysmacros.h /usr/include/alloca.h \
+ /usr/include/libxml2/libxml/xlink.h /usr/include/libxml2/libxml/SAX2.h \
+ /usr/include/libxml2/libxml/xmlmemory.h \
+ /usr/include/libxml2/libxml/threads.h \
+ /opt/gnome/include/json-glib-1.0/json-glib/json-glib.h \
+ /opt/gnome/include/json-glib-1.0/json-glib/json-types.h \
+ /opt/gnome/include/glib-2.0/glib-object.h \
+ /opt/gnome/include/glib-2.0/gobject/gbinding.h \
+ /opt/gnome/include/glib-2.0/gobject/gobject.h \
+ /opt/gnome/include/glib-2.0/gobject/gtype.h \
+ /opt/gnome/include/glib-2.0/gobject/gvalue.h \
+ /opt/gnome/include/glib-2.0/gobject/gparam.h \
+ /opt/gnome/include/glib-2.0/gobject/gclosure.h \
+ /opt/gnome/include/glib-2.0/gobject/gsignal.h \
+ /opt/gnome/include/glib-2.0/gobject/gmarshal.h \
+ /opt/gnome/include/glib-2.0/gobject/gboxed.h \
+ /opt/gnome/include/glib-2.0/gobject/glib-types.h \
+ /opt/gnome/include/glib-2.0/gobject/genums.h \
+ /opt/gnome/include/glib-2.0/gobject/gparamspecs.h \
+ /opt/gnome/include/glib-2.0/gobject/gsourceclosure.h \
+ /opt/gnome/include/glib-2.0/gobject/gtypemodule.h \
+ /opt/gnome/include/glib-2.0/gobject/gtypeplugin.h \
+ /opt/gnome/include/glib-2.0/gobject/gvaluearray.h \
+ /opt/gnome/include/glib-2.0/gobject/gvaluetypes.h \
+ /opt/gnome/include/json-glib-1.0/json-glib/json-builder.h \
+ /opt/gnome/include/json-glib-1.0/json-glib/json-generator.h \
+ /opt/gnome/include/glib-2.0/gio/gio.h \
+ /opt/gnome/include/glib-2.0/gio/giotypes.h \
+ /opt/gnome/include/glib-2.0/gio/gioenums.h \
+ /opt/gnome/include/glib-2.0/gio/gaction.h \
+ /opt/gnome/include/glib-2.0/gio/gactiongroup.h \
+ /opt/gnome/include/glib-2.0/gio/gactiongroupexporter.h \
+ /opt/gnome/include/glib-2.0/gio/gactionmap.h \
+ /opt/gnome/include/glib-2.0/gio/gappinfo.h \
+ /opt/gnome/include/glib-2.0/gio/gapplication.h \
+ /opt/gnome/include/glib-2.0/gio/gapplicationcommandline.h \
+ /opt/gnome/include/glib-2.0/gio/gasyncinitable.h \
+ /opt/gnome/include/glib-2.0/gio/ginitable.h \
+ /opt/gnome/include/glib-2.0/gio/gasyncresult.h \
+ /opt/gnome/include/glib-2.0/gio/gbufferedinputstream.h \
+ /opt/gnome/include/glib-2.0/gio/gfilterinputstream.h \
+ /opt/gnome/include/glib-2.0/gio/ginputstream.h \
+ /opt/gnome/include/glib-2.0/gio/gbufferedoutputstream.h \
+ /opt/gnome/include/glib-2.0/gio/gfilteroutputstream.h \
+ /opt/gnome/include/glib-2.0/gio/goutputstream.h \
+ /opt/gnome/include/glib-2.0/gio/gbytesicon.h \
+ /opt/gnome/include/glib-2.0/gio/gcancellable.h \
+ /opt/gnome/include/glib-2.0/gio/gcharsetconverter.h \
+ /opt/gnome/include/glib-2.0/gio/gconverter.h \
+ /opt/gnome/include/glib-2.0/gio/gcontenttype.h \
+ /opt/gnome/include/glib-2.0/gio/gconverterinputstream.h \
+ /opt/gnome/include/glib-2.0/gio/gconverteroutputstream.h \
+ /opt/gnome/include/glib-2.0/gio/gcredentials.h /usr/include/unistd.h \
+ /usr/include/x86_64-linux-gnu/bits/posix_opt.h \
+ /usr/include/x86_64-linux-gnu/bits/environments.h \
+ /usr/include/x86_64-linux-gnu/bits/confname.h /usr/include/getopt.h \
+ /opt/gnome/include/glib-2.0/gio/gdatainputstream.h \
+ /opt/gnome/include/glib-2.0/gio/gdataoutputstream.h \
+ /opt/gnome/include/glib-2.0/gio/gdbusaddress.h \
+ /opt/gnome/include/glib-2.0/gio/gdbusauthobserver.h \
+ /opt/gnome/include/glib-2.0/gio/gdbusconnection.h \
+ /opt/gnome/include/glib-2.0/gio/gdbuserror.h \
+ /opt/gnome/include/glib-2.0/gio/gdbusintrospection.h \
+ /opt/gnome/include/glib-2.0/gio/gdbusmessage.h \
+ /opt/gnome/include/glib-2.0/gio/gdbusmethodinvocation.h \
+ /opt/gnome/include/glib-2.0/gio/gdbusnameowning.h \
+ /opt/gnome/include/glib-2.0/gio/gdbusnamewatching.h \
+ /opt/gnome/include/glib-2.0/gio/gdbusproxy.h \
+ /opt/gnome/include/glib-2.0/gio/gdbusserver.h \
+ /opt/gnome/include/glib-2.0/gio/gdbusutils.h \
+ /opt/gnome/include/glib-2.0/gio/gdrive.h \
+ /opt/gnome/include/glib-2.0/gio/gemblemedicon.h \
+ /opt/gnome/include/glib-2.0/gio/gicon.h \
+ /opt/gnome/include/glib-2.0/gio/gemblem.h \
+ /opt/gnome/include/glib-2.0/gio/gfileattribute.h \
+ /opt/gnome/include/glib-2.0/gio/gfileenumerator.h \
+ /opt/gnome/include/glib-2.0/gio/gfile.h \
+ /opt/gnome/include/glib-2.0/gio/gfileicon.h \
+ /opt/gnome/include/glib-2.0/gio/gfileinfo.h \
+ /opt/gnome/include/glib-2.0/gio/gfileinputstream.h \
+ /opt/gnome/include/glib-2.0/gio/gfileiostream.h \
+ /opt/gnome/include/glib-2.0/gio/giostream.h \
+ /opt/gnome/include/glib-2.0/gio/gioerror.h \
+ /opt/gnome/include/glib-2.0/gio/gfilemonitor.h \
+ /opt/gnome/include/glib-2.0/gio/gfilenamecompleter.h \
+ /opt/gnome/include/glib-2.0/gio/gfileoutputstream.h \
+ /opt/gnome/include/glib-2.0/gio/ginetaddress.h \
+ /opt/gnome/include/glib-2.0/gio/ginetaddressmask.h \
+ /opt/gnome/include/glib-2.0/gio/ginetsocketaddress.h \
+ /opt/gnome/include/glib-2.0/gio/gsocketaddress.h \
+ /opt/gnome/include/glib-2.0/gio/gioenumtypes.h \
+ /opt/gnome/include/glib-2.0/gio/giomodule.h \
+ /opt/gnome/include/glib-2.0/gmodule.h \
+ /opt/gnome/include/glib-2.0/gio/gioscheduler.h \
+ /opt/gnome/include/glib-2.0/gio/gloadableicon.h \
+ /opt/gnome/include/glib-2.0/gio/gmemoryinputstream.h \
+ /opt/gnome/include/glib-2.0/gio/gmemoryoutputstream.h \
+ /opt/gnome/include/glib-2.0/gio/gmount.h \
+ /opt/gnome/include/glib-2.0/gio/gmountoperation.h \
+ /opt/gnome/include/glib-2.0/gio/gnativevolumemonitor.h \
+ /opt/gnome/include/glib-2.0/gio/gvolumemonitor.h \
+ /opt/gnome/include/glib-2.0/gio/gnetworkaddress.h \
+ /opt/gnome/include/glib-2.0/gio/gnetworkmonitor.h \
+ /opt/gnome/include/glib-2.0/gio/gnetworkservice.h \
+ /opt/gnome/include/glib-2.0/gio/gpermission.h \
+ /opt/gnome/include/glib-2.0/gio/gpollableinputstream.h \
+ /opt/gnome/include/glib-2.0/gio/gpollableoutputstream.h \
+ /opt/gnome/include/glib-2.0/gio/gpollableutils.h \
+ /opt/gnome/include/glib-2.0/gio/gpropertyaction.h \
+ /opt/gnome/include/glib-2.0/gio/gproxy.h \
+ /opt/gnome/include/glib-2.0/gio/gproxyaddress.h \
+ /opt/gnome/include/glib-2.0/gio/gproxyaddressenumerator.h \
+ /opt/gnome/include/glib-2.0/gio/gsocketaddressenumerator.h \
+ /opt/gnome/include/glib-2.0/gio/gproxyresolver.h \
+ /opt/gnome/include/glib-2.0/gio/gresolver.h \
+ /opt/gnome/include/glib-2.0/gio/gresource.h \
+ /opt/gnome/include/glib-2.0/gio/gseekable.h \
+ /opt/gnome/include/glib-2.0/gio/gsettingsschema.h \
+ /opt/gnome/include/glib-2.0/gio/gsettings.h \
+ /opt/gnome/include/glib-2.0/gio/gsimpleaction.h \
+ /opt/gnome/include/glib-2.0/gio/gsimpleactiongroup.h \
+ /opt/gnome/include/glib-2.0/gio/gactiongroup.h \
+ /opt/gnome/include/glib-2.0/gio/gactionmap.h \
+ /opt/gnome/include/glib-2.0/gio/gsimpleasyncresult.h \
+ /opt/gnome/include/glib-2.0/gio/gsimplepermission.h \
+ /opt/gnome/include/glib-2.0/gio/gsocketclient.h \
+ /opt/gnome/include/glib-2.0/gio/gsocketconnectable.h \
+ /opt/gnome/include/glib-2.0/gio/gsocketconnection.h \
+ /opt/gnome/include/glib-2.0/gio/gsocket.h \
+ /opt/gnome/include/glib-2.0/gio/gsocketcontrolmessage.h \
+ /opt/gnome/include/glib-2.0/gio/gsocketlistener.h \
+ /opt/gnome/include/glib-2.0/gio/gsocketservice.h \
+ /opt/gnome/include/glib-2.0/gio/gsrvtarget.h \
+ /opt/gnome/include/glib-2.0/gio/gsimpleproxyresolver.h \
+ /opt/gnome/include/glib-2.0/gio/gtask.h \
+ /opt/gnome/include/glib-2.0/gio/gtcpconnection.h \
+ /opt/gnome/include/glib-2.0/gio/gtcpwrapperconnection.h \
+ /opt/gnome/include/glib-2.0/gio/gtestdbus.h \
+ /opt/gnome/include/glib-2.0/gio/gthemedicon.h \
+ /opt/gnome/include/glib-2.0/gio/gthreadedsocketservice.h \
+ /opt/gnome/include/glib-2.0/gio/gtlsbackend.h \
+ /opt/gnome/include/glib-2.0/gio/gtlscertificate.h \
+ /opt/gnome/include/glib-2.0/gio/gtlsclientconnection.h \
+ /opt/gnome/include/glib-2.0/gio/gtlsconnection.h \
+ /opt/gnome/include/glib-2.0/gio/gtlsdatabase.h \
+ /opt/gnome/include/glib-2.0/gio/gtlsfiledatabase.h \
+ /opt/gnome/include/glib-2.0/gio/gtlsinteraction.h \
+ /opt/gnome/include/glib-2.0/gio/gtlsserverconnection.h \
+ /opt/gnome/include/glib-2.0/gio/gtlspassword.h \
+ /opt/gnome/include/glib-2.0/gio/gvfs.h \
+ /opt/gnome/include/glib-2.0/gio/gvolume.h \
+ /opt/gnome/include/glib-2.0/gio/gzlibcompressor.h \
+ /opt/gnome/include/glib-2.0/gio/gzlibdecompressor.h \
+ /opt/gnome/include/glib-2.0/gio/gdbusinterface.h \
+ /opt/gnome/include/glib-2.0/gio/gdbusinterfaceskeleton.h \
+ /opt/gnome/include/glib-2.0/gio/gdbusobject.h \
+ /opt/gnome/include/glib-2.0/gio/gdbusobjectskeleton.h \
+ /opt/gnome/include/glib-2.0/gio/gdbusobjectproxy.h \
+ /opt/gnome/include/glib-2.0/gio/gdbusobjectmanager.h \
+ /opt/gnome/include/glib-2.0/gio/gdbusobjectmanagerclient.h \
+ /opt/gnome/include/glib-2.0/gio/gdbusobjectmanagerserver.h \
+ /opt/gnome/include/glib-2.0/gio/gdbusactiongroup.h \
+ /opt/gnome/include/glib-2.0/gio/giotypes.h \
+ /opt/gnome/include/glib-2.0/gio/gremoteactiongroup.h \
+ /opt/gnome/include/glib-2.0/gio/gmenumodel.h \
+ /opt/gnome/include/glib-2.0/gio/gmenu.h \
+ /opt/gnome/include/glib-2.0/gio/gmenuexporter.h \
+ /opt/gnome/include/glib-2.0/gio/gdbusmenumodel.h \
+ /opt/gnome/include/json-glib-1.0/json-glib/json-parser.h \
+ /opt/gnome/include/json-glib-1.0/json-glib/json-path.h \
+ /opt/gnome/include/json-glib-1.0/json-glib/json-reader.h \
+ /opt/gnome/include/json-glib-1.0/json-glib/json-version.h \
+ /opt/gnome/include/json-glib-1.0/json-glib/json-enum-types.h \
+ /opt/gnome/include/json-glib-1.0/json-glib/json-gobject.h \
+ /opt/gnome/include/json-glib-1.0/json-glib/json-gvariant.h \
+ gdata/gdata-entry.h gdata/gdata-parsable.h gdata/atom/gdata-category.h \
+ gdata/atom/gdata-link.h gdata/atom/gdata-author.h gdata/gdata-types.h \
+ gdata/gdata-service.h /opt/gnome/include/libsoup-2.4/libsoup/soup.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-address.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-types.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-version.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-status.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-auth.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-headers.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-message.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-message-body.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-message-headers.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-method.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-misc.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-auth-domain.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-auth-domain-basic.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-auth-domain-digest.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-auth-manager.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-types.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-auth.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-cache.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-content-decoder.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-content-sniffer.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-cookie.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-cookie-jar.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-cookie-jar-db.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-cookie-jar-text.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-date.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-enum-types.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-form.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-multipart.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-logger.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-multipart-input-stream.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-proxy-resolver.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-proxy-resolver-default.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-proxy-uri-resolver.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-request.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-request-data.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-request.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-request-file.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-request-http.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-server.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-uri.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-session-async.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-session.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-session-feature.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-session-sync.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-socket.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-tld.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-value-utils.h \
+ /opt/gnome/include/glib-2.0/gobject/gvaluecollector.h \
+ /opt/gnome/include/libsoup-2.4/libsoup/soup-xmlrpc.h \
+ gdata/gdata-authorizer.h gdata/gdata-authorization-domain.h \
+ gdata/gdata-feed.h gdata/gdata-entry.h gdata/atom/gdata-generator.h \
+ gdata/gdata-query.h gdata/gdata-private.h gdata/gdata-service.h \
+ gdata/gdata-query.h gdata/gdata-parsable.h gdata/gdata-feed.h \
+ gdata/gdata-batch-operation.h gdata/gdata-parser.h \
+ gdata/gdata-comparable.h gdata/atom/gdata-category.h \
+ gdata/atom/gdata-link.h gdata/atom/gdata-author.h
+
+config.h:
+
+/opt/gnome/include/glib-2.0/glib.h:
+
+/opt/gnome/include/glib-2.0/glib/galloca.h:
+
+/opt/gnome/include/glib-2.0/glib/gtypes.h:
+
+/opt/gnome/lib64/glib-2.0/include/glibconfig.h:
+
+/opt/gnome/include/glib-2.0/glib/gmacros.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/4.7/include/stddef.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/4.7/include-fixed/limits.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/4.7/include-fixed/syslimits.h:
+
+/usr/include/limits.h:
+
+/usr/include/features.h:
+
+/usr/include/x86_64-linux-gnu/bits/predefs.h:
+
+/usr/include/x86_64-linux-gnu/sys/cdefs.h:
+
+/usr/include/x86_64-linux-gnu/bits/wordsize.h:
+
+/usr/include/x86_64-linux-gnu/gnu/stubs.h:
+
+/usr/include/x86_64-linux-gnu/gnu/stubs-64.h:
+
+/usr/include/x86_64-linux-gnu/bits/posix1_lim.h:
+
+/usr/include/x86_64-linux-gnu/bits/local_lim.h:
+
+/usr/include/linux/limits.h:
+
+/usr/include/x86_64-linux-gnu/bits/posix2_lim.h:
+
+/usr/include/x86_64-linux-gnu/bits/xopen_lim.h:
+
+/usr/include/x86_64-linux-gnu/bits/stdio_lim.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/4.7/include/float.h:
+
+/opt/gnome/include/glib-2.0/glib/gversionmacros.h:
+
+/usr/include/time.h:
+
+/usr/include/x86_64-linux-gnu/bits/time.h:
+
+/usr/include/x86_64-linux-gnu/bits/types.h:
+
+/usr/include/x86_64-linux-gnu/bits/typesizes.h:
+
+/usr/include/x86_64-linux-gnu/bits/timex.h:
+
+/usr/include/xlocale.h:
+
+/opt/gnome/include/glib-2.0/glib/garray.h:
+
+/opt/gnome/include/glib-2.0/glib/gasyncqueue.h:
+
+/opt/gnome/include/glib-2.0/glib/gthread.h:
+
+/opt/gnome/include/glib-2.0/glib/gatomic.h:
+
+/opt/gnome/include/glib-2.0/glib/gerror.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/4.7/include/stdarg.h:
+
+/opt/gnome/include/glib-2.0/glib/gquark.h:
+
+/opt/gnome/include/glib-2.0/glib/gbacktrace.h:
+
+/usr/include/signal.h:
+
+/usr/include/x86_64-linux-gnu/bits/sigset.h:
+
+/usr/include/x86_64-linux-gnu/bits/signum.h:
+
+/usr/include/x86_64-linux-gnu/bits/siginfo.h:
+
+/usr/include/x86_64-linux-gnu/bits/sigaction.h:
+
+/usr/include/x86_64-linux-gnu/bits/sigcontext.h:
+
+/usr/include/x86_64-linux-gnu/bits/sigstack.h:
+
+/usr/include/x86_64-linux-gnu/sys/ucontext.h:
+
+/usr/include/x86_64-linux-gnu/bits/pthreadtypes.h:
+
+/usr/include/x86_64-linux-gnu/bits/sigthread.h:
+
+/opt/gnome/include/glib-2.0/glib/gbase64.h:
+
+/opt/gnome/include/glib-2.0/glib/gbitlock.h:
+
+/opt/gnome/include/glib-2.0/glib/gbookmarkfile.h:
+
+/opt/gnome/include/glib-2.0/glib/gbytes.h:
+
+/opt/gnome/include/glib-2.0/glib/gcharset.h:
+
+/opt/gnome/include/glib-2.0/glib/gchecksum.h:
+
+/opt/gnome/include/glib-2.0/glib/gconvert.h:
+
+/opt/gnome/include/glib-2.0/glib/gdataset.h:
+
+/opt/gnome/include/glib-2.0/glib/gdate.h:
+
+/opt/gnome/include/glib-2.0/glib/gdatetime.h:
+
+/opt/gnome/include/glib-2.0/glib/gtimezone.h:
+
+/opt/gnome/include/glib-2.0/glib/gdir.h:
+
+/usr/include/dirent.h:
+
+/usr/include/x86_64-linux-gnu/bits/dirent.h:
+
+/opt/gnome/include/glib-2.0/glib/genviron.h:
+
+/opt/gnome/include/glib-2.0/glib/gfileutils.h:
+
+/opt/gnome/include/glib-2.0/glib/ggettext.h:
+
+/opt/gnome/include/glib-2.0/glib/ghash.h:
+
+/opt/gnome/include/glib-2.0/glib/glist.h:
+
+/opt/gnome/include/glib-2.0/glib/gmem.h:
+
+/opt/gnome/include/glib-2.0/glib/gnode.h:
+
+/opt/gnome/include/glib-2.0/glib/ghmac.h:
+
+/opt/gnome/include/glib-2.0/glib/gchecksum.h:
+
+/opt/gnome/include/glib-2.0/glib/ghook.h:
+
+/opt/gnome/include/glib-2.0/glib/ghostutils.h:
+
+/opt/gnome/include/glib-2.0/glib/giochannel.h:
+
+/opt/gnome/include/glib-2.0/glib/gmain.h:
+
+/opt/gnome/include/glib-2.0/glib/gpoll.h:
+
+/opt/gnome/include/glib-2.0/glib/gslist.h:
+
+/opt/gnome/include/glib-2.0/glib/gstring.h:
+
+/opt/gnome/include/glib-2.0/glib/gunicode.h:
+
+/opt/gnome/include/glib-2.0/glib/gutils.h:
+
+/opt/gnome/include/glib-2.0/glib/gkeyfile.h:
+
+/opt/gnome/include/glib-2.0/glib/gmappedfile.h:
+
+/opt/gnome/include/glib-2.0/glib/gmarkup.h:
+
+/opt/gnome/include/glib-2.0/glib/gmessages.h:
+
+/opt/gnome/include/glib-2.0/glib/goption.h:
+
+/opt/gnome/include/glib-2.0/glib/gpattern.h:
+
+/opt/gnome/include/glib-2.0/glib/gprimes.h:
+
+/opt/gnome/include/glib-2.0/glib/gqsort.h:
+
+/opt/gnome/include/glib-2.0/glib/gqueue.h:
+
+/opt/gnome/include/glib-2.0/glib/grand.h:
+
+/opt/gnome/include/glib-2.0/glib/gregex.h:
+
+/opt/gnome/include/glib-2.0/glib/gscanner.h:
+
+/opt/gnome/include/glib-2.0/glib/gsequence.h:
+
+/opt/gnome/include/glib-2.0/glib/gshell.h:
+
+/opt/gnome/include/glib-2.0/glib/gslice.h:
+
+/opt/gnome/include/glib-2.0/glib/gspawn.h:
+
+/opt/gnome/include/glib-2.0/glib/gstrfuncs.h:
+
+/opt/gnome/include/glib-2.0/glib/gstringchunk.h:
+
+/opt/gnome/include/glib-2.0/glib/gtestutils.h:
+
+/opt/gnome/include/glib-2.0/glib/gthreadpool.h:
+
+/opt/gnome/include/glib-2.0/glib/gtimer.h:
+
+/opt/gnome/include/glib-2.0/glib/gtrashstack.h:
+
+/opt/gnome/include/glib-2.0/glib/gtree.h:
+
+/opt/gnome/include/glib-2.0/glib/gurifuncs.h:
+
+/opt/gnome/include/glib-2.0/glib/gvarianttype.h:
+
+/opt/gnome/include/glib-2.0/glib/gvariant.h:
+
+/opt/gnome/include/glib-2.0/glib/gversion.h:
+
+/opt/gnome/include/glib-2.0/glib/deprecated/gallocator.h:
+
+/opt/gnome/include/glib-2.0/glib/deprecated/gcache.h:
+
+/opt/gnome/include/glib-2.0/glib/deprecated/gcompletion.h:
+
+/opt/gnome/include/glib-2.0/glib/deprecated/gmain.h:
+
+/opt/gnome/include/glib-2.0/glib/deprecated/grel.h:
+
+/opt/gnome/include/glib-2.0/glib/deprecated/gthread.h:
+
+/usr/include/pthread.h:
+
+/usr/include/endian.h:
+
+/usr/include/x86_64-linux-gnu/bits/endian.h:
+
+/usr/include/x86_64-linux-gnu/bits/byteswap.h:
+
+/usr/include/sched.h:
+
+/usr/include/x86_64-linux-gnu/bits/sched.h:
+
+/usr/include/x86_64-linux-gnu/bits/setjmp.h:
+
+/opt/gnome/include/glib-2.0/glib/gi18n-lib.h:
+
+/usr/include/libintl.h:
+
+/usr/include/string.h:
+
+/usr/include/libxml2/libxml/parser.h:
+
+/usr/include/libxml2/libxml/xmlversion.h:
+
+/usr/include/libxml2/libxml/xmlexports.h:
+
+/usr/include/libxml2/libxml/tree.h:
+
+/usr/include/stdio.h:
+
+/usr/include/libio.h:
+
+/usr/include/_G_config.h:
+
+/usr/include/wchar.h:
+
+/usr/include/x86_64-linux-gnu/bits/sys_errlist.h:
+
+/usr/include/libxml2/libxml/xmlstring.h:
+
+/usr/include/libxml2/libxml/xmlregexp.h:
+
+/usr/include/libxml2/libxml/dict.h:
+
+/usr/include/libxml2/libxml/hash.h:
+
+/usr/include/libxml2/libxml/valid.h:
+
+/usr/include/libxml2/libxml/xmlerror.h:
+
+/usr/include/libxml2/libxml/list.h:
+
+/usr/include/libxml2/libxml/xmlautomata.h:
+
+/usr/include/libxml2/libxml/entities.h:
+
+/usr/include/libxml2/libxml/encoding.h:
+
+/usr/include/iconv.h:
+
+/usr/include/libxml2/libxml/xmlIO.h:
+
+/usr/include/libxml2/libxml/globals.h:
+
+/usr/include/libxml2/libxml/SAX.h:
+
+/usr/include/stdlib.h:
+
+/usr/include/x86_64-linux-gnu/bits/waitflags.h:
+
+/usr/include/x86_64-linux-gnu/bits/waitstatus.h:
+
+/usr/include/x86_64-linux-gnu/sys/types.h:
+
+/usr/include/x86_64-linux-gnu/sys/select.h:
+
+/usr/include/x86_64-linux-gnu/bits/select.h:
+
+/usr/include/x86_64-linux-gnu/sys/sysmacros.h:
+
+/usr/include/alloca.h:
+
+/usr/include/libxml2/libxml/xlink.h:
+
+/usr/include/libxml2/libxml/SAX2.h:
+
+/usr/include/libxml2/libxml/xmlmemory.h:
+
+/usr/include/libxml2/libxml/threads.h:
+
+/opt/gnome/include/json-glib-1.0/json-glib/json-glib.h:
+
+/opt/gnome/include/json-glib-1.0/json-glib/json-types.h:
+
+/opt/gnome/include/glib-2.0/glib-object.h:
+
+/opt/gnome/include/glib-2.0/gobject/gbinding.h:
+
+/opt/gnome/include/glib-2.0/gobject/gobject.h:
+
+/opt/gnome/include/glib-2.0/gobject/gtype.h:
+
+/opt/gnome/include/glib-2.0/gobject/gvalue.h:
+
+/opt/gnome/include/glib-2.0/gobject/gparam.h:
+
+/opt/gnome/include/glib-2.0/gobject/gclosure.h:
+
+/opt/gnome/include/glib-2.0/gobject/gsignal.h:
+
+/opt/gnome/include/glib-2.0/gobject/gmarshal.h:
+
+/opt/gnome/include/glib-2.0/gobject/gboxed.h:
+
+/opt/gnome/include/glib-2.0/gobject/glib-types.h:
+
+/opt/gnome/include/glib-2.0/gobject/genums.h:
+
+/opt/gnome/include/glib-2.0/gobject/gparamspecs.h:
+
+/opt/gnome/include/glib-2.0/gobject/gsourceclosure.h:
+
+/opt/gnome/include/glib-2.0/gobject/gtypemodule.h:
+
+/opt/gnome/include/glib-2.0/gobject/gtypeplugin.h:
+
+/opt/gnome/include/glib-2.0/gobject/gvaluearray.h:
+
+/opt/gnome/include/glib-2.0/gobject/gvaluetypes.h:
+
+/opt/gnome/include/json-glib-1.0/json-glib/json-builder.h:
+
+/opt/gnome/include/json-glib-1.0/json-glib/json-generator.h:
+
+/opt/gnome/include/glib-2.0/gio/gio.h:
+
+/opt/gnome/include/glib-2.0/gio/giotypes.h:
+
+/opt/gnome/include/glib-2.0/gio/gioenums.h:
+
+/opt/gnome/include/glib-2.0/gio/gaction.h:
+
+/opt/gnome/include/glib-2.0/gio/gactiongroup.h:
+
+/opt/gnome/include/glib-2.0/gio/gactiongroupexporter.h:
+
+/opt/gnome/include/glib-2.0/gio/gactionmap.h:
+
+/opt/gnome/include/glib-2.0/gio/gappinfo.h:
+
+/opt/gnome/include/glib-2.0/gio/gapplication.h:
+
+/opt/gnome/include/glib-2.0/gio/gapplicationcommandline.h:
+
+/opt/gnome/include/glib-2.0/gio/gasyncinitable.h:
+
+/opt/gnome/include/glib-2.0/gio/ginitable.h:
+
+/opt/gnome/include/glib-2.0/gio/gasyncresult.h:
+
+/opt/gnome/include/glib-2.0/gio/gbufferedinputstream.h:
+
+/opt/gnome/include/glib-2.0/gio/gfilterinputstream.h:
+
+/opt/gnome/include/glib-2.0/gio/ginputstream.h:
+
+/opt/gnome/include/glib-2.0/gio/gbufferedoutputstream.h:
+
+/opt/gnome/include/glib-2.0/gio/gfilteroutputstream.h:
+
+/opt/gnome/include/glib-2.0/gio/goutputstream.h:
+
+/opt/gnome/include/glib-2.0/gio/gbytesicon.h:
+
+/opt/gnome/include/glib-2.0/gio/gcancellable.h:
+
+/opt/gnome/include/glib-2.0/gio/gcharsetconverter.h:
+
+/opt/gnome/include/glib-2.0/gio/gconverter.h:
+
+/opt/gnome/include/glib-2.0/gio/gcontenttype.h:
+
+/opt/gnome/include/glib-2.0/gio/gconverterinputstream.h:
+
+/opt/gnome/include/glib-2.0/gio/gconverteroutputstream.h:
+
+/opt/gnome/include/glib-2.0/gio/gcredentials.h:
+
+/usr/include/unistd.h:
+
+/usr/include/x86_64-linux-gnu/bits/posix_opt.h:
+
+/usr/include/x86_64-linux-gnu/bits/environments.h:
+
+/usr/include/x86_64-linux-gnu/bits/confname.h:
+
+/usr/include/getopt.h:
+
+/opt/gnome/include/glib-2.0/gio/gdatainputstream.h:
+
+/opt/gnome/include/glib-2.0/gio/gdataoutputstream.h:
+
+/opt/gnome/include/glib-2.0/gio/gdbusaddress.h:
+
+/opt/gnome/include/glib-2.0/gio/gdbusauthobserver.h:
+
+/opt/gnome/include/glib-2.0/gio/gdbusconnection.h:
+
+/opt/gnome/include/glib-2.0/gio/gdbuserror.h:
+
+/opt/gnome/include/glib-2.0/gio/gdbusintrospection.h:
+
+/opt/gnome/include/glib-2.0/gio/gdbusmessage.h:
+
+/opt/gnome/include/glib-2.0/gio/gdbusmethodinvocation.h:
+
+/opt/gnome/include/glib-2.0/gio/gdbusnameowning.h:
+
+/opt/gnome/include/glib-2.0/gio/gdbusnamewatching.h:
+
+/opt/gnome/include/glib-2.0/gio/gdbusproxy.h:
+
+/opt/gnome/include/glib-2.0/gio/gdbusserver.h:
+
+/opt/gnome/include/glib-2.0/gio/gdbusutils.h:
+
+/opt/gnome/include/glib-2.0/gio/gdrive.h:
+
+/opt/gnome/include/glib-2.0/gio/gemblemedicon.h:
+
+/opt/gnome/include/glib-2.0/gio/gicon.h:
+
+/opt/gnome/include/glib-2.0/gio/gemblem.h:
+
+/opt/gnome/include/glib-2.0/gio/gfileattribute.h:
+
+/opt/gnome/include/glib-2.0/gio/gfileenumerator.h:
+
+/opt/gnome/include/glib-2.0/gio/gfile.h:
+
+/opt/gnome/include/glib-2.0/gio/gfileicon.h:
+
+/opt/gnome/include/glib-2.0/gio/gfileinfo.h:
+
+/opt/gnome/include/glib-2.0/gio/gfileinputstream.h:
+
+/opt/gnome/include/glib-2.0/gio/gfileiostream.h:
+
+/opt/gnome/include/glib-2.0/gio/giostream.h:
+
+/opt/gnome/include/glib-2.0/gio/gioerror.h:
+
+/opt/gnome/include/glib-2.0/gio/gfilemonitor.h:
+
+/opt/gnome/include/glib-2.0/gio/gfilenamecompleter.h:
+
+/opt/gnome/include/glib-2.0/gio/gfileoutputstream.h:
+
+/opt/gnome/include/glib-2.0/gio/ginetaddress.h:
+
+/opt/gnome/include/glib-2.0/gio/ginetaddressmask.h:
+
+/opt/gnome/include/glib-2.0/gio/ginetsocketaddress.h:
+
+/opt/gnome/include/glib-2.0/gio/gsocketaddress.h:
+
+/opt/gnome/include/glib-2.0/gio/gioenumtypes.h:
+
+/opt/gnome/include/glib-2.0/gio/giomodule.h:
+
+/opt/gnome/include/glib-2.0/gmodule.h:
+
+/opt/gnome/include/glib-2.0/gio/gioscheduler.h:
+
+/opt/gnome/include/glib-2.0/gio/gloadableicon.h:
+
+/opt/gnome/include/glib-2.0/gio/gmemoryinputstream.h:
+
+/opt/gnome/include/glib-2.0/gio/gmemoryoutputstream.h:
+
+/opt/gnome/include/glib-2.0/gio/gmount.h:
+
+/opt/gnome/include/glib-2.0/gio/gmountoperation.h:
+
+/opt/gnome/include/glib-2.0/gio/gnativevolumemonitor.h:
+
+/opt/gnome/include/glib-2.0/gio/gvolumemonitor.h:
+
+/opt/gnome/include/glib-2.0/gio/gnetworkaddress.h:
+
+/opt/gnome/include/glib-2.0/gio/gnetworkmonitor.h:
+
+/opt/gnome/include/glib-2.0/gio/gnetworkservice.h:
+
+/opt/gnome/include/glib-2.0/gio/gpermission.h:
+
+/opt/gnome/include/glib-2.0/gio/gpollableinputstream.h:
+
+/opt/gnome/include/glib-2.0/gio/gpollableoutputstream.h:
+
+/opt/gnome/include/glib-2.0/gio/gpollableutils.h:
+
+/opt/gnome/include/glib-2.0/gio/gpropertyaction.h:
+
+/opt/gnome/include/glib-2.0/gio/gproxy.h:
+
+/opt/gnome/include/glib-2.0/gio/gproxyaddress.h:
+
+/opt/gnome/include/glib-2.0/gio/gproxyaddressenumerator.h:
+
+/opt/gnome/include/glib-2.0/gio/gsocketaddressenumerator.h:
+
+/opt/gnome/include/glib-2.0/gio/gproxyresolver.h:
+
+/opt/gnome/include/glib-2.0/gio/gresolver.h:
+
+/opt/gnome/include/glib-2.0/gio/gresource.h:
+
+/opt/gnome/include/glib-2.0/gio/gseekable.h:
+
+/opt/gnome/include/glib-2.0/gio/gsettingsschema.h:
+
+/opt/gnome/include/glib-2.0/gio/gsettings.h:
+
+/opt/gnome/include/glib-2.0/gio/gsimpleaction.h:
+
+/opt/gnome/include/glib-2.0/gio/gsimpleactiongroup.h:
+
+/opt/gnome/include/glib-2.0/gio/gactiongroup.h:
+
+/opt/gnome/include/glib-2.0/gio/gactionmap.h:
+
+/opt/gnome/include/glib-2.0/gio/gsimpleasyncresult.h:
+
+/opt/gnome/include/glib-2.0/gio/gsimplepermission.h:
+
+/opt/gnome/include/glib-2.0/gio/gsocketclient.h:
+
+/opt/gnome/include/glib-2.0/gio/gsocketconnectable.h:
+
+/opt/gnome/include/glib-2.0/gio/gsocketconnection.h:
+
+/opt/gnome/include/glib-2.0/gio/gsocket.h:
+
+/opt/gnome/include/glib-2.0/gio/gsocketcontrolmessage.h:
+
+/opt/gnome/include/glib-2.0/gio/gsocketlistener.h:
+
+/opt/gnome/include/glib-2.0/gio/gsocketservice.h:
+
+/opt/gnome/include/glib-2.0/gio/gsrvtarget.h:
+
+/opt/gnome/include/glib-2.0/gio/gsimpleproxyresolver.h:
+
+/opt/gnome/include/glib-2.0/gio/gtask.h:
+
+/opt/gnome/include/glib-2.0/gio/gtcpconnection.h:
+
+/opt/gnome/include/glib-2.0/gio/gtcpwrapperconnection.h:
+
+/opt/gnome/include/glib-2.0/gio/gtestdbus.h:
+
+/opt/gnome/include/glib-2.0/gio/gthemedicon.h:
+
+/opt/gnome/include/glib-2.0/gio/gthreadedsocketservice.h:
+
+/opt/gnome/include/glib-2.0/gio/gtlsbackend.h:
+
+/opt/gnome/include/glib-2.0/gio/gtlscertificate.h:
+
+/opt/gnome/include/glib-2.0/gio/gtlsclientconnection.h:
+
+/opt/gnome/include/glib-2.0/gio/gtlsconnection.h:
+
+/opt/gnome/include/glib-2.0/gio/gtlsdatabase.h:
+
+/opt/gnome/include/glib-2.0/gio/gtlsfiledatabase.h:
+
+/opt/gnome/include/glib-2.0/gio/gtlsinteraction.h:
+
+/opt/gnome/include/glib-2.0/gio/gtlsserverconnection.h:
+
+/opt/gnome/include/glib-2.0/gio/gtlspassword.h:
+
+/opt/gnome/include/glib-2.0/gio/gvfs.h:
+
+/opt/gnome/include/glib-2.0/gio/gvolume.h:
+
+/opt/gnome/include/glib-2.0/gio/gzlibcompressor.h:
+
+/opt/gnome/include/glib-2.0/gio/gzlibdecompressor.h:
+
+/opt/gnome/include/glib-2.0/gio/gdbusinterface.h:
+
+/opt/gnome/include/glib-2.0/gio/gdbusinterfaceskeleton.h:
+
+/opt/gnome/include/glib-2.0/gio/gdbusobject.h:
+
+/opt/gnome/include/glib-2.0/gio/gdbusobjectskeleton.h:
+
+/opt/gnome/include/glib-2.0/gio/gdbusobjectproxy.h:
+
+/opt/gnome/include/glib-2.0/gio/gdbusobjectmanager.h:
+
+/opt/gnome/include/glib-2.0/gio/gdbusobjectmanagerclient.h:
+
+/opt/gnome/include/glib-2.0/gio/gdbusobjectmanagerserver.h:
+
+/opt/gnome/include/glib-2.0/gio/gdbusactiongroup.h:
+
+/opt/gnome/include/glib-2.0/gio/giotypes.h:
+
+/opt/gnome/include/glib-2.0/gio/gremoteactiongroup.h:
+
+/opt/gnome/include/glib-2.0/gio/gmenumodel.h:
+
+/opt/gnome/include/glib-2.0/gio/gmenu.h:
+
+/opt/gnome/include/glib-2.0/gio/gmenuexporter.h:
+
+/opt/gnome/include/glib-2.0/gio/gdbusmenumodel.h:
+
+/opt/gnome/include/json-glib-1.0/json-glib/json-parser.h:
+
+/opt/gnome/include/json-glib-1.0/json-glib/json-path.h:
+
+/opt/gnome/include/json-glib-1.0/json-glib/json-reader.h:
+
+/opt/gnome/include/json-glib-1.0/json-glib/json-version.h:
+
+/opt/gnome/include/json-glib-1.0/json-glib/json-enum-types.h:
+
+/opt/gnome/include/json-glib-1.0/json-glib/json-gobject.h:
+
+/opt/gnome/include/json-glib-1.0/json-glib/json-gvariant.h:
+
+gdata/gdata-entry.h:
+
+gdata/gdata-parsable.h:
+
+gdata/atom/gdata-category.h:
+
+gdata/atom/gdata-link.h:
+
+gdata/atom/gdata-author.h:
+
+gdata/gdata-types.h:
+
+gdata/gdata-service.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-address.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-types.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-version.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-status.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-auth.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-headers.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-message.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-message-body.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-message-headers.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-method.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-misc.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-auth-domain.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-auth-domain-basic.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-auth-domain-digest.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-auth-manager.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-types.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-auth.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-cache.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-content-decoder.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-content-sniffer.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-cookie.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-cookie-jar.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-cookie-jar-db.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-cookie-jar-text.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-date.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-enum-types.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-form.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-multipart.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-logger.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-multipart-input-stream.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-proxy-resolver.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-proxy-resolver-default.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-proxy-uri-resolver.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-request.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-request-data.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-request.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-request-file.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-request-http.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-server.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-uri.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-session-async.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-session.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-session-feature.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-session-sync.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-socket.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-tld.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-value-utils.h:
+
+/opt/gnome/include/glib-2.0/gobject/gvaluecollector.h:
+
+/opt/gnome/include/libsoup-2.4/libsoup/soup-xmlrpc.h:
+
+gdata/gdata-authorizer.h:
+
+gdata/gdata-authorization-domain.h:
+
+gdata/gdata-feed.h:
+
+gdata/gdata-entry.h:
+
+gdata/atom/gdata-generator.h:
+
+gdata/gdata-query.h:
+
+gdata/gdata-private.h:
+
+gdata/gdata-service.h:
+
+gdata/gdata-query.h:
+
+gdata/gdata-parsable.h:
+
+gdata/gdata-feed.h:
+
+gdata/gdata-batch-operation.h:
+
+gdata/gdata-parser.h:
+
+gdata/gdata-comparable.h:
+
+gdata/atom/gdata-category.h:
+
+gdata/atom/gdata-link.h:
+
+gdata/atom/gdata-author.h:

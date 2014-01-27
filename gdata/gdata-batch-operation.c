@@ -613,7 +613,7 @@ gdata_batch_operation_run (GDataBatchOperation *self, GCancellable *cancellable,
 	g_return_val_if_fail (priv->has_run == FALSE, FALSE);
 
 	message = _gdata_service_build_message (priv->service, priv->authorization_domain, SOUP_METHOD_POST, priv->feed_uri, NULL, TRUE);
-
+	
 	/* Build the request */
 	g_get_current_time (&updated);
 	feed = _gdata_feed_new ("Batch operation feed", "batch1", updated.tv_sec);

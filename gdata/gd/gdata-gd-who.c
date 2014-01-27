@@ -51,12 +51,22 @@ struct _GDataGDWhoPrivate {
 	gchar *relation_type;
 	gchar *value_string;
 	gchar *email_address;
+        
+        /*For calendar use only*/
+        gboolean is_optional;
+        gchar *response_status;
+        gchar *comment;
+        guint additional_guests;      
 };
 
 enum {
 	PROP_RELATION_TYPE = 1,
 	PROP_VALUE_STRING,
-	PROP_EMAIL_ADDRESS
+	PROP_EMAIL_ADDRESS,
+        PROP_ADDITIONAL_GUESTS,
+        PROP_COMMENT,
+        PROP_RESPONSE_STATUS,
+        PROP_IS_OPTIONAL,   
 };
 
 G_DEFINE_TYPE_WITH_CODE (GDataGDWho, gdata_gd_who, GDATA_TYPE_PARSABLE,
@@ -130,6 +140,73 @@ gdata_gd_who_class_init (GDataGDWhoClass *klass)
 	                                                      "E-mail address", "The e-mail address of the person represented by the #GDataGDWho.",
 	                                                      NULL,
 	                                                      G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+	
+        /*below for calendar use only*/
+	
+	/**
+	 * GDataGDWho:additional-guests:
+	 *
+	 * The number of additional guests that the person has.
+	 *
+	 * For more information, see the
+	 * <ulink type="http" url="https://developers.google.com/google-apps/calendar/v3/reference/events">GData specification</ulink>.
+	 *
+	 * Since: UNRELEASED
+	 **/
+        g_object_class_install_property (gobject_class, PROP_ADDITIONAL_GUESTS,
+                                         g_param_spec_uint ("additional-guests",
+                                                           "Additional guests", "The number of additional guests that the person has.", 
+                                                           0, G_MAXUINT, 0, 
+                                                           G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+	
+	/**
+	 * GDataGDWho:comment:
+	 *
+	 * The attendee's response comment.
+	 *
+	 * For more information, see the
+	 * <ulink type="http" url="https://developers.google.com/google-apps/calendar/v3/reference/events">GData specification</ulink>.
+	 *
+	 * Since: UNRELEASED
+	 **/
+        g_object_class_install_property (gobject_class, PROP_COMMENT,
+                                         g_param_spec_string ("comment",
+                                                              "Comment", "The attendee's response comment.", 
+                                                              NULL, 
+                                                              G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+	/**
+	 * GDataGDWho:response-status:
+	 *
+	 * The attendee's response status.
+	 * 
+	 * For more information, see the
+	 * <ulink type="http" url="https://developers.google.com/google-apps/calendar/v3/reference/events">GData specification</ulink>.
+	 *
+	 * Since: UNRELEASED
+	 **/
+        g_object_class_install_property (gobject_class, PROP_RESPONSE_STATUS,
+                                         g_param_spec_string("response-status",
+                                                             "Response status", "The attendee's response status.", 
+                                                             NULL, 
+                                                             G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+ 
+	/**
+	 * GDataGDWho:is-optional:
+	 *
+	 * Whether this is an optional attendee.
+	 *
+	 * For more information, see the
+	 * <ulink type="http" url="https://developers.google.com/google-apps/calendar/v3/reference/events">GData specification</ulink>.
+	 *
+	 * Since: UNRELEASED
+	 **/
+        g_object_class_install_property (gobject_class, PROP_IS_OPTIONAL,
+                                         g_param_spec_boolean("is-optional",
+                                                              "Optional?", "Whether this is an optional attendee.", 
+                                                              FALSE, 
+                                                              G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));   
+	        
 }
 
 static gint
@@ -162,6 +239,8 @@ gdata_gd_who_finalize (GObject *object)
 	g_free (priv->relation_type);
 	g_free (priv->value_string);
 	g_free (priv->email_address);
+	g_free (priv->response_status);
+	g_free (priv->comment);
 
 	/* Chain up to the parent class */
 	G_OBJECT_CLASS (gdata_gd_who_parent_class)->finalize (object);
@@ -182,6 +261,18 @@ gdata_gd_who_get_property (GObject *object, guint property_id, GValue *value, GP
 		case PROP_EMAIL_ADDRESS:
 			g_value_set_string (value, priv->email_address);
 			break;
+                case PROP_IS_OPTIONAL:
+                        g_value_set_boolean (value, priv->is_optional);
+                        break;
+                case PROP_RESPONSE_STATUS:
+                        g_value_set_string (value, priv->response_status);
+                        break;
+                case PROP_COMMENT:
+                        g_value_set_string (value, priv->comment);
+                        break;
+                case PROP_ADDITIONAL_GUESTS:
+                        g_value_set_int (value, priv->additional_guests);
+                        break;
 		default:
 			/* We don't have any other property... */
 			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
@@ -203,6 +294,18 @@ gdata_gd_who_set_property (GObject *object, guint property_id, const GValue *val
 			break;
 		case PROP_EMAIL_ADDRESS:
 			gdata_gd_who_set_email_address (self, g_value_get_string (value));
+			break;
+                case PROP_IS_OPTIONAL:
+			gdata_gd_who_set_is_optional (self, g_value_get_boolean(value));
+			break;
+                case PROP_RESPONSE_STATUS:
+			gdata_gd_who_set_response_status (self, g_value_get_string (value));
+			break;
+                case PROP_COMMENT:
+			gdata_gd_who_set_comment (self, g_value_get_string (value));
+			break;
+                case PROP_ADDITIONAL_GUESTS:
+			gdata_gd_who_set_additional_guests (self, g_value_get_int (value));
 			break;
 		default:
 			/* We don't have any other property... */
@@ -303,7 +406,7 @@ gdata_gd_who_new (const gchar *relation_type, const gchar *value_string, const g
  *
  * Gets the #GDataGDWho:relation-type property.
  *
- * Return value: the relation type, or %NULL
+ * Return value: (allow-none): the relation type, or %NULL
  *
  * Since: 0.4.0
  **/
@@ -342,7 +445,7 @@ gdata_gd_who_set_relation_type (GDataGDWho *self, const gchar *relation_type)
  *
  * Gets the #GDataGDWho:value-string property.
  *
- * Return value: the value string, or %NULL
+ * Return value: (allow-none): the value string, or %NULL
  *
  * Since: 0.4.0
  **/
@@ -380,7 +483,7 @@ gdata_gd_who_set_value_string (GDataGDWho *self, const gchar *value_string)
  *
  * Gets the #GDataGDWho:email-address property.
  *
- * Return value: the e-mail address, or %NULL
+ * Return value: (allow-none): the e-mail address, or %NULL
  *
  * Since: 0.4.0
  **/
@@ -411,4 +514,164 @@ gdata_gd_who_set_email_address (GDataGDWho *self, const gchar *email_address)
 	g_free (self->priv->email_address);
 	self->priv->email_address = g_strdup (email_address);
 	g_object_notify (G_OBJECT (self), "email-address");
+}
+
+/**
+ * gdata_gd_who_get_additional_guests:
+ * @self: a #GDataGDWho
+ *
+ * Gets the #GDataGDWho:addition-guests property.
+ *
+ * Return value: the number of additional guests
+ *
+ * Since: UNRELEASED
+ **/
+guint
+gdata_gd_who_get_additional_guests (GDataGDWho *self)
+{
+	g_return_val_if_fail (GDATA_IS_GD_WHO (self), -1);
+	return self->priv->additional_guests;
+}
+
+/**
+ * gdata_gd_who_set_additional_guests:
+ * @self: a #GDataGDWho
+ * @additional_guests: The number of additional guests that the person has
+ *
+ * Sets the #GDataGDWho:additional-guests property to @additional_guests.
+ *
+ * Since: UNRELEASED
+ **/
+void
+gdata_gd_who_set_additional_guests (GDataGDWho *self, guint additional_guests)
+{
+        g_return_if_fail (GDATA_IS_GD_WHO (self));
+
+        self->priv->additional_guests = additional_guests;
+        g_object_notify (G_OBJECT (self), "additional-guests");
+}
+
+/**
+ * gdata_gd_who_get_comment:
+ * @self: a #GDataGDWho
+ *
+ * Gets the #GDataGDWho:comment property.
+ *
+ * Return value: (allow-none): the comment, or %NULL
+ *
+ * Since: UNRELEASED
+ **/
+const gchar *
+gdata_gd_who_get_comment (GDataGDWho *self)
+{
+	g_return_val_if_fail (GDATA_IS_GD_WHO (self), NULL);
+	return self->priv->comment;
+}
+
+/**
+ * gdata_gd_who_set_comment:
+ * @self: a #GDataGDWho
+ * @comment: (allow-none): the attendee's response comment, or %NULL
+ *
+ * Sets the #GDataGDWho:comment property to @comment.
+ * 
+ * Set @comment to %NULL to unset the property.
+ *
+ * Since: UNRELEASED
+ **/
+void
+gdata_gd_who_set_comment (GDataGDWho *self, const gchar *comment)
+{
+	g_return_if_fail (GDATA_IS_GD_WHO (self));
+        g_return_if_fail (comment == NULL || *comment != '\0');
+	
+	gchar *new_comment;
+	new_comment = g_strdup (comment);
+	g_free (self->priv->comment);
+        self->priv->comment = new_comment;
+        g_object_notify (G_OBJECT (self), "comment");
+}
+
+/**
+ * gdata_gd_who_is_optional:
+ * @self: a #GDataGDWho
+ *
+ * Gets the #GDataGDWho:is-optional property.
+ *
+ * Return value: %TRUE if this is an optional attendee, or %FALSE otherwise
+ *
+ * Since: UNRELEASED
+ **/
+gboolean
+gdata_gd_who_is_optional (GDataGDWho *self)
+{
+	g_return_val_if_fail (GDATA_IS_GD_WHO (self), FALSE);
+	return self->priv->is_optional;
+}
+
+/**
+ * gdata_gd_who_set_is_optional:
+ * @self: a #GDataGDWho
+ * @is_optional: whether this is an optional attendee. Optional
+ *
+ * Sets the #GDataGDWho:is_optional property to @is_optional.
+ *
+ * Since: UNRELEASED
+ **/
+void
+gdata_gd_who_set_is_optional (GDataGDWho *self, gboolean is_optional)
+{
+        g_return_if_fail (GDATA_IS_GD_WHO (self));
+
+        self->priv->additional_guests = is_optional;
+        g_object_notify (G_OBJECT (self), "is-optional");
+}
+
+/**
+ * gdata_gd_who_get_response_status:
+ * @self: a #GDataGDWho
+ *
+ * Gets the #GDataGDWho:response-status property.
+ *
+ * Return value: (allow-none): the response status. If it is not %NULL, it should be one of the following:
+ *  	GDATA_GD_WHO_RESPONSE_STATUS_NEEDSACTION
+ *	GDATA_GD_WHO_RESPONSE_STATUS_DECLINED
+ *	GDATA_GD_WHO_RESPONSE_STATUS_TENTATIVE
+ *	GDATA_GD_WHO_RESPONSE_STATUS_ACCEPTED
+ *
+ * Since: UNRELEASED
+ **/
+const gchar *
+gdata_gd_who_get_response_status (GDataGDWho *self)
+{
+	g_return_val_if_fail (GDATA_IS_GD_WHO (self), NULL);
+	return self->priv->response_status;
+}
+
+/**
+ * gdata_gd_who_set_response_status:
+ * @self: a #GDataGDWho
+ * @response_status: (allow-none): the attendee's response status. If it is not %NULL, it should be one of the following:
+ *	GDATA_GD_WHO_RESPONSE_STATUS_NEEDSACTION
+ *	GDATA_GD_WHO_RESPONSE_STATUS_DECLINED
+ *	GDATA_GD_WHO_RESPONSE_STATUS_TENTATIVE
+ *	GDATA_GD_WHO_RESPONSE_STATUS_ACCEPTED
+ *
+ * Sets the #GDataGDWho:response_status property to @response_status.
+ * 
+ * Set @response_status to %NULL to unset this property
+ *
+ * Since: UNRELEASED
+ **/
+void
+gdata_gd_who_set_response_status (GDataGDWho *self, const gchar *response_status)
+{
+        g_return_if_fail (GDATA_IS_GD_WHO (self));
+        g_return_if_fail (response_status == NULL || *response_status != '\0');
+
+	gchar *new_response_status;
+	new_response_status = g_strdup (self->priv->response_status);
+	g_free(self->priv->response_status);
+        self->priv->response_status = new_response_status;
+        g_object_notify (G_OBJECT (self), "response-status");
 }

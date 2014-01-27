@@ -72,6 +72,11 @@ G_BEGIN_DECLS
 #define GDATA_IS_GD_WHO_CLASS(k)	(G_TYPE_CHECK_CLASS_TYPE ((k), GDATA_TYPE_GD_WHO))
 #define GDATA_GD_WHO_GET_CLASS(o)	(G_TYPE_INSTANCE_GET_CLASS ((o), GDATA_TYPE_GD_WHO, GDataGDWhoClass))
 
+#define GDATA_GD_WHO_RESPONSE_STATUS_NEEDSACTION        "needsAction";
+#define GDATA_GD_WHO_RESPONSE_STATUS_DECLINED           "declined"
+#define GDATA_GD_WHO_RESPONSE_STATUS_TENTATIVE          "tentative"
+#define GDATA_GD_WHO_RESPONSE_STATUS_ACCEPTED           "accepted"
+
 typedef struct _GDataGDWhoPrivate	GDataGDWhoPrivate;
 
 /**
@@ -111,6 +116,18 @@ void gdata_gd_who_set_value_string (GDataGDWho *self, const gchar *value_string)
 
 const gchar *gdata_gd_who_get_email_address (GDataGDWho *self) G_GNUC_PURE;
 void gdata_gd_who_set_email_address (GDataGDWho *self, const gchar *email_address);
+
+guint gdata_gd_who_get_additional_guests (GDataGDWho *self) G_GNUC_PURE;
+void gdata_gd_who_set_additional_guests (GDataGDWho *self, guint additional_guests);
+
+const gchar *gdata_gd_who_get_comment (GDataGDWho *self) G_GNUC_PURE;
+void gdata_gd_who_set_comment (GDataGDWho *self, const gchar *comment);
+
+gboolean gdata_gd_who_is_optional (GDataGDWho *self) G_GNUC_PURE;
+void gdata_gd_who_set_is_optional (GDataGDWho *self, const gboolean optional);
+
+const gchar *gdata_gd_who_get_response_status (GDataGDWho *self) G_GNUC_PURE;
+void gdata_gd_who_set_response_status (GDataGDWho *self, const gchar *response_status);
 
 G_END_DECLS
 

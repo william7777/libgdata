@@ -339,7 +339,7 @@ _gdata_parsable_new_from_xml (GType parsable_type, const gchar *xml, gint length
 
 	if (length == -1)
 		length = strlen (xml);
-
+	
 	/* Parse the XML */
 	doc = xmlReadMemory (xml, length, "/dev/null", NULL, 0);
 	if (doc == NULL) {
@@ -362,7 +362,7 @@ _gdata_parsable_new_from_xml (GType parsable_type, const gchar *xml, gint length
 		             _("Empty document."));
 		return NULL;
 	}
-
+	
 	parsable = _gdata_parsable_new_from_xml_node (parsable_type, doc, node, user_data, error);
 	xmlFreeDoc (doc);
 
@@ -530,7 +530,7 @@ _gdata_parsable_new_from_json_node (GType parsable_type, JsonReader *reader, gpo
 			return NULL;
 		}
 
-		json_reader_end_element (reader);
+		json_reader_end_member (reader);
 	}
 
 	/* Call the post-parse function */

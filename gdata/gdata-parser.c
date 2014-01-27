@@ -655,7 +655,7 @@ gdata_parser_object_from_element_setter (xmlNode *element, const gchar *element_
 	setter (parent_parsable, parsable);
 	g_object_unref (parsable);
 	*success = TRUE;
-
+	
 	return TRUE;
 }
 

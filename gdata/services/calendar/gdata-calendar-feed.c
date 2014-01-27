@@ -37,6 +37,7 @@
 static void gdata_calendar_feed_finalize (GObject *object);
 static void gdata_calendar_feed_get_property (GObject *object, guint property_id, GValue *value, GParamSpec *pspec);
 static gboolean parse_xml (GDataParsable *parsable, xmlDoc *doc, xmlNode *node, gpointer user_data, GError **error);
+static gboolean parse_json (GDataParsable *parsable, JsonReader *reader, gpointer user_data, GError **error);
 
 struct _GDataCalendarFeedPrivate {
 	gchar *timezone;
@@ -154,6 +155,20 @@ parse_xml (GDataParsable *parsable, xmlDoc *doc, xmlNode *node, gpointer user_da
 	}
 
 	return TRUE;
+}
+
+static gboolean 
+parse_json (GDataParsable *parsable, JsonReader *reader, gpointer user_data, GError **error)
+{
+	gboolean success;
+	
+        GDataCalendarFeed *self = GDATA_CALENDAR_FEED (parsable);
+	
+        if (gdata_parser_string_from_json_member (reader, "timezone", P_DEFAULT, &(self->priv->timezone), &success, error) == TRUE) {
+		return success;
+        } else {
+		return GDATA_PARSABLE_CLASS (gdata_calendar_feed_parent_class)->parse_json (parsable, reader, user_data, error);
+	}
 }
 
 /**
