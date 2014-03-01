@@ -642,7 +642,7 @@ test_event_json (void)
 	event = gdata_calendar_event_new (NULL);
 
 	/* This function is different from the past function used to set the summary*/
-	gdata_entry_set_summary (GDATA_ENTRY (event), "Tennis with Beth");
+	gdata_entry_set_title (GDATA_ENTRY (event), "Tennis with Beth");
 	gdata_entry_set_content (GDATA_ENTRY (event), "Meet for a quick lesson.");
 	gdata_calendar_event_set_transparency (event, GDATA_CALENDAR_EVENT_TRANSPARENCY_OPAQUE);
 	gdata_calendar_event_set_status (event, GDATA_CALENDAR_EVENT_STATUS_CONFIRMED);
