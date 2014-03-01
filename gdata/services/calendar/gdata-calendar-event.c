@@ -111,6 +111,7 @@ static void get_json_extended_properties_cb (const gchar *key, const gchar *valu
 static void get_json_gadget (GDataParsable *parsable, JsonBuilder *builder);
 static void get_json_gadget_preferences_cb (const gchar *key, const gchar *value, JsonBuilder *builder);
 static void get_json_source (GDataParsable *parsable, JsonBuilder *builder);
+static void get_json_parent (GDataParsable *parsable, JsonBuilder *builder);
 static gboolean parse_json (GDataParsable *parsable, JsonReader *reader, gpointer user_data, GError **error);
 static gboolean parse_json_when (GDataParsable *parsable, JsonReader *reader, gboolean *success, GError **error);
 static gboolean parse_json_who (GDataParsable *parsable, JsonReader *reader, gboolean *success,GError **error);
@@ -2468,7 +2469,7 @@ get_json (GDataParsable *parsable, JsonBuilder *builder)
         GDataCalendarEventPrivate *priv = self->priv;
 
         /* Chain up to the parent class */  
-        GDATA_PARSABLE_CLASS (gdata_calendar_event_parent_class)->get_json (parsable, builder);
+        get_json_parent (parsable, builder);
 
         get_json_when (parsable, builder);
         get_json_where (parsable, builder);
@@ -2863,12 +2864,55 @@ get_json_source (GDataParsable *parsable, JsonBuilder *builder)
 	json_builder_end_object (builder);
 }
 
+static void
+get_json_parent (GDataParsable *parsable, JsonBuilder *builder)
+{
+	GDataEntry *self = GDATA_ENTRY (parsable);
+	GList *i;
+	GDataLink *link;
+
+	if (gdata_entry_get_title (self) != NULL) {
+		json_builder_set_member_name (builder, "summary");
+		json_builder_add_string_value (builder, gdata_entry_get_title (self));
+	}
+	
+	if (gdata_entry_get_id (self) != NULL) {
+		json_builder_set_member_name (builder, "id");
+		json_builder_add_string_value (builder, gdata_entry_get_id (self));
+	}
+	
+	if (gdata_entry_get_updated (self) != -1) {
+		gchar *updated = gdata_parser_int64_to_iso8601 (gdata_entry_get_updated (self));
+		json_builder_set_member_name (builder, "updated");
+		json_builder_add_string_value (builder, updated);
+		g_free (updated);
+	}
+	
+	if (gdata_entry_get_categories (self) != NULL) {
+		json_builder_set_member_name (builder, "kind");
+		json_builder_add_string_value (builder, gdata_category_get_term (GDATA_CATEGORY (gdata_entry_get_categories (self)->data)));
+	}
+	
+	if (gdata_entry_get_etag (self) != NULL) {
+		json_builder_set_member_name (builder, "etag");
+		json_builder_add_string_value (builder, gdata_entry_get_etag (self));
+	}
+	
+	link = gdata_entry_look_up_link (self, GDATA_LINK_SELF);
+	if (link != NULL) {
+		json_builder_set_member_name (builder, "htmlLink");
+		json_builder_add_string_value (builder, gdata_link_get_uri (link));
+	}
+}
+
 static gboolean 
 parse_json (GDataParsable *parsable, JsonReader *reader, gpointer user_data, GError **error)
 {
         gboolean success;
 	gchar *color_id;
 	gboolean guests_can_modify, guests_can_invite_others, guests_can_see_guests, anyone_can_add_self;
+	GDataLink *link;
+	const gchar *uri;
         
         GDataCalendarEvent *self = GDATA_CALENDAR_EVENT (parsable);
 	color_id = NULL;
@@ -2925,7 +2969,19 @@ parse_json (GDataParsable *parsable, JsonReader *reader, gpointer user_data, GEr
                 else    
 			success = FALSE;
                 return success;
-        } else {
+        } else if (g_strcmp0 (json_reader_get_member_name (reader), "summary") == 0) {
+		gdata_entry_set_title (GDATA_ENTRY (self), json_reader_get_string_value (reader));
+	} else if (g_strcmp0 (json_reader_get_member_name (reader), "htmlLink") == 0) {
+		uri = json_reader_get_string_value (reader);
+		
+		if (uri == NULL || *uri == '\0') {
+			return gdata_parser_error_required_json_content_missing (reader, error);
+		}
+		
+		link = gdata_link_new (uri, GDATA_LINK_SELF);
+		gdata_entry_add_link (GDATA_ENTRY (self), link);
+		g_object_unref(link);
+	}else {
 		return GDATA_PARSABLE_CLASS (gdata_calendar_event_parent_class)->parse_json (parsable, reader, user_data, error);
 	}
 }
