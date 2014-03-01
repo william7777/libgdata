@@ -2086,45 +2086,6 @@ gdata_calendar_event_get_hangout_link (GDataCalendarEvent *self)
 }
 
 /**
- * gdata_calendar_event_get_summary:
- * @self: a #GDataCalendarEvent
- *
- * Gets the #GDataEntry:summary property.
- *
- * Return value: (allow-none): the event's summary, or %NULL
- * 
- * Since: UNRELEASED
- **/
-const gchar * 
-gdata_calendar_event_get_summary (GDataCalendarEvent *self)
-{
-        g_return_val_if_fail (GDATA_IS_CALENDAR_EVENT (self), NULL);
-        return gdata_entry_get_summary (GDATA_ENTRY (self));
-}
-
-/**
- * gdata_calendar_event_set_summary:
- * @self: a #GDataCalendarEvent
- * @summary: (allow-none): a new event summary, or %NULL
- *
- * Sets the #GDataEntry:summary property to the new summary, @summary.
- *
- * Set @summary to %NULL to unset the property in the event.
- * 
- * Since: UNRELEASED
- **/
-void 
-gdata_calendar_event_set_summary (GDataCalendarEvent *self, const gchar *summary)
-{
-        g_return_if_fail (GDATA_IS_CALENDAR_EVENT (self));
-	g_return_if_fail (summary == NULL && *summary != '\0');
-	/* If is_locked is TRUE, summary cannot be changed*/
-	g_return_if_fail (self->priv->is_locked == FALSE);
-	
-	gdata_entry_set_summary (GDATA_ENTRY (self), summary);
-}
-
-/**
  * gdata_calendar_event_get_color:
  * @self: a #GDataCalendarEvent
  * @color: (out caller-allocates): a #GDataColor
