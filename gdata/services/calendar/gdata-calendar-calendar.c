@@ -743,38 +743,6 @@ gdata_calendar_calendar_set_location (GDataCalendarCalendar *self, const gchar *
  *
  * Gets the #GDataCalendarCalendar:location property.
  *
-}
-
-/**
- * gdata_calendar_calendar_set_location:
- * @self: a #GDataCalendarCalendar
- * @location: (allow-none): a new calendar location, or %NULL
- *
- * Sets the #GDataCalendarCalendar:location property to the new location, @location.
- *
- * Set @location to %NULL to unset the property in the event.
- * 
- * Since: UNRELEASED
- **/
-void 
-gdata_calendar_calendar_set_location (GDataCalendarCalendar *self, const gchar *location)
-{
-        g_return_if_fail (GDATA_IS_CALENDAR_CALENDAR (self));
-	g_return_if_fail (location == NULL || *location != '\0');
-	
-	gchar *new_location;
-	new_location = g_strdup (location);
-        g_free (self->priv->location);
-	self->priv->location = new_location;
-        g_object_notify (G_OBJECT (self), "location");
-}
-
-/**
- * gdata_calendar_calendar_get_location:
- * @self: a #GDataCalendarCalendar
- *
- * Gets the #GDataCalendarCalendar:location property.
- *
  * Return value: (allow-none): the calendar's location, or %NULL
  * 
  * Since: UNRELEASED
