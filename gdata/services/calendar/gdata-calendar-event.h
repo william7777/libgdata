@@ -119,8 +119,6 @@ gboolean gdata_calendar_event_is_attendees_omitted (GDataCalendarEvent *self) G_
 void gdata_calendar_event_set_is_attendees_omitted (GDataCalendarEvent *self, gboolean is_attendees_omitted);
 gboolean gdata_calendar_event_is_private_copy (GDataCalendarEvent *self) G_GNUC_PURE;
 gboolean gdata_calendar_event_is_locked (GDataCalendarEvent *self) G_GNUC_PURE;
-const gchar *gdata_calendar_event_get_summary (GDataCalendarEvent *self) G_GNUC_PURE;
-void gdata_calendar_event_set_summary (GDataCalendarEvent *self, const gchar *summary);
 const gchar *gdata_calendar_event_get_hangout_link (GDataCalendarEvent *self) G_GNUC_PURE;
 gboolean gdata_calendar_event_is_end_time_unspecified (GDataCalendarEvent *self) G_GNUC_PURE;
 const gchar *gdata_calendar_event_get_extended_property_private (GDataCalendarEvent *self, const gchar *name) G_GNUC_PURE;
