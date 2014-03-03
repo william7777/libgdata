@@ -2869,6 +2869,7 @@ get_json_parent (GDataParsable *parsable, JsonBuilder *builder)
 static gboolean 
 parse_json (GDataParsable *parsable, JsonReader *reader, gpointer user_data, GError **error)
 {
+	printf("Now processing %s\n", json_reader_get_member_name (reader));
         gboolean success;
 	gchar *color_id;
 	gboolean guests_can_modify, guests_can_invite_others, guests_can_see_guests, anyone_can_add_self;
@@ -3393,13 +3394,14 @@ parse_json_extended_properties (GDataParsable *parsable, JsonReader *reader, gbo
 {
 	guint iter, i;
 	GHashTable *tmp_hash_table;
+	gchar *member_name;
 	
 	GDataCalendarEvent *self = GDATA_CALENDAR_EVENT (parsable);
 	
-	if (g_strcmp0 (json_reader_get_member_name (reader), "extended_properties") != 0)
+	if (g_strcmp0 (json_reader_get_member_name (reader), "extendedProperties") != 0)
 		return FALSE;
 	g_assert (json_reader_is_object (reader));
-	
+
 	for (iter = 0; iter < json_reader_count_members (reader); iter++) {
 		if  (json_reader_read_element (reader, iter) == FALSE) {
 			*success = FALSE;
@@ -3409,9 +3411,11 @@ parse_json_extended_properties (GDataParsable *parsable, JsonReader *reader, gbo
 			return TRUE;
 		}
 		g_assert (json_reader_is_object (reader));
-		g_hash_table_new_full (tmp_hash_table, g_str_equal, g_free, g_free);
+		tmp_hash_table = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+		member_name = g_strdup (json_reader_get_member_name (reader));
+		
 		for (i = 0; i < json_reader_count_members (reader); i++) {
-			if  (json_reader_read_element (reader, iter) == FALSE) {
+			if  (json_reader_read_element (reader, i) == FALSE) {
 				*success = FALSE;
 				g_set_error (error, GDATA_SERVICE_ERROR, GDATA_SERVICE_ERROR_PROTOCOL_ERROR,
 					     /* Translators: the parameter is an error message. */
@@ -3426,27 +3430,28 @@ parse_json_extended_properties (GDataParsable *parsable, JsonReader *reader, gbo
 			}
 			json_reader_end_member (reader);
 		}
-		
-		if (g_strcmp0 (json_reader_get_member_name (reader), "private") == TRUE) {
+
+		if (g_strcmp0 (member_name, "private") == 0) {
 			self->priv->extended_properties_private = g_hash_table_ref (tmp_hash_table);
 			g_hash_table_unref (tmp_hash_table);
-		} else if (g_strcmp0 (json_reader_get_member_name (reader), "shared") == TRUE) {
+		} else if (g_strcmp0 (member_name, "shared") == 0) {
 			self->priv->extended_properties_shared = g_hash_table_ref (tmp_hash_table);
 			g_hash_table_unref (tmp_hash_table);
 		} else {
 			*success = FALSE;
 			g_set_error (error, GDATA_SERVICE_ERROR, GDATA_SERVICE_ERROR_PROTOCOL_ERROR,
 				     /* Translators: the parameter is an error message. */
-				     _ ("Member %d name %s in \"extendedProperties\" cannot be identified\n"), iter, json_reader_get_member_name (reader));
+				     _ ("Member %d name %s in \"extendedProperties\" cannot be identified\n"), iter, member_name);
 			return TRUE;
 		}
-		
+				
 		if (json_reader_get_error (reader) != NULL) {
 			g_propagate_error (error, g_error_copy (json_reader_get_error (reader)));
 			*success = FALSE;
 			return TRUE;
 		}
-			
+		
+		g_free (member_name);
 		json_reader_end_member (reader);
 	}
 	
