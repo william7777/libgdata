@@ -3107,7 +3107,7 @@ parse_json_reminders (GDataParsable *parsable, JsonReader *reader, gboolean *suc
 			             _("Member %d in \"reminder\" cannot be read\n"), iterator);
 			return TRUE;
 		}
-
+		
 		if (gdata_parser_boolean_from_json_member (reader, "useDefault", P_DEFAULT, &useDefault, success, error) == TRUE && *success == TRUE && useDefault == TRUE) { 
 			if(self->priv->times != NULL) {
 				when = g_object_ref (GDATA_GD_WHEN (self->priv->times->data));
@@ -3129,7 +3129,7 @@ parse_json_reminders (GDataParsable *parsable, JsonReader *reader, gboolean *suc
 			
 			g_object_unref (when);
 			json_reader_end_member (reader);
-		} else if (g_strcmp0 (json_reader_get_member_name (reader), "overrides") == 0) {
+		} else if (g_strcmp0 (json_reader_get_member_name (reader), "overrides") == 0) {		
 			*success = TRUE;
 
 			g_assert (json_reader_is_array(reader));
@@ -3511,7 +3511,7 @@ parse_json_gadget (GDataParsable *parsable, JsonReader *reader, gboolean *succes
 	if (g_strcmp0 (json_reader_get_member_name (reader), "gadget") != 0)
 		return FALSE;
 	g_assert (json_reader_is_object (reader));
-	
+
 	for (iter = 0; iter < json_reader_count_members (reader); iter++) {
 		if  (json_reader_read_element (reader, iter) == FALSE) {
 			*success = FALSE;
@@ -3553,7 +3553,7 @@ parse_json_gadget (GDataParsable *parsable, JsonReader *reader, gboolean *succes
 		}
 		json_reader_end_member (reader);		
 	}
-	
+
 	*success = TRUE;
 	return TRUE;
 	
@@ -3578,7 +3578,7 @@ parse_json_gadget_preferences (GDataParsable *parsable, JsonReader *reader, gboo
 				     _ ("Member %d in \"gadget-preferences\" cannot be read\n"), iter);
 			return TRUE;
 		}
-		
+				
 		g_hash_table_insert (self->priv->gadget_preferences, json_reader_get_member_name (reader), json_reader_get_string_value (reader));
 		if (json_reader_get_error (reader) != NULL) {
 			g_propagate_error (error, g_error_copy (json_reader_get_error (reader)));
