@@ -127,19 +127,19 @@ gboolean gdata_calendar_event_set_extended_property_private (GDataCalendarEvent 
 const gchar *gdata_calendar_event_get_extended_property_shared (GDataCalendarEvent *self, const gchar *name) G_GNUC_PURE;
 GHashTable *gdata_calendar_event_get_extended_properties_shared (GDataCalendarEvent *self) G_GNUC_PURE;
 gboolean gdata_calendar_event_set_extended_property_shared (GDataCalendarEvent *self, const gchar *name, const gchar *value);
-const gchar* gdata_calendar_event_get_source_title (GDataCalendarEvent *self) G_GNUC_PURE;
+const gchar *gdata_calendar_event_get_source_title (GDataCalendarEvent *self) G_GNUC_PURE;
 void gdata_calendar_event_set_source_title (GDataCalendarEvent *self, const gchar* source_title);
-const gchar* gdata_calendar_event_get_source_url (GDataCalendarEvent *self) G_GNUC_PURE;
+const gchar *gdata_calendar_event_get_source_url (GDataCalendarEvent *self) G_GNUC_PURE;
 void gdata_calendar_event_set_source_url (GDataCalendarEvent *self, const gchar* source_url);
-const gchar* gdata_calendar_event_get_gadget_display (GDataCalendarEvent *self) G_GNUC_PURE;
+const gchar *gdata_calendar_event_get_gadget_display (GDataCalendarEvent *self) G_GNUC_PURE;
 void gdata_calendar_event_set_gadget_display (GDataCalendarEvent *self, const gchar* gadget_display);
-const gchar* gdata_calendar_event_get_gadget_icon_link (GDataCalendarEvent *self) G_GNUC_PURE;
+const gchar *gdata_calendar_event_get_gadget_icon_link (GDataCalendarEvent *self) G_GNUC_PURE;
 void gdata_calendar_event_set_gadget_icon_link (GDataCalendarEvent *self, const gchar* gadget_icon_link);
-const gchar* gdata_calendar_event_get_gadget_link (GDataCalendarEvent *self) G_GNUC_PURE;
+const gchar *gdata_calendar_event_get_gadget_link (GDataCalendarEvent *self) G_GNUC_PURE;
 void gdata_calendar_event_set_gadget_link (GDataCalendarEvent *self, const gchar* gadget_link);
-const gchar* gdata_calendar_event_get_gadget_title (GDataCalendarEvent *self) G_GNUC_PURE;
+const gchar *gdata_calendar_event_get_gadget_title (GDataCalendarEvent *self) G_GNUC_PURE;
 void gdata_calendar_event_set_gadget_title (GDataCalendarEvent *self, const gchar* gadget_title);
-const gchar* gdata_calendar_event_get_gadget_type (GDataCalendarEvent *self) G_GNUC_PURE;
+const gchar *gdata_calendar_event_get_gadget_type (GDataCalendarEvent *self) G_GNUC_PURE;
 void gdata_calendar_event_set_gadget_type (GDataCalendarEvent *self, const gchar* gadget_type);
 guint gdata_calendar_event_get_gadget_height (GDataCalendarEvent *self) G_GNUC_PURE;
 void gdata_calendar_event_set_gadget_height (GDataCalendarEvent *self, guint gadget_height);
@@ -148,7 +148,15 @@ void gdata_calendar_event_set_gadget_width (GDataCalendarEvent *self, guint gadg
 const gchar *gdata_calendar_event_get_gadget_preference (GDataCalendarEvent *self, const gchar *name) G_GNUC_PURE;
 GHashTable *gdata_calendar_event_get_gadget_preferences (GDataCalendarEvent *self) G_GNUC_PURE;
 gboolean gdata_calendar_event_set_gadget_preference (GDataCalendarEvent *self, const gchar *name, const gchar *value);
-
+gint64 gdata_calendar_event_get_created (GDataCalendarEvent *self);
+const gchar *gdata_calendar_event_get_creator_id (GDataCalendarEvent *self) G_GNUC_PURE;
+const gchar *gdata_calendar_event_get_creator_email (GDataCalendarEvent *self) G_GNUC_PURE;
+const gchar *gdata_calendar_event_get_creator_display_name (GDataCalendarEvent *self) G_GNUC_PURE;
+gboolean gdata_calendar_event_is_creator_self (GDataCalendarEvent *self) G_GNUC_PURE;
+const gchar *gdata_calendar_event_get_organizer_id (GDataCalendarEvent *self) G_GNUC_PURE;
+const gchar *gdata_calendar_event_get_organizer_email (GDataCalendarEvent *self) G_GNUC_PURE;
+const gchar *gdata_calendar_event_get_organizer_display_name (GDataCalendarEvent *self) G_GNUC_PURE;
+gboolean gdata_calendar_event_is_organizer_self (GDataCalendarEvent *self) G_GNUC_PURE;
 G_END_DECLS
 
 #endif /* !GDATA_CALENDAR_EVENT_H */

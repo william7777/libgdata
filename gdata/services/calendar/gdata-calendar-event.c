@@ -122,6 +122,7 @@ static gboolean parse_json_extended_properties (GDataParsable *parsable, JsonRea
 static gboolean parse_json_source (GDataParsable *parsable, JsonReader *reader, gboolean *success, GError **error);
 static gboolean parse_json_gadget (GDataParsable *parsable, JsonReader *reader, gboolean *success, GError **error);
 static gboolean parse_json_gadget_preferences (GDataParsable *parsable, JsonReader *reader, gboolean *success, GError **error);
+static gboolean parse_json_creator_organizer (GDataParsable *parsable, JsonReader *reader, gboolean *success, GError **error);
 
 struct _GDataCalendarEventPrivate {
 	gint64 edited;
@@ -159,6 +160,15 @@ struct _GDataCalendarEventPrivate {
 	guint gadget_height;
 	guint gadget_width;
 	GHashTable *gadget_preferences;
+	gint64 created;
+	gchar *creator_id;
+	gchar *creator_email;
+	gchar *creator_display_name;
+	gboolean is_creator_self;
+	gchar *organizer_id;
+	gchar *organizer_email;
+	gchar *organizer_display_name;
+	gboolean is_organizer_self;
 };
 
 enum {
@@ -191,6 +201,15 @@ enum {
 	PROP_GADGET_TYPE,
 	PROP_GADGET_HEIGHT,
 	PROP_GADGET_WIDTH,
+	PROP_CREATED,
+	PROP_CREATOR_ID,
+	PROP_CREATOR_EMAIL,
+	PROP_CREATOR_DISPLAY_NAME,
+	PROP_IS_CREATOR_SELF,
+	PROP_ORGANIZER_ID,
+	PROP_ORGANIZER_EMAIL,
+	PROP_ORGANIZER_DISPLAY_NAME,
+	PROP_IS_ORGANIZER_SELF,
 };
 
 G_DEFINE_TYPE (GDataCalendarEvent, gdata_calendar_event, GDATA_TYPE_ENTRY)
@@ -577,7 +596,7 @@ gdata_calendar_event_class_init (GDataCalendarEventClass *klass)
                                          g_param_spec_string ("gadget-icon-link",
                                                               "Gadget icon link", "The gadget's icon URL.", 
                                                               NULL,
-                                                              G_PARAM_READWRITE| G_PARAM_STATIC_STRINGS));
+                                                              G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 	
 	/**
 	 * GDataCalendarEvent:gadget-link:
@@ -593,7 +612,7 @@ gdata_calendar_event_class_init (GDataCalendarEventClass *klass)
                                          g_param_spec_string ("gadget-link",
                                                               "Gadget link", "The gadget's URL.", 
                                                               NULL,
-                                                              G_PARAM_READWRITE| G_PARAM_STATIC_STRINGS));
+                                                              G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 	
 	/**
 	 * GDataCalendarEvent:gadget-title:
@@ -609,7 +628,7 @@ gdata_calendar_event_class_init (GDataCalendarEventClass *klass)
                                          g_param_spec_string ("gadget-title",
                                                               "Gadget title", "The gadget's title.", 
                                                               NULL,
-                                                              G_PARAM_READWRITE| G_PARAM_STATIC_STRINGS));
+                                                              G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 	
 	/**
 	 * GDataCalendarEvent:gadget-type:
@@ -625,7 +644,7 @@ gdata_calendar_event_class_init (GDataCalendarEventClass *klass)
                                          g_param_spec_string ("gadget-type",
                                                               "Gadget type", "The gadget's type.", 
                                                               NULL,
-                                                              G_PARAM_READWRITE| G_PARAM_STATIC_STRINGS));
+                                                              G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 	
 	/**
 	 * GDataCalendarEvent:gadget-height:
@@ -658,6 +677,148 @@ gdata_calendar_event_class_init (GDataCalendarEventClass *klass)
 	                                                    "Gadget width", "The gadget's width in pixels. Optional.",
 	                                                    0, G_MAXUINT, 0,
 	                                                    G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+	
+	/**
+	 * GDataCalendarEvent:created:
+	 *
+	 * The time this event is created.
+	 *
+	 * For more information, see the <ulink type="http" url="https://developers.google.com/google-apps/calendar/v3/reference/events">
+	 * Google Calendar API</ulink>.
+	 **/
+	g_object_class_install_property (gobject_class, PROP_CREATED,
+	                                 g_param_spec_int64 ("created",
+	                                                     "Created", "The time the event is created.",
+	                                                     -1, G_MAXINT64, -1,
+	                                                     G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+	
+	/**
+	 * GDataCalendarEvent: creator-id:
+	 * 
+	 * The creator's id.
+	 * 
+	 * For more information, see the <ulink type="http" url="https://developers.google.com/google-apps/calendar/v3/reference/events?hl=en">
+	 * Google Calendar API</ulink>.
+	 * 
+	 * Since: UNRELEASED
+	 **/
+	g_object_class_install_property (gobject_class, PROP_CREATOR_ID,
+					 g_param_spec_string ("creator-id",
+							      "Creator id", "The creator's id.",
+							      NULL,
+							      G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+	
+	/**
+	 * GDataCalendarEvent: creator-email:
+	 * 
+	 * The creator's email.
+	 * 
+	 * For more information, see the <ulink type="http" url="https://developers.google.com/google-apps/calendar/v3/reference/events?hl=en">
+	 * Google Calendar API</ulink>.
+	 * 
+	 * Since: UNRELEASED
+	 **/
+	g_object_class_install_property (gobject_class, PROP_CREATOR_EMAIL,
+					 g_param_spec_string ("creator-email",
+							      "Creator email", "The creator's email.",
+							      NULL,
+							      G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+	
+	/**
+	 * GDataCalendarEvent: creator-display-name:
+	 * 
+	 * The creator's display name.
+	 * 
+	 * For more information, see the <ulink type="http" url="https://developers.google.com/google-apps/calendar/v3/reference/events?hl=en">
+	 * Google Calendar API</ulink>.
+	 * 
+	 * Since: UNRELEASED
+	 **/
+	g_object_class_install_property (gobject_class, PROP_CREATOR_DISPLAY_NAME,
+					 g_param_spec_string ("creator-display-name",
+							      "Creator display name", "The creator's display name.",
+							      NULL,
+							      G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+	
+	/**
+	 * GDataCalendarEvent: is-creator-self:
+	 * 
+	 * Whether this is the creator.
+	 * 
+	 * For more information, see the <ulink type="http" url="https://developers.google.com/google-apps/calendar/v3/reference/events?hl=en">
+	 * Google Calendar API</ulink>.
+	 * 
+	 * Since: UNRELEASED
+	 **/
+	g_object_class_install_property (gobject_class, PROP_IS_CREATOR_SELF,
+					 g_param_spec_boolean ("is-creator-self",
+							      "Is creator self", "Whether this is the creator.",
+							      FALSE,
+							      G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+	
+	/**
+	 * GDataCalendarEvent: organizer-id:
+	 * 
+	 * The organizer's id.
+	 * 
+	 * For more information, see the <ulink type="http" url="https://developers.google.com/google-apps/calendar/v3/reference/events?hl=en">
+	 * Google Calendar API</ulink>.
+	 * 
+	 * Since: UNRELEASED
+	 **/
+	g_object_class_install_property (gobject_class, PROP_ORGANIZER_ID,
+					 g_param_spec_string ("organizer-id",
+							      "Creator id", "The organizer's id.",
+							      NULL,
+							      G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+	
+	/**
+	 * GDataCalendarEvent: organizer-email:
+	 * 
+	 * The organizer's email.
+	 * 
+	 * For more information, see the <ulink type="http" url="https://developers.google.com/google-apps/calendar/v3/reference/events?hl=en">
+	 * Google Calendar API</ulink>.
+	 * 
+	 * Since: UNRELEASED
+	 **/
+	g_object_class_install_property (gobject_class, PROP_ORGANIZER_EMAIL,
+					 g_param_spec_string ("organizer-email",
+							      "Creator email", "The organizer's email.",
+							      NULL,
+							      G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+	
+	/**
+	 * GDataCalendarEvent: organizer-display-name:
+	 * 
+	 * The organizer's display name.
+	 * 
+	 * For more information, see the <ulink type="http" url="https://developers.google.com/google-apps/calendar/v3/reference/events?hl=en">
+	 * Google Calendar API</ulink>.
+	 * 
+	 * Since: UNRELEASED
+	 **/
+	g_object_class_install_property (gobject_class, PROP_ORGANIZER_DISPLAY_NAME,
+					 g_param_spec_string ("organizer-display-name",
+							      "Creator display name", "The organizer's display name.",
+							      NULL,
+							      G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+	
+	/**
+	 * GDataCalendarEvent: is-organizer-self:
+	 * 
+	 * Whether this is the organizer.
+	 * 
+	 * For more information, see the <ulink type="http" url="https://developers.google.com/google-apps/calendar/v3/reference/events?hl=en">
+	 * Google Calendar API</ulink>.
+	 * 
+	 * Since: UNRELEASED
+	 **/
+	g_object_class_install_property (gobject_class, PROP_IS_ORGANIZER_SELF,
+					 g_param_spec_boolean ("is-organizer-self",
+							      "Is organizer self", "Whether this is the organizer.",
+							      FALSE,
+							      G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 }
 
 static void
@@ -665,6 +826,7 @@ gdata_calendar_event_init (GDataCalendarEvent *self)
 {
 	self->priv = G_TYPE_INSTANCE_GET_PRIVATE (self, GDATA_TYPE_CALENDAR_EVENT, GDataCalendarEventPrivate);
 	self->priv->edited = -1;
+	self->priv->created = -1;
 	self->priv->extended_properties_private = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
 	self->priv->extended_properties_shared = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
 	self->priv->gadget_preferences = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
@@ -738,6 +900,12 @@ gdata_calendar_event_finalize (GObject *object)
 	g_free (priv->gadget_link);
 	g_free (priv->gadget_title);
 	g_free (priv->gadget_type);
+	g_free (priv->creator_display_name);
+	g_free (priv->creator_email);
+	g_free (priv->creator_id);
+	g_free (priv->organizer_display_name);
+	g_free (priv->organizer_email);
+	g_free (priv->organizer_id);
 	g_hash_table_destroy (priv->extended_properties_private);
 	g_hash_table_destroy (priv->extended_properties_shared);
 	g_hash_table_destroy (priv->gadget_preferences);
@@ -838,6 +1006,33 @@ gdata_calendar_event_get_property (GObject *object, guint property_id, GValue *v
 			break;
 		case PROP_GADGET_WIDTH:
 			g_value_set_uint (value, priv->gadget_width);
+			break;
+		case PROP_CREATED:
+			g_value_set_int64 (value, priv->created);
+			break;
+		case PROP_CREATOR_ID:
+			g_value_set_string (value, priv->creator_id);
+			break;
+		case PROP_CREATOR_EMAIL:
+			g_value_set_string (value, priv->creator_email);
+			break;
+		case PROP_CREATOR_DISPLAY_NAME:
+			g_value_set_string (value, priv->creator_display_name);
+			break;
+		case PROP_IS_CREATOR_SELF:
+			g_value_set_boolean (value, priv->is_creator_self);
+			break;
+		case PROP_ORGANIZER_ID:
+			g_value_set_string (value, priv->organizer_id);
+			break;
+		case PROP_ORGANIZER_EMAIL:
+			g_value_set_string (value, priv->organizer_email);
+			break;
+		case PROP_ORGANIZER_DISPLAY_NAME:
+			g_value_set_string (value, priv->organizer_display_name);
+			break;
+		case PROP_IS_ORGANIZER_SELF:
+			g_value_set_boolean (value, priv->is_organizer_self);
 			break;
 		default:
 			/* We don't have any other property... */
@@ -1705,12 +1900,13 @@ gdata_calendar_event_get_description (GDataCalendarEvent *self)
 void 
 gdata_calendar_event_set_description (GDataCalendarEvent *self, const gchar *description)
 {
+	gchar *new_description;
+	
         g_return_if_fail (GDATA_IS_CALENDAR_EVENT (self));
 	g_return_if_fail (description == NULL && *description != '\0');
 	/* If is_locked is TRUE, description cannot be changed*/
 	g_return_if_fail (self->priv->is_locked == FALSE);
 	
-	gchar *new_description;
 	new_description = g_strdup (description);
         g_free (self->priv->description);
         self->priv->description = new_description;
@@ -2207,6 +2403,23 @@ gdata_calendar_event_is_locked(GDataCalendarEvent *self)
 }
 
 /**
+ * gdata_calendar_event_get_created:
+ * @self: a #GDataCalendarEvent
+ *
+ * Gets the #GDataCalendarEvent:created property. If the property is unset, <code class="literal">-1</code> will be returned.
+ *
+ * Return value: the UNIX timestamp for the time the event was created, or <code class="literal">-1</code>
+ * 
+ * Since: UNRELEASED
+ **/
+gint64
+gdata_calendar_event_get_created (GDataCalendarEvent *self)
+{
+	g_return_val_if_fail (GDATA_IS_CALENDAR_EVENT (self), -1);
+	return self->priv->created;
+}
+
+/**
  * gdata_calendar_event_get_extended_property_private:
  * @self: a #GDataCalendarEvent
  * @name: the property name; an arbitrary, unique string
@@ -2422,15 +2635,152 @@ gboolean gdata_calendar_event_set_gadget_preference (GDataCalendarEvent *self, c
 	return TRUE;
 }
 
+/**
+ * gdata_calendar_event_get_creator_id:
+ * @self: a #GDataCalendarEvent
+ *
+ * Gets the #GDataCalendarEvent:creator-id property.
+ *
+ * Return value: (allow-none): the creator id, or %NULL.
+ * 
+ * Since: UNRELEASED
+ **/
+const gchar *
+gdata_calendar_event_get_creator_id (GDataCalendarEvent *self)
+{
+	g_return_val_if_fail (GDATA_IS_CALENDAR_EVENT (self), NULL);
+	return self->priv->creator_id;
+}
+
+/**
+ * gdata_calendar_event_get_creator_email:
+ * @self: a #GDataCalendarEvent
+ *
+ * Gets the #GDataCalendarEvent:creator-email property.
+ *
+ * Return value: (allow-none): the creator email, or %NULL.
+ * 
+ * Since: UNRELEASED
+ **/
+const gchar *
+gdata_calendar_event_get_creator_email (GDataCalendarEvent *self)
+{
+	g_return_val_if_fail (GDATA_IS_CALENDAR_EVENT (self), NULL);
+	return self->priv->creator_email;
+}
+
+/**
+ * gdata_calendar_event_get_creator_display_name:
+ * @self: a #GDataCalendarEvent
+ *
+ * Gets the #GDataCalendarEvent:creator-display-name property.
+ *
+ * Return value: (allow-none): the creator display name, or %NULL.
+ * 
+ * Since: UNRELEASED
+ **/
+const gchar *
+gdata_calendar_event_get_creator_display_name (GDataCalendarEvent *self)
+{
+	g_return_val_if_fail (GDATA_IS_CALENDAR_EVENT (self), NULL);
+	return self->priv->creator_display_name;
+}
+
+/**
+ * gdata_calendar_event_is_creator_self:
+ * @self: a #GDataCalendarEvent
+ *
+ * Gets the #GDataCalendarEvent:is-display-name property.
+ *
+ * Return value: whether this is the creator itself.
+ * 
+ * Since: UNRELEASED
+ **/
+gboolean
+gdata_calendar_event_is_creator_self (GDataCalendarEvent *self)
+{
+	g_return_val_if_fail (GDATA_IS_CALENDAR_EVENT (self), FALSE);
+	return self->priv->is_creator_self;
+}
+
+/**
+ * gdata_calendar_event_get_organizer_id:
+ * @self: a #GDataCalendarEvent
+ *
+ * Gets the #GDataCalendarEvent:organizer-id property.
+ *
+ * Return value: (allow-none): the organizer id, or %NULL.
+ * 
+ * Since: UNRELEASED
+ **/
+const gchar *
+gdata_calendar_event_get_organizer_id (GDataCalendarEvent *self)
+{
+	g_return_val_if_fail (GDATA_IS_CALENDAR_EVENT (self), NULL);
+	return self->priv->organizer_id;
+}
+
+/**
+ * gdata_calendar_event_get_organizer_email:
+ * @self: a #GDataCalendarEvent
+ *
+ * Gets the #GDataCalendarEvent:organizer-email property.
+ *
+ * Return value: (allow-none): the organizer email, or %NULL.
+ * 
+ * Since: UNRELEASED
+ **/
+const gchar *
+gdata_calendar_event_get_organizer_email (GDataCalendarEvent *self)
+{
+	g_return_val_if_fail (GDATA_IS_CALENDAR_EVENT (self), NULL);
+	return self->priv->organizer_email;
+}
+
+/**
+ * gdata_calendar_event_get_organizer_display_name:
+ * @self: a #GDataCalendarEvent
+ *
+ * Gets the #GDataCalendarEvent:organizer-display-name property.
+ *
+ * Return value: (allow-none): the organizer display name, or %NULL.
+ * 
+ * Since: UNRELEASED
+ **/
+const gchar *
+gdata_calendar_event_get_organizer_display_name (GDataCalendarEvent *self)
+{
+	g_return_val_if_fail (GDATA_IS_CALENDAR_EVENT (self), NULL);
+	return self->priv->organizer_display_name;
+}
+
+/**
+ * gdata_calendar_event_is_organizer_self:
+ * @self: a #GDataCalendarEvent
+ *
+ * Gets the #GDataCalendarEvent:is-display-name property.
+ *
+ * Return value: whether this is the organizer itself.
+ * 
+ * Since: UNRELEASED
+ **/
+gboolean
+gdata_calendar_event_is_organizer_self (GDataCalendarEvent *self)
+{
+	g_return_val_if_fail (GDATA_IS_CALENDAR_EVENT (self), FALSE);
+	return self->priv->is_organizer_self;
+}
+
 static void 
 get_json (GDataParsable *parsable, JsonBuilder *builder)
 { 
 	gchar *color_id;
         GDataCalendarEvent *self = GDATA_CALENDAR_EVENT (parsable);
         GDataCalendarEventPrivate *priv = self->priv;
+	gchar *created_time;
 
         /* Chain up to the parent class */  
-        get_json_parent (parsable, builder);
+	get_json_parent (parsable, builder);
 
         get_json_when (parsable, builder);
         get_json_where (parsable, builder);
@@ -2438,7 +2788,7 @@ get_json (GDataParsable *parsable, JsonBuilder *builder)
 	get_json_extended_properties (parsable, builder);
 	get_json_gadget (parsable, builder);
 	get_json_source (parsable, builder);
-
+	
         if (priv->status != NULL) {
                 json_builder_set_member_name (builder, "status");
                 json_builder_add_string_value (builder, priv->status);
@@ -2802,6 +3152,8 @@ get_json_gadget (GDataParsable *parsable, JsonBuilder *builder)
 		g_hash_table_foreach (self->priv->gadget_preferences, (GHFunc) get_json_gadget_preferences_cb, builder);
 		json_builder_end_object (builder);
 	}
+	
+	json_builder_end_object (builder);
 }
 
 static void 
@@ -2880,7 +3232,7 @@ parse_json (GDataParsable *parsable, JsonReader *reader, gpointer user_data, GEr
 	color_id = NULL;
         success = TRUE;
 
-        if (gdata_parser_int64_time_from_json_member(reader, "updated", P_DEFAULT, &(self->priv->edited), &success, error) == TRUE || 
+        if (gdata_parser_int64_time_from_json_member (reader, "created", P_DEFAULT, &(self->priv->created), &success, error) == TRUE ||
             gdata_parser_string_from_json_member (reader, "status", P_DEFAULT, &(self->priv->status), &success, error) == TRUE ||
             gdata_parser_string_from_json_member (reader, "visibility", P_DEFAULT, &(self->priv->visibility), &success, error) == TRUE ||
             gdata_parser_string_from_json_member (reader, "transparency", P_DEFAULT, &(self->priv->transparency), &success, error) == TRUE ||
@@ -2901,7 +3253,8 @@ parse_json (GDataParsable *parsable, JsonReader *reader, gpointer user_data, GEr
                    parse_json_recurrence (parsable, reader, &success, error) == TRUE ||
 		   parse_json_extended_properties (parsable, reader, &success, error) == TRUE ||
 		   parse_json_source (parsable, reader, &success, error) == TRUE ||
-		   parse_json_gadget (parsable, reader, &success, error) == TRUE) {           
+		   parse_json_gadget (parsable, reader, &success, error) == TRUE ||
+		   parse_json_creator_organizer (parsable, reader, &success, error) == TRUE) {           
                 return success;
         } else if (gdata_parser_boolean_from_json_member (reader, "guestsCanModify", P_DEFAULT, &(guests_can_modify), &success, error) == TRUE) {
 		if(success == TRUE)
@@ -3588,6 +3941,72 @@ parse_json_gadget_preferences (GDataParsable *parsable, JsonReader *reader, gboo
 		json_reader_end_member (reader);
 	}
 	
+	*success = TRUE;
+	return TRUE;
+}
+
+static gboolean 
+parse_json_creator_organizer (GDataParsable *parsable, JsonReader *reader, gboolean *success, GError **error)
+{
+	guint iter;
+	gchar *name;
+	GDataCalendarEvent *self = GDATA_CALENDAR_EVENT (parsable);
+	
+	if (g_strcmp0 (json_reader_get_member_name (reader), "creator") != 0 && g_strcmp0 (json_reader_get_member_name (reader), "organizer") != 0)
+		return FALSE;
+	
+	name = g_strdup (json_reader_get_member_name (reader));
+	g_assert (json_reader_is_object (reader));
+	for (iter = 0; iter < json_reader_count_members (reader); iter++) {
+		if  (json_reader_read_element (reader, iter) == FALSE) {
+			*success = FALSE;
+			g_set_error (error, GDATA_SERVICE_ERROR, GDATA_SERVICE_ERROR_PROTOCOL_ERROR,
+				     /* Translators: the parameter is an error message. */
+				     _ ("Member %d in %s cannot be read\n"), iter, name);
+			g_free (name);
+			return TRUE;
+		}
+		
+		if (g_strcmp0 (json_reader_get_member_name (reader), "id") == 0) {
+			if (g_strcmp0 (name, "creator") == 0) {
+				self->priv->creator_id = g_strdup (json_reader_get_string_value (reader));
+			} else {
+				self->priv->organizer_id = g_strdup (json_reader_get_string_value (reader));
+			}
+		} else if (g_strcmp0 (json_reader_get_member_name (reader), "email") == 0) {
+			if (g_strcmp0 (name, "creator") == 0) {
+				self->priv->creator_email = g_strdup (json_reader_get_string_value (reader));
+			} else {
+				self->priv->organizer_email = g_strdup (json_reader_get_string_value (reader));
+			}
+		} else if (g_strcmp0 (json_reader_get_member_name (reader), "displayName") == 0) {
+			if (g_strcmp0 (name, "creator") == 0) {
+				self->priv->creator_display_name = g_strdup (json_reader_get_string_value (reader));
+			} else {
+				self->priv->organizer_display_name = g_strdup (json_reader_get_string_value (reader));
+			}
+		} else if (g_strcmp0 (json_reader_get_member_name (reader), "self") == 0) {
+			if (g_strcmp0 (name, "creator") == 0) {
+				self->priv->is_creator_self = json_reader_get_boolean_value (reader);
+			} else {
+				self->priv->is_organizer_self = json_reader_get_boolean_value (reader);
+			}
+		} else {
+			*success = FALSE;
+			g_set_error (error, GDATA_SERVICE_ERROR, GDATA_SERVICE_ERROR_PROTOCOL_ERROR,
+				     /* Translators: the parameter is an error message. */
+				     _ ("Member %d name %s cannot be identified\n"), iter, name);
+			return TRUE;
+		}
+		
+		if (json_reader_get_error (reader) != NULL) {
+			g_propagate_error (error, g_error_copy (json_reader_get_error (reader)));
+			*success = FALSE;
+			return TRUE;
+		}
+		json_reader_end_member (reader);	
+	}
+	g_free (name);
 	*success = TRUE;
 	return TRUE;
 }

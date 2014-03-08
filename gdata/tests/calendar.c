@@ -1679,13 +1679,13 @@ test_event_json_dates (void){
 		"\"id\": \"l24tc4o4m8iink4rh8pqu7ua8s\","
 		"\"status\": \"confirmed\","
 		"\"htmlLink\": \"https://www.google.com/calendar/event?eid=bDI0dGM0bzRtOGlpbms0cmg4cHF1N3VhOHNfMjAwMDAxMDFUMDAwMDAwWiB3aWxsLm15dUBt\","
-		//"\"created\": \"2013-08-29T13:05:58.000Z\","
+		"\"created\": \"2013-08-29T13:05:58.000Z\","
 		"\"updated\": \"2013-08-29T13:05:58.843Z\","
 		"\"summary\": \"Title\","
 		"\"description\": \"Description\","
 		"\"location\": \"Where\","
 		"\"colorId\": \"10\","
-		/*
+		
 		"\"creator\": {"
 			"\"email\": \"will.myu@gmail.com\","
 			"\"displayName\": \"Miao Yu\","
@@ -1696,7 +1696,6 @@ test_event_json_dates (void){
 			"\"displayName\": \"Miao Yu\","
 			"\"self\": true"
 		"},"
-		 * */
 		"\"start\": {"
 			"\"dateTime\": \"1999-12-31T19:00:00-05:00\","
 			"\"timeZone\": \"UTC\""
@@ -1763,7 +1762,7 @@ test_event_json_dates (void){
 			"\"width\": 25,"
 			"\"height\": 25,"
 			"\"display\": \"somedisplay\","
-			"\"preference\": {"
+			"\"preferences\": {"
 				"\"pkey1\": \"pvalue1\","
 				"\"pkey2\": \"pvalue2\","
 				"\"pkey3\": \"pvalue3\""
@@ -1782,11 +1781,20 @@ test_event_json_dates (void){
 			"\"useDefault\": false"
 		"}"
 		"}", -1, &error));
+	printf ("Finish parsing\n");
+	fflush (NULL);
 	g_assert_no_error (error);
+	printf ("No error\n");
+	fflush (NULL);
 	g_assert (GDATA_IS_ENTRY (event));
+	printf ("is event\n");
+	fflush (NULL);
 	g_clear_error (&error);
 	gchar *parsable = gdata_parsable_get_json (GDATA_PARSABLE(event));
-	printf("%s\n", parsable);
+	printf ("finish gdata_parsable_get_json\n");
+	fflush (NULL);
+	
+	printf("the result is %d\n%s\n", parsable==NULL, parsable);
 	fflush(NULL);
 	
 }
