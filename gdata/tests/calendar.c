@@ -1709,11 +1709,9 @@ test_event_json_dates (void){
 			"\"RRULE:FREQ=DAILY;INTERVAL=1\""
 		"],"
 		"\"recurringEventId\": \"9lu6qar2a61h8i58mg6l54g73c\","
-		/*
 		"\"originalStartTime\": {"
 			"\"dateTime\": \"2013-09-23T10:30:00-04:00\""
 		"},"
-		 * */
 		"\"iCalUID\": \"l24tc4o4m8iink4rh8pqu7ua8s@google.com\","
 		"\"sequence\": 0,"
 		"\"attendees\": ["
@@ -1822,7 +1820,9 @@ test_event_json_recurrence(void){
                 "\"self\": true"
                 "},"
                 "\"recurringEventId\":\"g5928e82rrch95b25f8ud0dlsg\","
-                "\"originalStartTime\":\"2009-04-29T16:30:00.000+01:00\","
+                "\"originalStartTime\": {"
+			"\"dateTime\": \"2013-09-23T10:30:00-04:00\""
+		"},"
                 "\"guestsCanModify\":false,"
                 "\"guestsCanInviteOthers\":false,"
                 "\"guestsCanSeeGuests\":false,"

@@ -169,6 +169,7 @@ struct _GDataCalendarEventPrivate {
 	gchar *organizer_email;
 	gchar *organizer_display_name;
 	gboolean is_organizer_self;
+	GDataGDWhen *original_start_time;
 };
 
 enum {
@@ -830,6 +831,7 @@ gdata_calendar_event_init (GDataCalendarEvent *self)
 	self->priv->extended_properties_private = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
 	self->priv->extended_properties_shared = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
 	self->priv->gadget_preferences = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+	self->priv->original_start_time = NULL;
 }
 
 static GObject *
@@ -1866,7 +1868,7 @@ gboolean
 gdata_calendar_event_is_exception (GDataCalendarEvent *self)
 {
 	g_return_val_if_fail (GDATA_IS_CALENDAR_EVENT (self), FALSE);
-	return (self->priv->original_event_id != NULL && self->priv->original_event_uri != NULL) ? TRUE : FALSE;
+	return (self->priv->original_event_id != NULL && self->priv->original_start_time != NULL) ? TRUE : FALSE;
 }
 
 /**
@@ -3221,7 +3223,6 @@ get_json_parent (GDataParsable *parsable, JsonBuilder *builder)
 static gboolean 
 parse_json (GDataParsable *parsable, JsonReader *reader, gpointer user_data, GError **error)
 {
-	printf("Now processing %s\n", json_reader_get_member_name (reader));
         gboolean success;
 	gchar *color_id;
 	gboolean guests_can_modify, guests_can_invite_others, guests_can_see_guests, anyone_can_add_self;
@@ -3239,7 +3240,6 @@ parse_json (GDataParsable *parsable, JsonReader *reader, gpointer user_data, GEr
             gdata_parser_string_from_json_member (reader, "iCalUID", P_DEFAULT, &(self->priv->uid), &success, error) == TRUE ||
             gdata_parser_string_from_json_member (reader, "description", P_DEFAULT, &(self->priv->description), &success, error) == TRUE ||
             gdata_parser_string_from_json_member (reader, "recurringEventId", P_DEFAULT, &(self->priv->original_event_id), &success, error) == TRUE ||
-            gdata_parser_string_from_json_member (reader, "originalStartTime", P_DEFAULT, &(self->priv->original_event_uri), &success, error) == TRUE ||
 	    gdata_parser_boolean_from_json_member (reader, "attendeesOmitted", P_DEFAULT, &(self->priv->is_attendees_omitted), &success, error) == TRUE ||
 	    gdata_parser_boolean_from_json_member (reader, "privateCopy", P_DEFAULT, &(self->priv->is_private_copy), &success, error) == TRUE ||
 	    gdata_parser_boolean_from_json_member (reader, "locked", P_DEFAULT, &(self->priv->is_locked), &success, error) == TRUE ||
@@ -3307,19 +3307,23 @@ parse_json_when (GDataParsable *parsable, JsonReader *reader, gboolean *success,
         GDataCalendarEvent *self = GDATA_CALENDAR_EVENT (parsable);
 
         GDataGDWhen *when;  
-        gchar *start_time, *end_time, *start_timezone, *end_timezone;
-        gint64 start_time_64, end_time_64;
+        gchar *start_time, *end_time, *start_timezone, *end_timezone, *original_time, *original_timezone;
+        gint64 start_time_64, end_time_64, original_time_64;
         gboolean is_date;
         gint iterator;
 
         start_time = NULL;
         end_time = NULL;
+	original_time = NULL;
         start_timezone = NULL;
         end_timezone = NULL;
+	original_timezone = NULL;
         is_date = FALSE;
 
 
-        if (g_strcmp0 (json_reader_get_member_name (reader), "start") != 0 && g_strcmp0 (json_reader_get_member_name (reader), "end") != 0) {
+        if (g_strcmp0 (json_reader_get_member_name (reader), "start") != 0 && 
+	    g_strcmp0 (json_reader_get_member_name (reader), "end") != 0 &&
+	    g_strcmp0 (json_reader_get_member_name (reader), "originalStartTime") != 0) {
                 return FALSE;
         } else if (g_strcmp0 (json_reader_get_member_name (reader), "start") == 0) { 
 		g_assert (json_reader_is_object (reader));
@@ -3376,7 +3380,7 @@ parse_json_when (GDataParsable *parsable, JsonReader *reader, gboolean *success,
 
 		*success = TRUE;
 		return TRUE;
-        } else {
+        } else if (g_strcmp0 (json_reader_get_member_name (reader), "end") == 0) {
 		g_assert (json_reader_is_object (reader));
 
 		for(iterator = 0; iterator != json_reader_count_members (reader); iterator++) {
@@ -3430,7 +3434,58 @@ parse_json_when (GDataParsable *parsable, JsonReader *reader, gboolean *success,
 
 		*success = TRUE;
 		return TRUE;
-        }
+        } else {
+		g_assert (json_reader_is_object (reader));
+
+		for (iterator = 0; iterator != json_reader_count_members (reader); iterator++) {
+			if (json_reader_read_element (reader, iterator) == FALSE) {
+				json_reader_end_element (reader);
+				*success = FALSE;
+				g_set_error (error, GDATA_SERVICE_ERROR, GDATA_SERVICE_ERROR_PROTOCOL_ERROR,
+					     /* Translators: the parameter is an error message. */
+					     _("Member %d in \"originalStartTime\" cannot be read\n"), iterator);
+				return TRUE;
+			} 
+
+			if (gdata_parser_string_from_json_member (reader, "date", P_DEFAULT, &original_time, success, error) == TRUE && 
+			    *success == TRUE && gdata_parser_int64_from_date (original_time, &original_time_64) == TRUE) {
+				is_date = TRUE;   
+				g_free (original_time);
+			} else if (gdata_parser_int64_time_from_json_member (reader, (gchar*)"dateTime", P_DEFAULT, &original_time_64, success, error) == TRUE && *success == TRUE) {
+				is_date = FALSE;
+			} else if (gdata_parser_string_from_json_member (reader, (gchar*)"timeZone", P_DEFAULT, &original_timezone, success, error) == TRUE && *success == TRUE) {
+				;
+			} else {
+				g_set_error (error, GDATA_SERVICE_ERROR, GDATA_SERVICE_ERROR_PROTOCOL_ERROR,
+					     /* Translators: the parameter is an error message. */
+					     _("Invalid JSON titled %s in \"originalStartTime\" was received from the server"), json_reader_get_member_name(reader));
+				*success = FALSE;
+				return TRUE;
+			}   
+			
+			if (json_reader_get_error (reader) != NULL) {
+				g_propagate_error (error, g_error_copy (json_reader_get_error (reader)));
+				*success = FALSE;
+				return TRUE;
+			}
+			json_reader_end_member (reader);            
+		}
+		
+		if (self->priv->original_start_time == NULL) {
+			self->priv->original_start_time = gdata_gd_when_new (original_time_64, -1, is_date);
+		} else {
+			gdata_gd_when_set_start_time (self->priv->original_start_time, original_time_64);
+			gdata_gd_when_set_is_date (self->priv->original_start_time, is_date);
+		}
+		
+		if (original_timezone != NULL) {
+			gdata_gd_when_set_start_timezone (self->priv->original_start_time, original_timezone);
+			g_free (original_timezone);
+		}
+
+		*success = TRUE;
+		return TRUE;
+	}
 }
 
 static gboolean 
